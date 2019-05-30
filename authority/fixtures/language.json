@@ -1,0 +1,3122 @@
+[
+{
+  "model": "authority.language",
+  "pk": 1,
+  "fields": {
+    "iso_639_1": "aa",
+    "iso_639_2": "aar",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Afar",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 2,
+  "fields": {
+    "iso_639_1": "ab",
+    "iso_639_2": "abk",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Abkhazian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 3,
+  "fields": {
+    "iso_639_1": "af",
+    "iso_639_2": "afr",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Afrikaans",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 4,
+  "fields": {
+    "iso_639_1": "ak",
+    "iso_639_2": "aka",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Akan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 5,
+  "fields": {
+    "iso_639_1": "sq",
+    "iso_639_2": "alb",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Albanian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 6,
+  "fields": {
+    "iso_639_1": "am",
+    "iso_639_2": "amh",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Amharic",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 7,
+  "fields": {
+    "iso_639_1": "ar",
+    "iso_639_2": "ara",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Arabic",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 8,
+  "fields": {
+    "iso_639_1": "an",
+    "iso_639_2": "arg",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Aragonese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 9,
+  "fields": {
+    "iso_639_1": "hy",
+    "iso_639_2": "arm",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Armenian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 10,
+  "fields": {
+    "iso_639_1": "as",
+    "iso_639_2": "asm",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Assamese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 11,
+  "fields": {
+    "iso_639_1": "av",
+    "iso_639_2": "ava",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Avaric",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 12,
+  "fields": {
+    "iso_639_1": "ae",
+    "iso_639_2": "ave",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Avestan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 13,
+  "fields": {
+    "iso_639_1": "ay",
+    "iso_639_2": "aym",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Aymara",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 14,
+  "fields": {
+    "iso_639_1": "az",
+    "iso_639_2": "aze",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Azerbaijani",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 15,
+  "fields": {
+    "iso_639_1": "ba",
+    "iso_639_2": "bak",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Bashkir",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 16,
+  "fields": {
+    "iso_639_1": "bm",
+    "iso_639_2": "bam",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Bambara",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 17,
+  "fields": {
+    "iso_639_1": "eu",
+    "iso_639_2": "baq",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Basque",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 18,
+  "fields": {
+    "iso_639_1": "be",
+    "iso_639_2": "bel",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Belarusian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 19,
+  "fields": {
+    "iso_639_1": "bn",
+    "iso_639_2": "ben",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Bengali",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 20,
+  "fields": {
+    "iso_639_1": "bh",
+    "iso_639_2": "bih",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Bihari languages",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 21,
+  "fields": {
+    "iso_639_1": "bi",
+    "iso_639_2": "bis",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Bislama",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 22,
+  "fields": {
+    "iso_639_1": "bs",
+    "iso_639_2": "bos",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Bosnian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 23,
+  "fields": {
+    "iso_639_1": "br",
+    "iso_639_2": "bre",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Breton",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 24,
+  "fields": {
+    "iso_639_1": "bg",
+    "iso_639_2": "bul",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Bulgarian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 25,
+  "fields": {
+    "iso_639_1": "my",
+    "iso_639_2": "bur",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Burmese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 26,
+  "fields": {
+    "iso_639_1": "ca",
+    "iso_639_2": "cat",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Catalan; Valencian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 27,
+  "fields": {
+    "iso_639_1": "ch",
+    "iso_639_2": "cha",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Chamorro",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 28,
+  "fields": {
+    "iso_639_1": "ce",
+    "iso_639_2": "che",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Chechen",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 29,
+  "fields": {
+    "iso_639_1": "zh",
+    "iso_639_2": "chi",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Chinese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 30,
+  "fields": {
+    "iso_639_1": "cu",
+    "iso_639_2": "chu",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Old Slavonic; Old Bulgarian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 31,
+  "fields": {
+    "iso_639_1": "cv",
+    "iso_639_2": "chv",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Chuvash",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 32,
+  "fields": {
+    "iso_639_1": "kw",
+    "iso_639_2": "cor",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Cornish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 33,
+  "fields": {
+    "iso_639_1": "co",
+    "iso_639_2": "cos",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Corsican",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 34,
+  "fields": {
+    "iso_639_1": "cr",
+    "iso_639_2": "cre",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Cree",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 35,
+  "fields": {
+    "iso_639_1": "cs",
+    "iso_639_2": "cze",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Czech",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 36,
+  "fields": {
+    "iso_639_1": "da",
+    "iso_639_2": "dan",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Danish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 37,
+  "fields": {
+    "iso_639_1": "dv",
+    "iso_639_2": "div",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Divehi; Dhivehi; Maldivian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 38,
+  "fields": {
+    "iso_639_1": "nl",
+    "iso_639_2": "dut",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Dutch; Flemish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 39,
+  "fields": {
+    "iso_639_1": "dz",
+    "iso_639_2": "dzo",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Dzongkha",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 40,
+  "fields": {
+    "iso_639_1": "en",
+    "iso_639_2": "eng",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "English",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 41,
+  "fields": {
+    "iso_639_1": "eo",
+    "iso_639_2": "epo",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Esperanto",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 42,
+  "fields": {
+    "iso_639_1": "et",
+    "iso_639_2": "est",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Estonian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 43,
+  "fields": {
+    "iso_639_1": "ee",
+    "iso_639_2": "ewe",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Ewe",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 44,
+  "fields": {
+    "iso_639_1": "fo",
+    "iso_639_2": "fao",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Faroese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 45,
+  "fields": {
+    "iso_639_1": "fj",
+    "iso_639_2": "fij",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Fijian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 46,
+  "fields": {
+    "iso_639_1": "fi",
+    "iso_639_2": "fin",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Finnish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 47,
+  "fields": {
+    "iso_639_1": "fr",
+    "iso_639_2": "fre",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "French",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 48,
+  "fields": {
+    "iso_639_1": "fy",
+    "iso_639_2": "fry",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Western Frisian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 49,
+  "fields": {
+    "iso_639_1": "ff",
+    "iso_639_2": "ful",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Fulah",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 50,
+  "fields": {
+    "iso_639_1": "ka",
+    "iso_639_2": "geo",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Georgian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 51,
+  "fields": {
+    "iso_639_1": "de",
+    "iso_639_2": "ger",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "German",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 52,
+  "fields": {
+    "iso_639_1": "gd",
+    "iso_639_2": "gla",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Gaelic; Scottish Gaelic",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 53,
+  "fields": {
+    "iso_639_1": "ga",
+    "iso_639_2": "gle",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Irish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 54,
+  "fields": {
+    "iso_639_1": "gl",
+    "iso_639_2": "glg",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Galician",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 55,
+  "fields": {
+    "iso_639_1": "gv",
+    "iso_639_2": "glv",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Manx",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 56,
+  "fields": {
+    "iso_639_1": "el",
+    "iso_639_2": "gre",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Greek, Modern (1453-)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 57,
+  "fields": {
+    "iso_639_1": "gn",
+    "iso_639_2": "grn",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Guarani",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 58,
+  "fields": {
+    "iso_639_1": "gu",
+    "iso_639_2": "guj",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Gujarati",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 59,
+  "fields": {
+    "iso_639_1": "ht",
+    "iso_639_2": "hat",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Haitian; Haitian Creole",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 60,
+  "fields": {
+    "iso_639_1": "ha",
+    "iso_639_2": "hau",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Hausa",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 61,
+  "fields": {
+    "iso_639_1": "he",
+    "iso_639_2": "heb",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Hebrew",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 62,
+  "fields": {
+    "iso_639_1": "hz",
+    "iso_639_2": "her",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Herero",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 63,
+  "fields": {
+    "iso_639_1": "hi",
+    "iso_639_2": "hin",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Hindi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 64,
+  "fields": {
+    "iso_639_1": "ho",
+    "iso_639_2": "hmo",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Hiri Motu",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 65,
+  "fields": {
+    "iso_639_1": "hr",
+    "iso_639_2": "hrv",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Croatian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 66,
+  "fields": {
+    "iso_639_1": "hu",
+    "iso_639_2": "hun",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Hungarian",
+    "user_created": "judit.hegedus",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "judit.hegedus",
+    "date_updated": "2018-06-22T11:07:03"
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 67,
+  "fields": {
+    "iso_639_1": "ig",
+    "iso_639_2": "ibo",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Igbo",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 68,
+  "fields": {
+    "iso_639_1": "is",
+    "iso_639_2": "ice",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Icelandic",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 69,
+  "fields": {
+    "iso_639_1": "io",
+    "iso_639_2": "ido",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Ido",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 70,
+  "fields": {
+    "iso_639_1": "ii",
+    "iso_639_2": "iii",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Sichuan Yi; Nuosu",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 71,
+  "fields": {
+    "iso_639_1": "iu",
+    "iso_639_2": "iku",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Inuktitut",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 72,
+  "fields": {
+    "iso_639_1": "ie",
+    "iso_639_2": "ile",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Interlingue; Occidental",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 73,
+  "fields": {
+    "iso_639_1": "ia",
+    "iso_639_2": "ina",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Interlingua (International Auxiliary Language Association)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 74,
+  "fields": {
+    "iso_639_1": "id",
+    "iso_639_2": "ind",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Indonesian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 75,
+  "fields": {
+    "iso_639_1": "ik",
+    "iso_639_2": "ipk",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Inupiaq",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 76,
+  "fields": {
+    "iso_639_1": "it",
+    "iso_639_2": "ita",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Italian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 77,
+  "fields": {
+    "iso_639_1": "jv",
+    "iso_639_2": "jav",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Javanese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 78,
+  "fields": {
+    "iso_639_1": "ja",
+    "iso_639_2": "jpn",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Japanese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 79,
+  "fields": {
+    "iso_639_1": "kl",
+    "iso_639_2": "kal",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kalaallisut; Greenlandic",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 80,
+  "fields": {
+    "iso_639_1": "kn",
+    "iso_639_2": "kan",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kannada",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 81,
+  "fields": {
+    "iso_639_1": "ks",
+    "iso_639_2": "kas",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kashmiri",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 82,
+  "fields": {
+    "iso_639_1": "kr",
+    "iso_639_2": "kau",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kanuri",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 83,
+  "fields": {
+    "iso_639_1": "kk",
+    "iso_639_2": "kaz",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kazakh",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 84,
+  "fields": {
+    "iso_639_1": "km",
+    "iso_639_2": "khm",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Central Khmer",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 85,
+  "fields": {
+    "iso_639_1": "ki",
+    "iso_639_2": "kik",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kikuyu; Gikuyu",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 86,
+  "fields": {
+    "iso_639_1": "rw",
+    "iso_639_2": "kin",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kinyarwanda",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 87,
+  "fields": {
+    "iso_639_1": "ky",
+    "iso_639_2": "kir",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kirghiz; Kyrgyz",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 88,
+  "fields": {
+    "iso_639_1": "kv",
+    "iso_639_2": "kom",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Komi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 89,
+  "fields": {
+    "iso_639_1": "kg",
+    "iso_639_2": "kon",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kongo",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 90,
+  "fields": {
+    "iso_639_1": "ko",
+    "iso_639_2": "kor",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Korean",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 91,
+  "fields": {
+    "iso_639_1": "kj",
+    "iso_639_2": "kua",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kuanyama; Kwanyama",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 92,
+  "fields": {
+    "iso_639_1": "ku",
+    "iso_639_2": "kur",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Kurdish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 93,
+  "fields": {
+    "iso_639_1": "lo",
+    "iso_639_2": "lao",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Lao",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 94,
+  "fields": {
+    "iso_639_1": "la",
+    "iso_639_2": "lat",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Latin",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 95,
+  "fields": {
+    "iso_639_1": "lv",
+    "iso_639_2": "lav",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Latvian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 96,
+  "fields": {
+    "iso_639_1": "li",
+    "iso_639_2": "lim",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Limburgan; Limburger; Limburgish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 97,
+  "fields": {
+    "iso_639_1": "ln",
+    "iso_639_2": "lin",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Lingala",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 98,
+  "fields": {
+    "iso_639_1": "lt",
+    "iso_639_2": "lit",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Lithuanian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 99,
+  "fields": {
+    "iso_639_1": "lb",
+    "iso_639_2": "ltz",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Luxembourgish; Letzeburgesch",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 100,
+  "fields": {
+    "iso_639_1": "lu",
+    "iso_639_2": "lub",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Luba-Katanga",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 101,
+  "fields": {
+    "iso_639_1": "lg",
+    "iso_639_2": "lug",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Ganda",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 102,
+  "fields": {
+    "iso_639_1": "mk",
+    "iso_639_2": "mac",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Macedonian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 103,
+  "fields": {
+    "iso_639_1": "mh",
+    "iso_639_2": "mah",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Marshallese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 104,
+  "fields": {
+    "iso_639_1": "ml",
+    "iso_639_2": "mal",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Malayalam",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 105,
+  "fields": {
+    "iso_639_1": "mi",
+    "iso_639_2": "mao",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Maori",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 106,
+  "fields": {
+    "iso_639_1": "mr",
+    "iso_639_2": "mar",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Marathi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 107,
+  "fields": {
+    "iso_639_1": "ms",
+    "iso_639_2": "may",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Malay",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 108,
+  "fields": {
+    "iso_639_1": "mg",
+    "iso_639_2": "mlg",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Malagasy",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 109,
+  "fields": {
+    "iso_639_1": "mt",
+    "iso_639_2": "mlt",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Maltese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 110,
+  "fields": {
+    "iso_639_1": "mn",
+    "iso_639_2": "mon",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Mongolian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 111,
+  "fields": {
+    "iso_639_1": "na",
+    "iso_639_2": "nau",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Nauru",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 112,
+  "fields": {
+    "iso_639_1": "nv",
+    "iso_639_2": "nav",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Navajo; Navaho",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 113,
+  "fields": {
+    "iso_639_1": "nr",
+    "iso_639_2": "nbl",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Ndebele, South; South Ndebele",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 114,
+  "fields": {
+    "iso_639_1": "nd",
+    "iso_639_2": "nde",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Ndebele, North; North Ndebele",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 115,
+  "fields": {
+    "iso_639_1": "ng",
+    "iso_639_2": "ndo",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Ndonga",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 116,
+  "fields": {
+    "iso_639_1": "ne",
+    "iso_639_2": "nep",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Nepali",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 117,
+  "fields": {
+    "iso_639_1": "nn",
+    "iso_639_2": "nno",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Norwegian Nynorsk; Nynorsk, Norwegian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 118,
+  "fields": {
+    "iso_639_1": "nb",
+    "iso_639_2": "nob",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Bokm\u221a\u2022l, Norwegian; Norwegian Bokm\u221a\u2022l",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 119,
+  "fields": {
+    "iso_639_1": "False",
+    "iso_639_2": "nor",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Norwegian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 120,
+  "fields": {
+    "iso_639_1": "ny",
+    "iso_639_2": "nya",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Chichewa; Chewa; Nyanja",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 121,
+  "fields": {
+    "iso_639_1": "oc",
+    "iso_639_2": "oci",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Occitan (post 1500); Proven\u221a\u00dfal",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 122,
+  "fields": {
+    "iso_639_1": "oj",
+    "iso_639_2": "oji",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Ojibwa",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 123,
+  "fields": {
+    "iso_639_1": "or",
+    "iso_639_2": "ori",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Oriya",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 124,
+  "fields": {
+    "iso_639_1": "om",
+    "iso_639_2": "orm",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Oromo",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 125,
+  "fields": {
+    "iso_639_1": "os",
+    "iso_639_2": "oss",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Ossetian; Ossetic",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 126,
+  "fields": {
+    "iso_639_1": "pa",
+    "iso_639_2": "pan",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Panjabi; Punjabi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 127,
+  "fields": {
+    "iso_639_1": "fa",
+    "iso_639_2": "per",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Persian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 128,
+  "fields": {
+    "iso_639_1": "pi",
+    "iso_639_2": "pli",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Pali",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 129,
+  "fields": {
+    "iso_639_1": "pl",
+    "iso_639_2": "pol",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Polish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 130,
+  "fields": {
+    "iso_639_1": "pt",
+    "iso_639_2": "por",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Portuguese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 131,
+  "fields": {
+    "iso_639_1": "ps",
+    "iso_639_2": "pus",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Pushto; Pashto",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 132,
+  "fields": {
+    "iso_639_1": "qu",
+    "iso_639_2": "que",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Quechua",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 133,
+  "fields": {
+    "iso_639_1": "rm",
+    "iso_639_2": "roh",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Romansh",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 134,
+  "fields": {
+    "iso_639_1": "ro",
+    "iso_639_2": "rum",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Romanian; Moldavian; Moldovan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 135,
+  "fields": {
+    "iso_639_1": "rn",
+    "iso_639_2": "run",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Rundi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 136,
+  "fields": {
+    "iso_639_1": "ru",
+    "iso_639_2": "rus",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Russian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 137,
+  "fields": {
+    "iso_639_1": "sg",
+    "iso_639_2": "sag",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Sango",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 138,
+  "fields": {
+    "iso_639_1": "sa",
+    "iso_639_2": "san",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Sanskrit",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 139,
+  "fields": {
+    "iso_639_1": "si",
+    "iso_639_2": "sin",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Sinhala; Sinhalese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 140,
+  "fields": {
+    "iso_639_1": "sk",
+    "iso_639_2": "slo",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Slovak",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 141,
+  "fields": {
+    "iso_639_1": "sl",
+    "iso_639_2": "slv",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Slovenian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 142,
+  "fields": {
+    "iso_639_1": "se",
+    "iso_639_2": "sme",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Northern Sami",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 143,
+  "fields": {
+    "iso_639_1": "sm",
+    "iso_639_2": "smo",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Samoan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 144,
+  "fields": {
+    "iso_639_1": "sn",
+    "iso_639_2": "sna",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Shona",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 145,
+  "fields": {
+    "iso_639_1": "sd",
+    "iso_639_2": "snd",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Sindhi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 146,
+  "fields": {
+    "iso_639_1": "so",
+    "iso_639_2": "som",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Somali",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 147,
+  "fields": {
+    "iso_639_1": "st",
+    "iso_639_2": "sot",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Sotho, Southern",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 148,
+  "fields": {
+    "iso_639_1": "es",
+    "iso_639_2": "spa",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Spanish; Castilian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 149,
+  "fields": {
+    "iso_639_1": "sc",
+    "iso_639_2": "srd",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Sardinian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 150,
+  "fields": {
+    "iso_639_1": "sr",
+    "iso_639_2": "srp",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Serbian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 151,
+  "fields": {
+    "iso_639_1": "ss",
+    "iso_639_2": "ssw",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Swati",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 152,
+  "fields": {
+    "iso_639_1": "su",
+    "iso_639_2": "sun",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Sundanese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 153,
+  "fields": {
+    "iso_639_1": "sw",
+    "iso_639_2": "swa",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Swahili",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 154,
+  "fields": {
+    "iso_639_1": "sv",
+    "iso_639_2": "swe",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Swedish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 155,
+  "fields": {
+    "iso_639_1": "ty",
+    "iso_639_2": "tah",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tahitian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 156,
+  "fields": {
+    "iso_639_1": "ta",
+    "iso_639_2": "tam",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tamil",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 157,
+  "fields": {
+    "iso_639_1": "tt",
+    "iso_639_2": "tat",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tatar",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 158,
+  "fields": {
+    "iso_639_1": "te",
+    "iso_639_2": "tel",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Telugu",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 159,
+  "fields": {
+    "iso_639_1": "tg",
+    "iso_639_2": "tgk",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tajik",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 160,
+  "fields": {
+    "iso_639_1": "tl",
+    "iso_639_2": "tgl",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tagalog",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 161,
+  "fields": {
+    "iso_639_1": "th",
+    "iso_639_2": "tha",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Thai",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 162,
+  "fields": {
+    "iso_639_1": "bo",
+    "iso_639_2": "bod",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tibetan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 163,
+  "fields": {
+    "iso_639_1": "ti",
+    "iso_639_2": "tir",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tigrinya",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 164,
+  "fields": {
+    "iso_639_1": "to",
+    "iso_639_2": "ton",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tonga (Tonga Islands)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 165,
+  "fields": {
+    "iso_639_1": "tn",
+    "iso_639_2": "tsn",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tswana",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 166,
+  "fields": {
+    "iso_639_1": "ts",
+    "iso_639_2": "tso",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Tsonga",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 167,
+  "fields": {
+    "iso_639_1": "tk",
+    "iso_639_2": "tuk",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Turkmen",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 168,
+  "fields": {
+    "iso_639_1": "tr",
+    "iso_639_2": "tur",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Turkish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 169,
+  "fields": {
+    "iso_639_1": "tw",
+    "iso_639_2": "twi",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Twi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 170,
+  "fields": {
+    "iso_639_1": "ug",
+    "iso_639_2": "uig",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Uighur; Uyghur",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 171,
+  "fields": {
+    "iso_639_1": "uk",
+    "iso_639_2": "ukr",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Ukrainian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 172,
+  "fields": {
+    "iso_639_1": "ur",
+    "iso_639_2": "urd",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Urdu",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 173,
+  "fields": {
+    "iso_639_1": "uz",
+    "iso_639_2": "uzb",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Uzbek",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 174,
+  "fields": {
+    "iso_639_1": "ve",
+    "iso_639_2": "ven",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Venda",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 175,
+  "fields": {
+    "iso_639_1": "vi",
+    "iso_639_2": "vie",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Vietnamese",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 176,
+  "fields": {
+    "iso_639_1": "vo",
+    "iso_639_2": "vol",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Volap\u221a\u00bak",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 177,
+  "fields": {
+    "iso_639_1": "cy",
+    "iso_639_2": "wel",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Welsh",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 178,
+  "fields": {
+    "iso_639_1": "wa",
+    "iso_639_2": "wln",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Walloon",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 179,
+  "fields": {
+    "iso_639_1": "wo",
+    "iso_639_2": "wol",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Wolof",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 180,
+  "fields": {
+    "iso_639_1": "xh",
+    "iso_639_2": "xho",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Xhosa",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 181,
+  "fields": {
+    "iso_639_1": "yi",
+    "iso_639_2": "yid",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Yiddish",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 182,
+  "fields": {
+    "iso_639_1": "yo",
+    "iso_639_2": "yor",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Yoruba",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 183,
+  "fields": {
+    "iso_639_1": "za",
+    "iso_639_2": "zha",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Zhuang; Chuang",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 184,
+  "fields": {
+    "iso_639_1": "zu",
+    "iso_639_2": "zul",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Zulu",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 185,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": "ach",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Acholi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 186,
+  "fields": {
+    "iso_639_1": "sh",
+    "iso_639_2": "hbs",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Serbo-Croatian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 187,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": "rom",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Romany",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 188,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": "luo",
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Dholuo",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 189,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": null,
+    "iso_639_3": "kri",
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Krio",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 190,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": "mni",
+    "iso_639_3": "mni",
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Manipuri",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 191,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": null,
+    "iso_639_3": "nbr",
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Numana-Nunku-Gbantu-Numbu",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 192,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": null,
+    "iso_639_3": "ksw",
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "S'gaw Karen",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 193,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": null,
+    "iso_639_3": "prs",
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Afghan Persian, Dari",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 194,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": null,
+    "iso_639_3": "pes",
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Western Persian",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.language",
+  "pk": 195,
+  "fields": {
+    "iso_639_1": null,
+    "iso_639_2": null,
+    "iso_639_3": null,
+    "wiki_url": null,
+    "authority_url": null,
+    "language": "Silent",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-08-07T08:34:00",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-08-07T08:34:00"
+  }
+}
+]
