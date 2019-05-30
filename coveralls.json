@@ -1,0 +1,6 @@
+{
+  "skip_files": [
+    "settings/wsgi.py",
+    "manage.py"
+  ]
+}
