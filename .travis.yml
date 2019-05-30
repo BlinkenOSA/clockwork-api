@@ -6,6 +6,9 @@ python:
 services:
   - mysql
 
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+
 install:
   - pip install -r requirements.txt
   - pip install coveralls
