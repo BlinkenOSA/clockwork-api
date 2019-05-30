@@ -1,4 +1,4 @@
 [report]
 omit =
     manage.py
-    clockwork_apy/wsgi.py
+    clockwork_api/wsgi.py
