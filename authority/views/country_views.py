@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.filters import SearchFilter
 
 from authority.models import Country
-from authority.serializers import CountrySerializer
+from authority.serializers import CountrySerializer, CountrySelectSerializer
 
 
 class CountryList(generics.ListCreateAPIView):
@@ -16,7 +16,7 @@ class CountryDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CountrySelectList(generics.ListAPIView):
-    serializer_class = CountrySerializer
+    serializer_class = CountrySelectSerializer
     pagination_class = None
     filter_backends = (SearchFilter,)
     search_fields = ('country',)
