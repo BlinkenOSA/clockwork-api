@@ -16,9 +16,30 @@ class VIAFTest(APITestCase):
         self.token = Token.objects.get(user__username='testuser')
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token.key)
 
-    def test_get_all_puppies(self):
+    def test_get_person(self):
         response = self.client.get(reverse('authority-v1:viaf-list'), {'query': 'Lenin'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         records = response.data
         has_result = len(list(filter(lambda r: r['viaf_id'] == "http://www.viaf.org/viaf/7393146", records))) == 1
+        self.assertTrue(has_result)
+
+    def test_get_corporation(self):
+        response = self.client.get(reverse('authority-v1:viaf-list'), {'query': 'Reuters', 'type': 'corporation'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        records = response.data
+        has_result = len(list(filter(lambda r: r['viaf_id'] == "http://www.viaf.org/viaf/132548028", records))) == 1
+        self.assertTrue(has_result)
+
+    def test_get_country(self):
+        response = self.client.get(reverse('authority-v1:viaf-list'), {'query': 'Hungary', 'type': 'country'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        records = response.data
+        has_result = len(list(filter(lambda r: r['viaf_id'] == "http://www.viaf.org/viaf/128544491", records))) == 1
+        self.assertTrue(has_result)
+
+    def test_get_place(self):
+        response = self.client.get(reverse('authority-v1:viaf-list'), {'query': 'Budapest', 'type': 'place'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        records = response.data
+        has_result = len(list(filter(lambda r: r['viaf_id'] == "http://www.viaf.org/viaf/154759119", records))) == 1
         self.assertTrue(has_result)
