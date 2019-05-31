@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 
 class VIAFMixin(object):
     def get_results_from_viaf(self, query, request_type):
-        if len(query) == 0 or len(request_type) == 0:
-            return {}
+        if len(query) == 0:
+            return []
         else:
             if request_type == 'person':
                 query = 'local.personalNames+all+"' + query + '"'
@@ -27,7 +27,7 @@ class VIAFMixin(object):
             if r.status_code == 200:
                 return self.assemble_data_stream(json.loads(r.text))
             else:
-                return {}
+                return []
 
 
     @staticmethod

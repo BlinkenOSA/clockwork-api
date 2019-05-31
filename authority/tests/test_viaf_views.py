@@ -16,6 +16,11 @@ class VIAFTest(APITestCase):
         self.token = Token.objects.get(user__username='testuser')
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token.key)
 
+    def test_get_empty_result(self):
+        response = self.client.get(reverse('authority-v1:viaf-list'), {'query': ''})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])
+
     def test_get_person(self):
         response = self.client.get(reverse('authority-v1:viaf-list'), {'query': 'Lenin'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
