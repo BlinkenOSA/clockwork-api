@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from authority.views.country_views import CountryList, CountryDetail, CountrySelectList
 from authority.views.language_views import LanguageList, LanguageDetail, LanguageSelectList
+from authority.views.viaf_views import VIAFList
 from authority.views.wikipedia_views import WikipediaList
 
 app_name = 'authority'
@@ -18,5 +19,6 @@ urlpatterns = [
     url(r'^select/languages/$', LanguageSelectList.as_view(), name='language-select-list'),
 
     # Authority services URLs
-    url(r'^wikipedia/$', WikipediaList.as_view(), name='wikipedia-list')
+    url(r'^wikipedia/$', WikipediaList.as_view(), name='wikipedia-list'),
+    url(r'^viaf/$', VIAFList.as_view(), name='viaf-list')
 ]
