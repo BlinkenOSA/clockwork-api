@@ -14,4 +14,4 @@ class PersonTest(TestCase):
 
     def test_name(self):
         person = Person.objects.get(wiki_url='https://en.wikipedia.org/wiki/Mikhail_Gorbachev')
-        self.assertEqual(person.name, "Gorbachev, Mikhail")
+        self.assertEqual(person.get_name(), "Gorbachev, Mikhail")
