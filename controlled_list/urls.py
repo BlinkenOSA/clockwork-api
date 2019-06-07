@@ -20,7 +20,7 @@ from controlled_list.views.reproduction_right_views import ReproductionRightList
 from controlled_list.views.rights_restriction_reason_views import RightsRestrictionReasonDetail, \
     RightsRestrictionReasonSelectList, RightsRestrictionReasonList
 
-app_name = 'authority'
+app_name = 'controlled_list'
 
 urlpatterns = [
     # Access Rights URLs
