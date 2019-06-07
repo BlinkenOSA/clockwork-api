@@ -1,0 +1,23 @@
+[
+{
+  "model": "controlled_list.reproductionright",
+  "pk": 1,
+  "fields": {
+    "statement": "Material in this collection is in the public domain."
+  }
+},
+{
+  "model": "controlled_list.reproductionright",
+  "pk": 2,
+  "fields": {
+    "statement": "Reproduction is allowed for non commercial purposes."
+  }
+},
+{
+  "model": "controlled_list.reproductionright",
+  "pk": 3,
+  "fields": {
+    "statement": "Third party rights are to be cleared."
+  }
+}
+]

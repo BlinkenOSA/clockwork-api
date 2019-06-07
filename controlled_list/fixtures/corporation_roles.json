@@ -1,0 +1,134 @@
+[
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 1,
+  "fields": {
+    "role": "Creator",
+    "user_created": "csaba.szilagyi",
+    "date_created": "2018-05-31T14:38:03",
+    "user_updated": "csaba.szilagyi",
+    "date_updated": "2018-05-31T14:38:03"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 2,
+  "fields": {
+    "role": "Producer",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-08-07T11:34:24",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-08-07T11:34:42"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 3,
+  "fields": {
+    "role": "Copyright holder",
+    "user_created": "",
+    "date_created": "2019-02-01T14:08:18",
+    "user_updated": "",
+    "date_updated": "2019-02-01T14:08:18"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 4,
+  "fields": {
+    "role": "Creator/Author",
+    "user_created": "",
+    "date_created": "2019-02-01T14:08:26",
+    "user_updated": "",
+    "date_updated": "2019-02-01T14:08:26"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 5,
+  "fields": {
+    "role": "Camera",
+    "user_created": "",
+    "date_created": "2019-02-01T14:14:22",
+    "user_updated": "",
+    "date_updated": "2019-02-01T14:14:22"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 6,
+  "fields": {
+    "role": "Interviewee",
+    "user_created": "",
+    "date_created": "2019-02-01T15:34:14",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:34:14"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 7,
+  "fields": {
+    "role": "Appears in",
+    "user_created": "",
+    "date_created": "2019-02-01T15:34:52",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:34:52"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 8,
+  "fields": {
+    "role": "Director",
+    "user_created": "",
+    "date_created": "2019-02-01T15:40:20",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:40:20"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 9,
+  "fields": {
+    "role": "Presenter",
+    "user_created": "",
+    "date_created": "2019-02-01T16:30:19",
+    "user_updated": "",
+    "date_updated": "2019-02-01T16:30:19"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 10,
+  "fields": {
+    "role": "Reporter",
+    "user_created": "",
+    "date_created": "2019-02-01T16:30:19",
+    "user_updated": "",
+    "date_updated": "2019-02-01T16:30:19"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 11,
+  "fields": {
+    "role": "Editor",
+    "user_created": "",
+    "date_created": "2019-02-01T16:31:45",
+    "user_updated": "",
+    "date_updated": "2019-02-01T16:31:45"
+  }
+},
+{
+  "model": "controlled_list.corporationrole",
+  "pk": 12,
+  "fields": {
+    "role": "Music",
+    "user_created": "",
+    "date_created": "2019-02-01T16:49:47",
+    "user_updated": "",
+    "date_updated": "2019-02-01T16:49:47"
+  }
+}
+]

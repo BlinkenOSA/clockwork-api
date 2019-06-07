@@ -1,0 +1,37 @@
+[
+{
+  "model": "controlled_list.languageusage",
+  "pk": 1,
+  "fields": {
+    "usage": "Original"
+  }
+},
+{
+  "model": "controlled_list.languageusage",
+  "pk": 2,
+  "fields": {
+    "usage": "Voice-over"
+  }
+},
+{
+  "model": "controlled_list.languageusage",
+  "pk": 3,
+  "fields": {
+    "usage": "Dubbing"
+  }
+},
+{
+  "model": "controlled_list.languageusage",
+  "pk": 4,
+  "fields": {
+    "usage": "Subtitles"
+  }
+},
+{
+  "model": "controlled_list.languageusage",
+  "pk": 5,
+  "fields": {
+    "usage": "Intertitles"
+  }
+}
+]

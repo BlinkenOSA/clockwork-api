@@ -1,0 +1,16 @@
+[
+{
+  "model": "controlled_list.datetype",
+  "pk": 1,
+  "fields": {
+    "type": "Date of production"
+  }
+},
+{
+  "model": "controlled_list.datetype",
+  "pk": 2,
+  "fields": {
+    "type": "Date of air"
+  }
+}
+]
