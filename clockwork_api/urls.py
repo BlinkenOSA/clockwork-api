@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^authority/v1/', include('authority.urls', namespace='authority-v1')),
+    url(r'^controlled_list/v1/', include('controlled_list.urls', namespace='controlled_list-v1')),
     path('admin/', admin.site.urls)
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\
