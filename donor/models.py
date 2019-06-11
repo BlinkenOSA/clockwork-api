@@ -40,7 +40,10 @@ class Donor(models.Model):
 
     def set_name(self):
         if self.first_name:
-            self.name = "%s %s %s" % (self.first_name, self.middle_name, self.last_name)
+            if self.middle_name:
+                self.name = "%s %s %s" % (self.first_name, self.middle_name, self.last_name)
+            else:
+                self.name = "%s %s" % (self.first_name, self.last_name)
         elif self.corporation_name:
             self.name = self.corporation_name
 
