@@ -9,6 +9,7 @@ INSTALLED_APPS = [
     'accounts',
     'authority',
     'controlled_list',
+    'donor',
 
     'rest_framework',
     'rest_framework.authtoken',
