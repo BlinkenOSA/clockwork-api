@@ -7,6 +7,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'accounts',
+    'archival_unit',
     'authority',
     'controlled_list',
     'donor',
