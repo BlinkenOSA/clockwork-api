@@ -24,10 +24,12 @@ class ArchivalUnitWriteSerializer(serializers.ModelSerializer):
     def validate_status(self, value):
         if value not in ['Final', 'Draft']:
             raise ValidationError("Status should be either: 'Final' or 'Draft'")
+        return value
 
     def validate_level(self, value):
         if value not in ['F', 'SF', 'S']:
             raise ValidationError("Level should be either: 'Fonds', 'Subfonds', 'Series'")
+        return value
 
     class Meta:
         model = ArchivalUnit

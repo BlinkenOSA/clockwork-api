@@ -12,7 +12,7 @@ class ArchivalUnitList(MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = ArchivalUnit.objects.all()
     method_serializer_classes = {
         ('GET', ): ArchivalUnitReadSerializer,
-        ('PUT', 'PATCH'): ArchivalUnitWriteSerializer
+        ('POST', ): ArchivalUnitWriteSerializer
     }
 
 
