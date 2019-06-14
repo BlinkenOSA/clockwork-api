@@ -1,5 +1,5 @@
 from django.test import TestCase
-from authority.models import Country, Language, Place, Person, PersonOtherFormat, Corporation, Genre, Subject
+from authority.models import Person
 
 
 class PersonTest(TestCase):

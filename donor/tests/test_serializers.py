@@ -4,7 +4,7 @@ from authority.models import Country
 from donor.serializers import DonorSerializer
 
 
-class DonorTest(TestCase):
+class DonorSerializerTest(TestCase):
     """ Test module for Donor Serializer """
     fixtures = ['country']
 
