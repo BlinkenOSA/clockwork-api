@@ -6,11 +6,12 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    url(r'^v1/accessions/', include('accession.urls', namespace='accession-v1')),
-    url(r'^v1/archival_units/', include('archival_unit.urls', namespace='archival_unit-v1')),
+    url(r'^v1/accession/', include('accession.urls', namespace='accession-v1')),
+    url(r'^v1/archival_unit/', include('archival_unit.urls', namespace='archival_unit-v1')),
     url(r'^v1/authority/', include('authority.urls', namespace='authority-v1')),
     url(r'^v1/controlled_list/', include('controlled_list.urls', namespace='controlled_list-v1')),
-    url(r'^v1/donors/', include('donor.urls', namespace='donor-v1')),
+    url(r'^v1/donor/', include('donor.urls', namespace='donor-v1')),
+    url(r'^v1/isaar/', include('isaar.urls', namespace='isaar-v1')),
     path('admin/', admin.site.urls)
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\
