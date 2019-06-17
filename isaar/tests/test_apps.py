@@ -1,9 +1,9 @@
 from django.apps import apps
 from django.test import TestCase
-from controlled_list.apps import ControlledListConfig
+from isaar.apps import IsaarConfig
 
 
-class ControlledListConfigTest(TestCase):
+class IsaarConfigTest(TestCase):
     def test_apps(self):
-        self.assertEqual(ControlledListConfig.name, 'controlled_list')
-        self.assertEqual(apps.get_app_config('controlled_list').name, 'controlled_list')
+        self.assertEqual(IsaarConfig.name, 'isaar')
+        self.assertEqual(apps.get_app_config('isaar').name, 'isaar')
