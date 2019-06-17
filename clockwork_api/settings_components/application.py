@@ -6,6 +6,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'accession',
     'accounts',
     'archival_unit',
     'authority',

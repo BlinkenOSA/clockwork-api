@@ -1,7 +1,4 @@
 from rest_framework import serializers
-
-
-# ArchivalUnit serializers
 from rest_framework.exceptions import ValidationError
 
 from archival_unit.models import ArchivalUnit

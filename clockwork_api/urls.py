@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
+    url(r'^v1/accessions/', include('accession.urls', namespace='accession-v1')),
     url(r'^v1/archival_units/', include('archival_unit.urls', namespace='archival_unit-v1')),
     url(r'^v1/authority/', include('authority.urls', namespace='authority-v1')),
     url(r'^v1/controlled_list/', include('controlled_list.urls', namespace='controlled_list-v1')),
