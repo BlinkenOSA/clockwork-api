@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from archival_unit.models import ArchivalUnit
 
@@ -26,6 +27,10 @@ class ArchivalUnitTest(TestCase):
             title='Audiovisual Recordings of Public Events',
             parent=self.subfonds
         )
+        self.user = User.objects.create_superuser(username='testuser',
+                                                  email='testuser@eqar.eu',
+                                                  password='testpassword')
+        self.user.save()
 
     def test_get_fonds(self):
         self.assertEqual(self.fonds.get_fonds().id, self.fonds.id)
