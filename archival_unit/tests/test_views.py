@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -46,3 +48,22 @@ class ArchivalUnitViewTest(APITestCase):
     def test_mixin_for_not_allowed_method(self):
         response = self.client.put(reverse('archival_unit-v1:archival_unit-list'))
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_create_for_user_created(self):
+        subfonds = {
+            'fonds': 206,
+            'subfonds': 3,
+            'level': 'SF',
+            'title': 'Public Events',
+            'parent': self.fonds.id
+        }
+        response = self.client.post(reverse('archival_unit-v1:archival_unit-list'), data=subfonds)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['user_created'], self.user.username)
+
+    def test_update_for_user_updated(self):
+        response = self.client.patch(reverse('archival_unit-v1:archival_unit-detail',
+                                             kwargs={'pk': self.fonds.pk}),
+                                     data={'title': 'Updated Title'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['user_updated'], self.user.username)

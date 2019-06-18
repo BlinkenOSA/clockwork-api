@@ -31,14 +31,14 @@ class ArchivalUnitWriteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if 'user' not in validated_data:
-            validated_data['user_created'] = self.context['request'].user
+            validated_data['user_created'] = self.context['request'].user.username
         return super(ArchivalUnitWriteSerializer, self).create(validated_data)
 
     def update(self, instance, validated_data):
         if 'user' not in validated_data:
-            validated_data['user_updated'] = self.context['request'].user
+            validated_data['user_updated'] = self.context['request'].user.username
             validated_data['date_updated'] = timezone.now()
-        return super(ArchivalUnitWriteSerializer, self).update(validated_data)
+        return super(ArchivalUnitWriteSerializer, self).update(instance, validated_data)
 
     class Meta:
         model = ArchivalUnit
