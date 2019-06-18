@@ -5,7 +5,10 @@ from drf_writable_nested import WritableNestedModelSerializer
 
 
 # Country serializers
-class CountrySerializer(serializers.ModelSerializer):
+from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
+
+
+class CountrySerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Country
         fields = '__all__'
@@ -18,7 +21,7 @@ class CountrySelectSerializer(serializers.ModelSerializer):
 
 
 # Language serializers
-class LanguageSerializer(serializers.ModelSerializer):
+class LanguageSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Language
         fields = '__all__'
@@ -31,7 +34,7 @@ class LanguageSelectSerializer(serializers.ModelSerializer):
 
 
 # Place serializers
-class PlaceSerializer(serializers.ModelSerializer):
+class PlaceSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Place
         fields = '__all__'
@@ -50,7 +53,7 @@ class PersonOtherFormatSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PersonSerializer(WritableNestedModelSerializer):
+class PersonSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     person_other_formats = PersonOtherFormatSerializer(many=True, source='personotherformat_set')
 
     class Meta:
@@ -73,7 +76,7 @@ class CorporationOtherFormatSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CorporationSerializer(WritableNestedModelSerializer):
+class CorporationSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     corporation_other_formats = PersonOtherFormatSerializer(many=True, source='corporationotherformat_set')
 
     class Meta:
@@ -88,7 +91,7 @@ class CorporationSelectSerializer(serializers.ModelSerializer):
 
 
 # Genre serializers
-class GenreSerializer(serializers.ModelSerializer):
+class GenreSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = '__all__'
@@ -101,7 +104,7 @@ class GenreSelectSerializer(serializers.ModelSerializer):
 
 
 # Subject serializers
-class SubjectSerializer(serializers.ModelSerializer):
+class SubjectSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Subject
         fields = '__all__'

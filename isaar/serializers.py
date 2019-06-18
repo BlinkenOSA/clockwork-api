@@ -2,6 +2,7 @@ from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
 from authority.serializers import LanguageSelectSerializer
+from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from isaar.models import Isaar, IsaarParallelName, IsaarOtherName, IsaarStandardizedName, IsaarCorporateBodyIdentifier, \
     IsaarPlace, IsaarPlaceQualifier
 
@@ -63,7 +64,7 @@ class IsaarReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class IsaarWriteSerializer(WritableNestedModelSerializer):
+class IsaarWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     parallel_names = IsaarParallelNameSerializer(many=True, source='isaarparallelname_set')
     other_names = IsaarOtherNameSerializer(many=True, source='isaarothername_set')
     standardized_names = IsaarStandardizedNameSerializer(many=True, source='isaarstandardizedname_set')

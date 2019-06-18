@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from controlled_list.models import AccessRight, ArchivalUnitTheme, Building, CarrierType, CorporationRole, DateType, \
     ExtentUnit, GeoRole, Keyword, LanguageUsage, Locale, PersonRole, PrimaryType, ReproductionRight, \
     RightsRestrictionReason
@@ -57,7 +59,7 @@ class CarrierTypeSelectSerializer(serializers.ModelSerializer):
 
 
 # CorporationRole serializers
-class CorporationRoleSerializer(serializers.ModelSerializer):
+class CorporationRoleSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = CorporationRole
         fields = '__all__'
@@ -96,7 +98,7 @@ class ExtentUnitSelectSerializer(serializers.ModelSerializer):
 
 
 # GeoRole serializers
-class GeoRoleSerializer(serializers.ModelSerializer):
+class GeoRoleSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = GeoRole
         fields = '__all__'
@@ -109,7 +111,7 @@ class GeoRoleSelectSerializer(serializers.ModelSerializer):
 
 
 # Keyword serializers
-class KeywordSerializer(serializers.ModelSerializer):
+class KeywordSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Keyword
         fields = '__all__'
@@ -148,7 +150,7 @@ class LocaleSelectSerializer(serializers.ModelSerializer):
 
 
 # PersonRole serializers
-class PersonRoleSerializer(serializers.ModelSerializer):
+class PersonRoleSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = PersonRole
         fields = '__all__'
@@ -183,7 +185,7 @@ class ReproductionRightSerializer(serializers.ModelSerializer):
 class ReproductionRightSelectSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReproductionRight
-        fields = ('id', 'right')
+        fields = ('id', 'statement')
 
 
 # RightsRestrictionReason serializers

@@ -1,8 +1,8 @@
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from archival_unit.models import ArchivalUnit
+from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from controlled_list.serializers import ArchivalUnitThemeSerializer, LocaleSerializer
 
 
@@ -15,7 +15,7 @@ class ArchivalUnitReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ArchivalUnitWriteSerializer(serializers.ModelSerializer):
+class ArchivalUnitWriteSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     reference_code = serializers.CharField(required=False)
     reference_code_id = serializers.CharField(required=False)
 
@@ -28,17 +28,6 @@ class ArchivalUnitWriteSerializer(serializers.ModelSerializer):
         if value not in ['F', 'SF', 'S']:
             raise ValidationError("Level should be either: 'Fonds', 'Subfonds', 'Series'")
         return value
-
-    def create(self, validated_data):
-        if 'user' not in validated_data:
-            validated_data['user_created'] = self.context['request'].user.username
-        return super(ArchivalUnitWriteSerializer, self).create(validated_data)
-
-    def update(self, instance, validated_data):
-        if 'user' not in validated_data:
-            validated_data['user_updated'] = self.context['request'].user.username
-            validated_data['date_updated'] = timezone.now()
-        return super(ArchivalUnitWriteSerializer, self).update(instance, validated_data)
 
     class Meta:
         model = ArchivalUnit

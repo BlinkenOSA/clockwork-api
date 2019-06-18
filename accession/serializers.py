@@ -2,6 +2,7 @@ from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 from accession.models import Accession, AccessionItem, AccessionMethod, AccessionCopyrightStatus
 from archival_unit.serializers import ArchivalUnitSelectSerializer
+from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from controlled_list.serializers import BuildingSelectSerializer
 from donor.serializers import DonorSelectSerializer
 
@@ -37,7 +38,7 @@ class AccessionReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AccessionWriteSerializer(WritableNestedModelSerializer):
+class AccessionWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     items = AccessionItemSerializer(many=True, source='accessionitem_set')
 
     class Meta:

@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
+from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from donor.models import Donor
 
 
-class DonorSerializer(serializers.ModelSerializer):
+class DonorSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     def validate(self, data):
         first_name = data.get('first_name', None)
         corporation_name = data.get('corporation_name', None)
