@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^v1/controlled_list/', include('controlled_list.urls', namespace='controlled_list-v1')),
     url(r'^v1/donor/', include('donor.urls', namespace='donor-v1')),
     url(r'^v1/isaar/', include('isaar.urls', namespace='isaar-v1')),
+    url(r'^v1/isad/', include('isad.urls', namespace='isad-v1')),
     path('admin/', admin.site.urls)
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\
