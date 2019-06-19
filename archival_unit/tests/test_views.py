@@ -66,4 +66,5 @@ class ArchivalUnitViewTest(APITestCase):
                                              kwargs={'pk': self.fonds.pk}),
                                      data={'title': 'Updated Title'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], 'Updated Title')
         self.assertEqual(response.data['user_updated'], self.user.username)
