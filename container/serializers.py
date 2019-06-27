@@ -30,14 +30,15 @@ class ContainerSelectSerializer(serializers.ModelSerializer):
         return "%s/%s" % (obj.archival_unit.reference_code, obj.container_no)
 
     def get_digital_version_duration(self, obj):
-        tech_md = json.loads(obj.digital_version_technical_metadata)
-        for stream in tech_md['streams']:
-            if stream.get('codec_type') == 'video':
-                seconds = float(stream.get('duration'))
-                total_seconds = datetime.timedelta(seconds=seconds).total_seconds()
-                hours, remainder = divmod(total_seconds, 60 * 60)
-                minutes, seconds = divmod(remainder, 60)
-                return "%02d:%02d:%02d" % (hours, minutes, seconds)
+        if obj.digital_version_technical_metadata:
+            tech_md = json.loads(obj.digital_version_technical_metadata)
+            for stream in tech_md['streams']:
+                if stream.get('codec_type') == 'video':
+                    seconds = float(stream.get('duration'))
+                    total_seconds = datetime.timedelta(seconds=seconds).total_seconds()
+                    hours, remainder = divmod(total_seconds, 60 * 60)
+                    minutes, seconds = divmod(remainder, 60)
+                    return "%02d:%02d:%02d" % (hours, minutes, seconds)
 
     class Meta:
         model = Container
