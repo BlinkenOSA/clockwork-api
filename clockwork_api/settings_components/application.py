@@ -10,6 +10,7 @@ INSTALLED_APPS = [
     'accounts',
     'archival_unit',
     'authority',
+    'container',
     'controlled_list',
     'donor',
     'isaar',
