@@ -13,6 +13,7 @@ INSTALLED_APPS = [
     'container',
     'controlled_list',
     'donor',
+    'finding_aids',
     'isaar',
     'isad',
 
