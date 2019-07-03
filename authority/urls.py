@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from authority.views.corporation_views import CorporationList, CorporationDetail, CorporationSelectList
 from authority.views.country_views import CountryList, CountryDetail, CountrySelectList
@@ -15,42 +15,42 @@ app_name = 'authority'
 
 urlpatterns = [
     # Country URLs
-    url(r'^countries/$', CountryList.as_view(), name='country-list'),
-    url(r'^countries/(?P<pk>[0-9]+)/$', CountryDetail.as_view(), name='country-detail'),
-    url(r'^select/countries/$', CountrySelectList.as_view(), name='country-select-list'),
+    path('countries/', CountryList.as_view(), name='country-list'),
+    path('countries/<int:pk>/', CountryDetail.as_view(), name='country-detail'),
+    path('select/countries/', CountrySelectList.as_view(), name='country-select-list'),
 
     # Language URLs
-    url(r'^languages/$', LanguageList.as_view(), name='language-list'),
-    url(r'^languages/(?P<pk>[0-9]+)/$', LanguageDetail.as_view(), name='language-detail'),
-    url(r'^select/languages/$', LanguageSelectList.as_view(), name='language-select-list'),
+    path('languages/', LanguageList.as_view(), name='language-list'),
+    path('languages/<int:pk>/', LanguageDetail.as_view(), name='language-detail'),
+    path('select/languages/', LanguageSelectList.as_view(), name='language-select-list'),
 
     # Place URLs
-    url(r'^places/$', PlaceList.as_view(), name='place-list'),
-    url(r'^places/(?P<pk>[0-9]+)/$', PlaceDetail.as_view(), name='place-detail'),
-    url(r'^select/places/$', PlaceSelectList.as_view(), name='place-select-list'),
+    path('places/', PlaceList.as_view(), name='place-list'),
+    path('places/<int:pk>/', PlaceDetail.as_view(), name='place-detail'),
+    path('select/places/', PlaceSelectList.as_view(), name='place-select-list'),
 
     # Person URLs
-    url(r'^people/$', PersonList.as_view(), name='person-list'),
-    url(r'^people/(?P<pk>[0-9]+)/$', PersonDetail.as_view(), name='person-detail'),
-    url(r'^select/people/$', PersonSelectList.as_view(), name='person-select-list'),
+    path('people/', PersonList.as_view(), name='person-list'),
+    path('people/<int:pk>/', PersonDetail.as_view(), name='person-detail'),
+    path('select/people/', PersonSelectList.as_view(), name='person-select-list'),
 
     # Corporation URLs
-    url(r'^corporations/$', CorporationList.as_view(), name='corporation-list'),
-    url(r'^corporations/(?P<pk>[0-9]+)/$', CorporationDetail.as_view(), name='corporation-detail'),
-    url(r'^select/corporations/$', CorporationSelectList.as_view(), name='corporation-select-list'),
+    path('corporations/', CorporationList.as_view(), name='corporation-list'),
+    path('corporations/<int:pk>/', CorporationDetail.as_view(), name='corporation-detail'),
+    path('select/corporations/', CorporationSelectList.as_view(), name='corporation-select-list'),
 
     # Genre URLs
-    url(r'^genres/$', GenreList.as_view(), name='genre-list'),
-    url(r'^genres/(?P<pk>[0-9]+)/$', GenreDetail.as_view(), name='genre-detail'),
-    url(r'^select/genres/$', GenreSelectList.as_view(), name='genre-select-list'),
+    path('genres/', GenreList.as_view(), name='genre-list'),
+    path('genres/<int:pk>/', GenreDetail.as_view(), name='genre-detail'),
+    path('select/genres/', GenreSelectList.as_view(), name='genre-select-list'),
 
     # Subject URLs
-    url(r'^subjects/$', SubjectList.as_view(), name='subject-list'),
-    url(r'^subjects/(?P<pk>[0-9]+)/$', SubjectDetail.as_view(), name='subject-detail'),
-    url(r'^select/subjects/$', SubjectSelectList.as_view(), name='subject-select-list'),
+    path('subjects/', SubjectList.as_view(), name='subject-list'),
+    path('subjects/<int:pk>/', SubjectDetail.as_view(), name='subject-detail'),
+    path('select/subjects/', SubjectSelectList.as_view(), name='subject-select-list'),
 
     # Authority services URLs
-    url(r'^wikipedia/$', WikipediaList.as_view(), name='wikipedia-list'),
-    url(r'^viaf/$', VIAFList.as_view(), name='viaf-list'),
-    url(r'^lcsh/$', LCSHList.as_view(), name='lcsh-list')
+    path('wikipedia/', WikipediaList.as_view(), name='wikipedia-list'),
+    path('viaf/', VIAFList.as_view(), name='viaf-list'),
+    path('lcsh/', LCSHList.as_view(), name='lcsh-list')
 ]
