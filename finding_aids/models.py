@@ -150,7 +150,6 @@ class FindingAidsEntity(CloneableMixin, models.Model):
         super(FindingAidsEntity, self).save()
 
 
-
 class FindingAidsEntityAlternativeTitle(models.Model):
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
