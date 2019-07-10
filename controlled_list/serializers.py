@@ -133,7 +133,7 @@ class LanguageUsageSerializer(serializers.ModelSerializer):
 class LanguageUsageSelectSerializer(serializers.ModelSerializer):
     class Meta:
         model = LanguageUsage
-        fields = ('id', 'keyword')
+        fields = ('id', 'usage')
 
 
 # Locale serializers
