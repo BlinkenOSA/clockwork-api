@@ -34,7 +34,7 @@ class IsaarCorporateBodyIdentifierSerizlier(serializers.ModelSerializer):
 class IsaarPlaceQualifierSerializer(serializers.ModelSerializer):
     class Meta:
         model = IsaarPlaceQualifier
-        exclude = ('isaar',)
+        fields = '__all__'
 
 
 class IsaarPlaceReadSerializer(serializers.ModelSerializer):
