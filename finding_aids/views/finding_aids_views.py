@@ -1,6 +1,8 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from container.models import Container
@@ -12,10 +14,9 @@ from finding_aids.serializers import FindingAidsSelectSerializer, \
 class FindingAidsCreate(generics.CreateAPIView):
     serializer_class = FindingAidsEntityWriteSerializer
 
-    def get_serializer_context(self):
-        context = super(FindingAidsCreate, self).get_serializer_context
-        context['container'] = get_object_or_404(Container, pk=self.kwargs.get('container_id', None))
-        return context
+    def perform_create(self, serializer):
+        container = get_object_or_404(Container, pk=self.kwargs.get('container_id', None))
+        serializer.save(container=container, archival_unit=container.archival_unit)
 
 
 class FindingAidsDetail(MethodSerializerMixin, generics.RetrieveUpdateAPIView):
@@ -24,6 +25,20 @@ class FindingAidsDetail(MethodSerializerMixin, generics.RetrieveUpdateAPIView):
         ('GET', ): FindingAidsEntityReadSerializer,
         ('PUT', 'PATCH', 'DELETE'): FindingAidsEntityWriteSerializer
     }
+
+
+class FindingAidsPublish(APIView):
+    def put(self, request, *args, **kwargs):
+        action = self.kwargs.get('action', None)
+        fa_id = self.kwargs.get('pk', None)
+        finding_aids = get_object_or_404(FindingAidsEntity, pk=fa_id)
+
+        if action == 'publish':
+            finding_aids.publish(request.user)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            finding_aids.unpublish()
+            return Response(status=status.HTTP_200_OK)
 
 
 class FindingAidsSelectList(generics.ListAPIView):

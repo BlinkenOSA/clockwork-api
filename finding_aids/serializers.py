@@ -1,8 +1,10 @@
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
+from archival_unit.models import ArchivalUnit
 from authority.serializers import LanguageSelectSerializer
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
+from container.models import Container
 from controlled_list.serializers import DateTypeSelectSerializer, CorporationRoleSelectSerializer, \
     PersonRoleSelectSerializer, GeoRoleSelectSerializer, LanguageUsageSelectSerializer, ExtentUnitSelectSerializer
 from finding_aids.models import FindingAidsEntity, FindingAidsEntityAlternativeTitle, FindingAidsEntityDate, \
@@ -161,29 +163,31 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
 
 
 class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
+    container = serializers.PrimaryKeyRelatedField(queryset=Container.objects.all(), required=False)
+    archival_unit = serializers.PrimaryKeyRelatedField(queryset=ArchivalUnit.objects.all(), required=False)
     places_of_creation = FindingAidsEntityPlaceOfCreationSerializer(
-        many=True, source='findingaidsentityplaceofcreation_set')
-    creators = FindingAidsEntityCreatorSerializer(many=True, source='findingaidsentitycreator_set')
-    dates = FindingAidsEntityDateWriteSerializer(many=True, source='findingaidsentitydate_set')
+        many=True, source='findingaidsentityplaceofcreation_set', required=False)
+    creators = FindingAidsEntityCreatorSerializer(many=True, source='findingaidsentitycreator_set', required=False)
+    dates = FindingAidsEntityDateWriteSerializer(many=True, source='findingaidsentitydate_set', required=False)
     alternative_titles = FindingAidsEntityAlternativeTitleSerializer(
-        many=True, source='findingaidsentityalternativetitle_set')
-    subjects = FindingAidsEntitySubjectSerializer(many=True, source='findingaidsentitysubject_set')
+        many=True, source='findingaidsentityalternativetitle_set', required=False)
+    subjects = FindingAidsEntitySubjectSerializer(many=True, source='findingaidsentitysubject_set', required=False)
     associated_people = FindingAidsEntityAssociatedPersonWriteSerializer(
-        many=True, source='findingaidsentityassociatedperson_set')
+        many=True, source='findingaidsentityassociatedperson_set', required=False)
     associated_corporations = FindingAidsEntityAssociatedCorporationWriteSerializer(
-        many=True, source='findingaidsentityassociatedperson_set')
+        many=True, source='findingaidsentityassociatedperson_set', required=False)
     associated_places = FindingAidsEntityAssociatedPlaceWriteSerializer(
-        many=True, source='findingaidsentityassociatedplace_set'
+        many=True, source='findingaidsentityassociatedplace_set', required=False
     )
     associated_countries = FindingAidsEntityAssociatedCountryWriteSerializer(
-        many=True, source='findingaidsentityassociatedcountry_set'
+        many=True, source='findingaidsentityassociatedcountry_set', required=False
     )
-    languges = FindingAidsEntityLanguageWriteSerializer(many=True, source='findingaidsentitylanguage_set')
-    extents = FindingAidsEntityExtentWriteSerializer(many=True, source='findingaidsentityextent_set')
+    languges = FindingAidsEntityLanguageWriteSerializer(many=True, source='findingaidsentitylanguage_set', required=False)
+    extents = FindingAidsEntityExtentWriteSerializer(many=True, source='findingaidsentityextent_set', required=False)
 
     class Meta:
         model = FindingAidsEntity
-        exclude = '__all__'
+        fields = '__all__'
 
 
 class FindingAidsSelectSerializer(serializers.ModelSerializer):
