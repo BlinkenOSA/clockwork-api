@@ -14,6 +14,6 @@ urlpatterns = [
     # Select URLs
     path('select/accession_copyright_status/', AccessionCopyrightStatusSelectList.as_view(),
          name='accession_copyright_status-select-list'),
-    path('select/accession_methods/', AccessionMethodSelectList.as_view(),
+    path('select/accession_method/', AccessionMethodSelectList.as_view(),
          name='accession_method-select-list'),
 ]
