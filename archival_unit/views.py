@@ -29,5 +29,5 @@ class ArchivalUnitSelectList(generics.ListAPIView):
     pagination_class = None
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filterset_fields = ('fonds', 'subfonds', 'series', 'level')
-    search_fields = ('title',)
+    search_fields = ['title', 'reference_code']
     queryset = ArchivalUnit.objects.all().order_by('fonds', 'subfonds', 'series')
