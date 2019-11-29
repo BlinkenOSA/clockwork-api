@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.filters import SearchFilter
 
 from donor.models import Donor
-from donor.serializers import DonorSerializer
+from donor.serializers import DonorSerializer, DonorSelectSerializer
 
 
 class DonorList(generics.ListCreateAPIView):
@@ -16,8 +16,8 @@ class DonorDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class DonorSelectList(generics.ListAPIView):
-    serializer_class = Donor
+    serializer_class = DonorSelectSerializer
     pagination_class = None
     filter_backends = (SearchFilter,)
-    search_fields = ('name',)
+    search_fields = ['name']
     queryset = Donor.objects.all().order_by('name')
