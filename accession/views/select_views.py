@@ -5,10 +5,12 @@ from accession.serializers import AccessionMethodSelectSerializer, AccessionCopy
 
 
 class AccessionMethodSelectList(generics.ListAPIView):
+    pagination_class = None
     serializer_class = AccessionMethodSelectSerializer
     queryset = AccessionMethod.objects.all().order_by('method')
 
 
 class AccessionCopyrightStatusSelectList(generics.ListAPIView):
+    pagination_class = None
     serializer_class = AccessionCopyrightStatusSelectSerializer
     queryset = AccessionCopyrightStatus.objects.all().order_by('status')
