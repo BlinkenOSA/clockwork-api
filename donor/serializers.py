@@ -1,10 +1,13 @@
 from rest_framework import serializers
 
+from authority.serializers import CountrySelectSerializer
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from donor.models import Donor
 
 
 class DonorSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
+    country = CountrySelectSerializer()
+
     def validate(self, data):
         first_name = data.get('first_name', None)
         corporation_name = data.get('corporation_name', None)
