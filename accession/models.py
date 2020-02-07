@@ -4,6 +4,8 @@ import uuid as uuid
 from django.db import models
 from django_date_extensions.fields import ApproximateDateField
 
+from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
+
 
 class Accession(models.Model):
     id = models.AutoField(primary_key=True)
