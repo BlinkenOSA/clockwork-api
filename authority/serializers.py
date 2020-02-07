@@ -77,7 +77,7 @@ class CorporationOtherFormatSerializer(serializers.ModelSerializer):
 
 
 class CorporationSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
-    corporation_other_formats = PersonOtherFormatSerializer(many=True, source='corporationotherformat_set')
+    corporation_other_formats = CorporationOtherFormatSerializer(many=True, source='corporationotherformat_set')
 
     class Meta:
         model = Corporation
