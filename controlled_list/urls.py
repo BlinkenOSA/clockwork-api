@@ -35,9 +35,9 @@ urlpatterns = [
     path('select/archival_unit_themes/', ArchivalUnitThemeSelectList.as_view(), name='archival_unit_themes-select-list'),
 
     # Building URLs
-    path('building/', BuildingList.as_view(), name='building-list'),
-    path('building/<int:pk>/', BuildingDetail.as_view(), name='building-detail'),
-    path('select/building/', BuildingSelectList.as_view(), name='building-select-list'),
+    path('buildings/', BuildingList.as_view(), name='building-list'),
+    path('buildings/<int:pk>/', BuildingDetail.as_view(), name='building-detail'),
+    path('select/buildings/', BuildingSelectList.as_view(), name='building-select-list'),
 
     # Carrier Type URLs
     path('carrier_types/', CarrierTypeList.as_view(), name='carrier_type-list'),

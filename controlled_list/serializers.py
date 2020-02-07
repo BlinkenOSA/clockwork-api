@@ -10,7 +10,7 @@ from controlled_list.models import AccessRight, ArchivalUnitTheme, Building, Car
 class AccessRightSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccessRight
-        fields = '__all__'
+        fields = ('id', 'statement', 'is_removable')
 
 
 class AccessRightSelectSerializer(serializers.ModelSerializer):
@@ -23,7 +23,7 @@ class AccessRightSelectSerializer(serializers.ModelSerializer):
 class ArchivalUnitThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArchivalUnitTheme
-        fields = '__all__'
+        fields = ('id', 'theme', 'is_removable')
 
 
 class ArchivalUnitThemeSelectSerializer(serializers.ModelSerializer):
@@ -36,7 +36,7 @@ class ArchivalUnitThemeSelectSerializer(serializers.ModelSerializer):
 class BuildingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Building
-        fields = '__all__'
+        fields = ('id', 'building', 'is_removable')
 
 
 class BuildingSelectSerializer(serializers.ModelSerializer):
@@ -49,7 +49,7 @@ class BuildingSelectSerializer(serializers.ModelSerializer):
 class CarrierTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarrierType
-        fields = '__all__'
+        fields = ('id', 'type', 'is_removable')
 
 
 class CarrierTypeSelectSerializer(serializers.ModelSerializer):
@@ -62,7 +62,7 @@ class CarrierTypeSelectSerializer(serializers.ModelSerializer):
 class CorporationRoleSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = CorporationRole
-        fields = '__all__'
+        fields = ('id', 'role', 'is_removable')
 
 
 class CorporationRoleSelectSerializer(serializers.ModelSerializer):
@@ -75,7 +75,7 @@ class CorporationRoleSelectSerializer(serializers.ModelSerializer):
 class DateTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DateType
-        fields = '__all__'
+        fields = ('id', 'type', 'is_removable')
 
 
 class DateTypeSelectSerializer(serializers.ModelSerializer):
@@ -88,7 +88,7 @@ class DateTypeSelectSerializer(serializers.ModelSerializer):
 class ExtentUnitSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExtentUnit
-        fields = '__all__'
+        fields = ('id', 'unit', 'is_removable')
 
 
 class ExtentUnitSelectSerializer(serializers.ModelSerializer):
@@ -101,7 +101,7 @@ class ExtentUnitSelectSerializer(serializers.ModelSerializer):
 class GeoRoleSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = GeoRole
-        fields = '__all__'
+        fields = ('id', 'role', 'is_removable')
 
 
 class GeoRoleSelectSerializer(serializers.ModelSerializer):
@@ -114,7 +114,7 @@ class GeoRoleSelectSerializer(serializers.ModelSerializer):
 class KeywordSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Keyword
-        fields = '__all__'
+        fields = ('id', 'keyword', 'is_removable')
 
 
 class KeywordSelectSerializer(serializers.ModelSerializer):
@@ -127,7 +127,7 @@ class KeywordSelectSerializer(serializers.ModelSerializer):
 class LanguageUsageSerializer(serializers.ModelSerializer):
     class Meta:
         model = LanguageUsage
-        fields = '__all__'
+        fields = ('id', 'usage', 'is_removable')
 
 
 class LanguageUsageSelectSerializer(serializers.ModelSerializer):
@@ -140,7 +140,7 @@ class LanguageUsageSelectSerializer(serializers.ModelSerializer):
 class LocaleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Locale
-        fields = '__all__'
+        fields = ('id', 'locale', 'is_removable')
 
 
 class LocaleSelectSerializer(serializers.ModelSerializer):
@@ -153,7 +153,7 @@ class LocaleSelectSerializer(serializers.ModelSerializer):
 class PersonRoleSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = PersonRole
-        fields = '__all__'
+        fields = ('id', 'role', 'is_removable')
 
 
 class PersonRoleSelectSerializer(serializers.ModelSerializer):
@@ -166,7 +166,7 @@ class PersonRoleSelectSerializer(serializers.ModelSerializer):
 class PrimaryTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrimaryType
-        fields = '__all__'
+        fields = ('id', 'type', 'is_removable')
 
 
 class PrimaryTypeSelectSerializer(serializers.ModelSerializer):
@@ -179,7 +179,7 @@ class PrimaryTypeSelectSerializer(serializers.ModelSerializer):
 class ReproductionRightSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReproductionRight
-        fields = '__all__'
+        fields = ('id', 'statement', 'is_removable')
 
 
 class ReproductionRightSelectSerializer(serializers.ModelSerializer):
@@ -192,7 +192,7 @@ class ReproductionRightSelectSerializer(serializers.ModelSerializer):
 class RightsRestrictionReasonSerializer(serializers.ModelSerializer):
     class Meta:
         model = RightsRestrictionReason
-        fields = '__all__'
+        fields = ('id', 'reason', 'is_removable')
 
 
 class RightsRestrictionReasonSelectSerializer(serializers.ModelSerializer):

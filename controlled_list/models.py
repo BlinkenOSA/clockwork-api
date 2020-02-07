@@ -1,7 +1,9 @@
 from django.db import models
 
+from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
-class AccessRight(models.Model):
+
+class AccessRight(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     statement = models.CharField(unique=True, max_length=200)
 
@@ -10,7 +12,7 @@ class AccessRight(models.Model):
         ordering = ['statement']
 
 
-class ArchivalUnitTheme(models.Model):
+class ArchivalUnitTheme(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     theme = models.CharField(unique=True, max_length=200)
 
@@ -19,7 +21,7 @@ class ArchivalUnitTheme(models.Model):
         ordering = ['theme']
 
 
-class Building(models.Model):
+class Building(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     building = models.CharField(max_length=50)
 
@@ -28,7 +30,7 @@ class Building(models.Model):
         ordering = ['building']
 
 
-class CarrierType(models.Model):
+class CarrierType(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     type = models.CharField(unique=True, max_length=100)
     type_original_language = models.CharField(max_length=100, blank=True, null=True)
@@ -42,7 +44,7 @@ class CarrierType(models.Model):
         ordering = ['type']
 
 
-class CorporationRole(models.Model):
+class CorporationRole(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     role = models.CharField(unique=True, max_length=100)
 
@@ -57,7 +59,7 @@ class CorporationRole(models.Model):
         ordering = ['role']
 
 
-class DateType(models.Model):
+class DateType(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     type = models.CharField(unique=True, max_length=100)
 
@@ -66,7 +68,7 @@ class DateType(models.Model):
         ordering = ['type']
 
 
-class ExtentUnit(models.Model):
+class ExtentUnit(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     unit = models.CharField(unique=True, max_length=100)
 
@@ -75,7 +77,7 @@ class ExtentUnit(models.Model):
         ordering = ['unit']
 
 
-class GeoRole(models.Model):
+class GeoRole(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     role = models.CharField(unique=True, max_length=100)
 
@@ -90,7 +92,7 @@ class GeoRole(models.Model):
         ordering = ['role']
 
 
-class Keyword(models.Model):
+class Keyword(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     keyword = models.CharField(unique=True, max_length=100)
 
@@ -105,7 +107,7 @@ class Keyword(models.Model):
         ordering = ['keyword']
 
 
-class LanguageUsage(models.Model):
+class LanguageUsage(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     usage = models.CharField(unique=True, max_length=100)
 
@@ -114,7 +116,7 @@ class LanguageUsage(models.Model):
         ordering = ['usage']
 
 
-class Locale(models.Model):
+class Locale(models.Model, DetectProtectedMixin):
     id = models.CharField(primary_key=True, max_length=2)
     locale_name = models.CharField(unique=True, max_length=50)
 
@@ -123,7 +125,7 @@ class Locale(models.Model):
         ordering = ['locale_name']
 
 
-class PersonRole(models.Model):
+class PersonRole(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     role = models.CharField(unique=True, max_length=100)
 
@@ -138,7 +140,7 @@ class PersonRole(models.Model):
         ordering = ['role']
 
 
-class PrimaryType(models.Model):
+class PrimaryType(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     type = models.CharField(unique=True, max_length=20)
 
@@ -147,7 +149,7 @@ class PrimaryType(models.Model):
         ordering = ['type']
 
 
-class ReproductionRight(models.Model):
+class ReproductionRight(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     statement = models.CharField(unique=True, max_length=200)
 
@@ -156,7 +158,7 @@ class ReproductionRight(models.Model):
         ordering = ['statement']
 
 
-class RightsRestrictionReason(models.Model):
+class RightsRestrictionReason(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     reason = models.CharField(unique=True, max_length=200)
 

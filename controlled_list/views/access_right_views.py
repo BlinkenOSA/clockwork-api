@@ -8,6 +8,9 @@ from controlled_list.serializers import AccessRightSerializer, AccessRightSelect
 class AccessRightList(generics.ListCreateAPIView):
     queryset = AccessRight.objects.all()
     serializer_class = AccessRightSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['statement']
+    ordering_fields = ['statement']
 
 
 class AccessRightDetail(generics.RetrieveUpdateDestroyAPIView):
