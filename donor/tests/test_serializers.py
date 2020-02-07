@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from authority.models import Country
-from donor.serializers import DonorSerializer
+from donor.serializers import DonorWriteSerializer
 
 
 class DonorSerializerTest(TestCase):
@@ -18,7 +18,7 @@ class DonorSerializerTest(TestCase):
         }
 
     def test_donor_invalid(self):
-        serializer = DonorSerializer(data=self.donor)
+        serializer = DonorWriteSerializer(data=self.donor)
         serializer.is_valid()
         self.assertFalse(serializer.is_valid())
         self.assertEqual(serializer.errors['non_field_errors'][0], "Name or Corporation Name is mandatory!")
@@ -26,5 +26,5 @@ class DonorSerializerTest(TestCase):
     def test_donor_valid(self):
         self.donor['first_name'] = 'John'
         self.donor['last_name'] = 'Doe'
-        serializer = DonorSerializer(data=self.donor)
+        serializer = DonorWriteSerializer(data=self.donor)
         self.assertTrue(serializer.is_valid())
