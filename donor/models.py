@@ -1,8 +1,10 @@
 from django.db import models
 import uuid
 
+from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
-class Donor(models.Model):
+
+class Donor(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     old_id = models.IntegerField(blank=True, null=True)

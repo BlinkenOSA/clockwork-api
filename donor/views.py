@@ -4,8 +4,9 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny
 
+from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from donor.models import Donor
-from donor.serializers import DonorSerializer, DonorSelectSerializer
+from donor.serializers import DonorSelectSerializer, DonorReadSerializer, DonorWriteSerializer
 from django_filters import rest_framework as filters
 
 
@@ -24,19 +25,25 @@ class DonorFilterClass(filters.FilterSet):
         fields = ['search']
 
 
-class DonorList(generics.ListCreateAPIView):
+class DonorList(MethodSerializerMixin, generics.ListCreateAPIView):
     authentication_classes = []
     permission_classes = [AllowAny]
     queryset = Donor.objects.all().order_by('name')
     filter_class = DonorFilterClass
     filter_backends = [OrderingFilter, filters.DjangoFilterBackend]
     ordering_fields = ['name']
-    serializer_class = DonorSerializer
+    method_serializer_classes = {
+        ('GET', ): DonorReadSerializer,
+        ('POST', ): DonorWriteSerializer
+    }
 
 
-class DonorDetail(generics.RetrieveUpdateDestroyAPIView):
+class DonorDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Donor.objects.all()
-    serializer_class = DonorSerializer
+    method_serializer_classes = {
+        ('GET', ): DonorReadSerializer,
+        ('PUT', 'PATCH', 'DELETE'): DonorWriteSerializer
+    }
 
 
 class DonorSelectList(generics.ListAPIView):
