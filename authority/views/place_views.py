@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 from authority.models import Place
 from authority.serializers import PlaceSerializer, PlaceSelectSerializer
@@ -7,6 +7,9 @@ from authority.serializers import PlaceSerializer, PlaceSelectSerializer
 
 class PlaceList(generics.ListCreateAPIView):
     queryset = Place.objects.all()
+    filter_backends = (OrderingFilter, SearchFilter)
+    ordering_fields = ['place']
+    search_fields = ('place',)
     serializer_class = PlaceSerializer
 
 

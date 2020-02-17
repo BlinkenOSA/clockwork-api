@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 from authority.models import Subject
 from authority.serializers import SubjectSerializer, SubjectSelectSerializer
@@ -7,6 +7,9 @@ from authority.serializers import SubjectSerializer, SubjectSelectSerializer
 
 class SubjectList(generics.ListCreateAPIView):
     queryset = Subject.objects.all()
+    filter_backends = (OrderingFilter, SearchFilter)
+    ordering_fields = ['subject']
+    search_fields = ('subject',)
     serializer_class = SubjectSerializer
 
 

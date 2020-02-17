@@ -9,13 +9,15 @@ from authority.models import Country
 class WikipediaMixin(object):
     def get_wikilinks(self, query, lang):
         data = []
-        wikipedia.set_lang(lang)
 
         if len(query) > 0:
             ws = wikipedia.search(query, results=2)
             for entry in ws:
                 wiki_url = 'http://%s.wikipedia.org/wiki/%s' % (lang, entry)
-                data.append(wiki_url)
+                data.append({
+                    'name': entry,
+                    'url': wiki_url
+                })
         return data
 
 
@@ -25,7 +27,12 @@ class WikipediaList(WikipediaMixin, APIView):
     search_fields = ('query',)
 
     def get(self, request, *args, **kwargs):
+        data = []
+        languages = ['en', 'ru', 'hu', 'de', 'pl', 'it', 'es', 'fr', 'ro', 'cs', 'bg', 'uk']
+
         query = request.query_params.get('query', '')
-        lang = request.query_params.get('lang', 'en')
-        data = self.get_wikilinks(query, lang)
+
+        if query != '':
+            for lang in languages:
+                data += self.get_wikilinks(query, lang)
         return Response(data)

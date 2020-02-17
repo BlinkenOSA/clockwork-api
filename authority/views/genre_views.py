@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 from authority.models import Genre
 from authority.serializers import GenreSerializer, GenreSelectSerializer
@@ -7,6 +7,9 @@ from authority.serializers import GenreSerializer, GenreSelectSerializer
 
 class GenreList(generics.ListCreateAPIView):
     queryset = Genre.objects.all()
+    filter_backends = (OrderingFilter, SearchFilter)
+    ordering_fields = ['genre']
+    search_fields = ('genre',)
     serializer_class = GenreSerializer
 
 

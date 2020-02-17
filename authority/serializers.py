@@ -50,10 +50,11 @@ class PlaceSelectSerializer(serializers.ModelSerializer):
 class PersonOtherFormatSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonOtherFormat
-        fields = '__all__'
+        exclude = ('person',)
 
 
 class PersonSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
+    name = serializers.CharField(source='__str__')
     person_other_formats = PersonOtherFormatSerializer(many=True, source='personotherformat_set')
 
     class Meta:
@@ -73,7 +74,7 @@ class PersonSelectSerializer(serializers.ModelSerializer):
 class CorporationOtherFormatSerializer(serializers.ModelSerializer):
     class Meta:
         model = CorporationOtherFormat
-        fields = '__all__'
+        exclude = ('corporation',)
 
 
 class CorporationSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):

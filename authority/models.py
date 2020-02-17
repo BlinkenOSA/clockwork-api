@@ -73,7 +73,7 @@ class Person(models.Model):
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
-    def get_name(self):
+    def __str__(self):
         return ', '.join((self.last_name, self.first_name))
 
     class Meta:
