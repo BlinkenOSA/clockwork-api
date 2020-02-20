@@ -124,7 +124,7 @@
   "pk": 11,
   "fields": {
     "type": "Plastic card box",
-    "type_original_language": "muanyag kártyadoboz",
+    "type_original_language": "müanyag kártyadoboz",
     "width": 245,
     "height": 55,
     "depth": 235,
@@ -256,7 +256,7 @@
   "pk": 22,
   "fields": {
     "type": "Digital container",
-    "type_original_language": "Digitális gyűjtő",
+    "type_original_language": "Digitális gyüjtő",
     "width": 1,
     "height": null,
     "depth": null,
