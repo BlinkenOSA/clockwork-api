@@ -4,7 +4,7 @@
   "pk": 1,
   "fields": {
     "type": "Archival boxes",
-    "type_original_language": "levéltári doboz",
+    "type_original_language": "leveltari doboz",
     "width": 125,
     "height": 265,
     "depth": 320,
@@ -16,7 +16,7 @@
   "pk": 2,
   "fields": {
     "type": "Archival card box",
-    "type_original_language": "levéltári kártyadoboz",
+    "type_original_language": "leveltari kartyadoboz",
     "width": 315,
     "height": 235,
     "depth": 170,
@@ -28,7 +28,7 @@
   "pk": 3,
   "fields": {
     "type": "Boxes of color prints",
-    "type_original_language": "levéltári fényképdoboz",
+    "type_original_language": "leveltari fenykepdoboz",
     "width": 440,
     "height": 100,
     "depth": 310,
@@ -112,7 +112,7 @@
   "pk": 10,
   "fields": {
     "type": "SVHS",
-    "type_original_language": "videókazetta S-VHS",
+    "type_original_language": "videokazetta S-VHS",
     "width": 25,
     "height": 105,
     "depth": 170,
@@ -124,7 +124,7 @@
   "pk": 11,
   "fields": {
     "type": "Plastic card box",
-    "type_original_language": "müanyag kártyadoboz",
+    "type_original_language": "muanyag kartyadoboz",
     "width": 245,
     "height": 55,
     "depth": 235,
@@ -172,7 +172,7 @@
   "pk": 15,
   "fields": {
     "type": "SDLT I",
-    "type_original_language": "mágnesszalag SDLT",
+    "type_original_language": "magnesszalag SDLT",
     "width": 34,
     "height": 110,
     "depth": 110,
@@ -184,7 +184,7 @@
   "pk": 16,
   "fields": {
     "type": "Oversized box (40 cm)",
-    "type_original_language": "levéltári doboz túlméretes",
+    "type_original_language": "leveltari doboz tulmeretes",
     "width": 400,
     "height": 200,
     "depth": 150,
@@ -196,7 +196,7 @@
   "pk": 17,
   "fields": {
     "type": "SVHS-C",
-    "type_original_language": "videókazetta S-VHS-C",
+    "type_original_language": "videokazetta S-VHS-C",
     "width": 1,
     "height": null,
     "depth": null,
@@ -220,7 +220,7 @@
   "pk": 19,
   "fields": {
     "type": "mini DV",
-    "type_original_language": "videókazetta mini DV",
+    "type_original_language": "videokazetta mini DV",
     "width": 1,
     "height": null,
     "depth": null,
@@ -232,7 +232,7 @@
   "pk": 20,
   "fields": {
     "type": "Oversized folder",
-    "type_original_language": "levéltári mappa túlméretes",
+    "type_original_language": "leveltari mappa tulmeretes",
     "width": 1,
     "height": null,
     "depth": null,
@@ -244,7 +244,7 @@
   "pk": 21,
   "fields": {
     "type": "N/A",
-    "type_original_language": "nem elérhető",
+    "type_original_language": "nem elerheto",
     "width": 1,
     "height": null,
     "depth": null,
@@ -256,7 +256,7 @@
   "pk": 22,
   "fields": {
     "type": "Digital container",
-    "type_original_language": "Digitális gyüjtő",
+    "type_original_language": "digitalis gyujto",
     "width": 1,
     "height": null,
     "depth": null,
