@@ -36,10 +36,10 @@ class VIAFTest(APITestCase):
         self.assertTrue(has_result)
 
     def test_get_country(self):
-        response = self.client.get(reverse('authority-v1:viaf-list'), {'query': 'Hungary', 'type': 'country'})
+        response = self.client.get(reverse('authority-v1:viaf-list'), {'query': 'Russia', 'type': 'country'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         records = response.data
-        has_result = len(list(filter(lambda r: r['viaf_id'] == "http://www.viaf.org/viaf/128544491", records))) == 1
+        has_result = len(list(filter(lambda r: r['viaf_id'] == "http://www.viaf.org/viaf/124251745", records))) == 1
         self.assertTrue(has_result)
 
     def test_get_place(self):

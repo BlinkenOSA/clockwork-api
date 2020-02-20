@@ -16,7 +16,8 @@ class WikipediaTest(APITestCase):
         self.token = Token.objects.get(user__username='testuser')
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token.key)
 
-    def test_get_all_puppies(self):
+    def test_get_query(self):
         response = self.client.get(reverse('authority-v1:wikipedia-list'), {'query': 'Lenin'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue("http://en.wikipedia.org/wiki/Vladimir Lenin" in response.data)
+        has_result = len(list(filter(lambda r: r['url'] == "http://en.wikipedia.org/wiki/Vladimir Lenin", response.data))) == 1
+        self.assertTrue(has_result)
