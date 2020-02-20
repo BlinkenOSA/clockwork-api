@@ -1,0 +1,44 @@
+[
+{
+    "model": "authority.country",
+    "pk": 46,
+    "fields": {
+        "alpha2": "CZ",
+        "alpha3": "CZE",
+        "wiki_url": null,
+        "authority_url": null,
+        "country": "Czech Republic",
+        "user_created": "",
+        "date_created": "2017-11-24T00:00:00",
+        "user_updated": "",
+        "date_updated": null
+    }
+},
+{
+    "model": "donor.donor",
+    "pk": 15,
+    "fields": {
+        "uuid": "1954bd80-aa88-4379-abd1-982eafb4585b",
+        "old_id": 69,
+        "name": "Research Support Scheme",
+        "first_name": "",
+        "middle_name": "",
+        "last_name": "",
+        "corporation_name": "",
+        "extra_info": "",
+        "postal_code": " 110 00",
+        "country": 46,
+        "city": "Praha 1",
+        "address": "Bartolomejska 11",
+        "email": "rss-admin@oziris.ceu.hu",
+        "fax": null,
+        "phone": null,
+        "website": "N/A",
+        "note": null,
+        "user_created": "finding.aids",
+        "date_created": "2018-05-07T08:24:21",
+        "user_updated": "",
+        "date_updated": "2018-05-07T08:24:21"
+    }
+}
+]
