@@ -8,8 +8,8 @@ from controlled_list.models import CarrierType, PrimaryType
 from finding_aids.models import FindingAidsEntity
 
 
-class ArchivalUnitTest(TestCase):
-    """ Test module for ArchivalUnit model """
+class FindingAidsTest(TestCase):
+    """ Test module for FindingAids model """
     fixtures = ['carrier_types', 'primary_types']
 
     def setUp(self):
