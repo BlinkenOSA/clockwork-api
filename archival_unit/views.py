@@ -4,16 +4,19 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from archival_unit.models import ArchivalUnit
 from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnitReadSerializer, \
-    ArchivalUnitWriteSerializer
+    ArchivalUnitWriteSerializer, ArchivalUnitFondsSerializer, ArchivalUnitSeriesSerializer
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 
 
 class ArchivalUnitList(MethodSerializerMixin, generics.ListCreateAPIView):
-    queryset = ArchivalUnit.objects.all()
+    queryset = ArchivalUnit.objects.filter(level='F')
     method_serializer_classes = {
-        ('GET', ): ArchivalUnitReadSerializer,
+        ('GET', ): ArchivalUnitFondsSerializer,
         ('POST', ): ArchivalUnitWriteSerializer
     }
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filterset_fields = ('fonds',)
+    search_fields = ['title_full', 'title_original']
 
 
 class ArchivalUnitDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
