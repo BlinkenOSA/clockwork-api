@@ -19,5 +19,5 @@ class LocaleSelectList(generics.ListAPIView):
     serializer_class = LocaleSelectSerializer
     pagination_class = None
     filter_backends = (SearchFilter,)
-    search_fields = ('locale',)
-    queryset = Locale.objects.all().order_by('locale')
+    search_fields = ('locale_name',)
+    queryset = Locale.objects.all().order_by('locale_name')

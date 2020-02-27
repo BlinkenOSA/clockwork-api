@@ -140,7 +140,7 @@ class LanguageUsageSelectSerializer(serializers.ModelSerializer):
 class LocaleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Locale
-        fields = ('id', 'locale', 'is_removable')
+        fields = ('id', 'locale_name', 'is_removable')
 
 
 class LocaleSelectSerializer(serializers.ModelSerializer):
