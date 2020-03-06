@@ -2,8 +2,10 @@ import uuid as uuid
 from django.db import models
 from django.utils import timezone
 
+from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
-class ArchivalUnit(models.Model):
+
+class ArchivalUnit(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children',
@@ -83,6 +85,7 @@ class ArchivalUnit(models.Model):
             self.reference_code_id = 'hu_osa_' + str(self.fonds) + '-' + str(self.subfonds) + '-' + str(self.series)
 
     def save(self, **kwargs):
+        super(ArchivalUnit, self).save()
         self.set_sort()
         self.set_reference_code()
         self.set_title_full()

@@ -9,7 +9,7 @@ from controlled_list.serializers import ArchivalUnitThemeSerializer, LocaleSeria
 class ArchivalUnitSeriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArchivalUnit
-        fields = ('id', 'fonds', 'subfonds', 'series', 'level', 'reference_code', 'title')
+        fields = ('id', 'fonds', 'subfonds', 'series', 'level', 'reference_code', 'title', 'is_removable')
 
 
 class ArchivalUnitSubfondsSerializer(serializers.ModelSerializer):
@@ -25,7 +25,7 @@ class ArchivalUnitSubfondsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ArchivalUnit
-        fields = ('id', 'fonds', 'subfonds', 'series', 'level', 'children', 'reference_code', 'title')
+        fields = ('id', 'fonds', 'subfonds', 'series', 'level', 'children', 'reference_code', 'title', 'is_removable')
 
 
 class ArchivalUnitFondsSerializer(serializers.ModelSerializer):
@@ -41,7 +41,7 @@ class ArchivalUnitFondsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ArchivalUnit
-        fields = ('id', 'fonds', 'subfonds', 'series', 'level', 'children', 'reference_code', 'title')
+        fields = ('id', 'fonds', 'subfonds', 'series', 'level', 'children', 'reference_code', 'title', 'is_removable')
 
 
 class ArchivalUnitReadSerializer(serializers.ModelSerializer):
