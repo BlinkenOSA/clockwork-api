@@ -51,6 +51,14 @@ class IsaarPlaceWriteSerializer(serializers.ModelSerializer):
         exclude = ('isaar',)
 
 
+class IsaarListSerializer(serializers.ModelSerializer):
+    isad = serializers.SlugRelatedField(many=True, slug_field='reference_code', read_only=True, source='isad_set')
+
+    class Meta:
+        model = Isaar
+        fields = ['id', 'name', 'type', 'status', 'isad']
+
+
 class IsaarReadSerializer(serializers.ModelSerializer):
     parallel_names = IsaarParallelNameSerializer(many=True, source='isaarparallelname_set')
     other_names = IsaarOtherNameSerializer(many=True, source='isaarothername_set')
