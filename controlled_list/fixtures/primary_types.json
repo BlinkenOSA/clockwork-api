@@ -1,0 +1,37 @@
+[
+{
+  "model": "controlled_list.primarytype",
+  "pk": 1,
+  "fields": {
+    "type": "Textual"
+  }
+},
+{
+  "model": "controlled_list.primarytype",
+  "pk": 2,
+  "fields": {
+    "type": "Video"
+  }
+},
+{
+  "model": "controlled_list.primarytype",
+  "pk": 3,
+  "fields": {
+    "type": "Still Image"
+  }
+},
+{
+  "model": "controlled_list.primarytype",
+  "pk": 4,
+  "fields": {
+    "type": "Audio"
+  }
+},
+{
+  "model": "controlled_list.primarytype",
+  "pk": 5,
+  "fields": {
+    "type": "Electronic Record"
+  }
+}
+]

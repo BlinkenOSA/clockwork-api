@@ -1,0 +1,23 @@
+[
+{
+  "model": "controlled_list.building",
+  "pk": 1,
+  "fields": {
+    "building": "Arany Janos u. 32."
+  }
+},
+{
+  "model": "controlled_list.building",
+  "pk": 2,
+  "fields": {
+    "building": "Kerepesi"
+  }
+},
+{
+  "model": "controlled_list.building",
+  "pk": 3,
+  "fields": {
+    "building": "Oktober 6. u."
+  }
+}
+]

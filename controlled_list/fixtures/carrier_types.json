@@ -1,0 +1,314 @@
+[
+{
+  "model": "controlled_list.carriertype",
+  "pk": 1,
+  "fields": {
+    "type": "Archival boxes",
+    "type_original_language": "leveltari doboz",
+    "width": 125,
+    "height": 265,
+    "depth": 320,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 2,
+  "fields": {
+    "type": "Archival card box",
+    "type_original_language": "leveltari kartyadoboz",
+    "width": 315,
+    "height": 235,
+    "depth": 170,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 3,
+  "fields": {
+    "type": "Boxes of color prints",
+    "type_original_language": "leveltari fenykepdoboz",
+    "width": 440,
+    "height": 100,
+    "depth": 310,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 4,
+  "fields": {
+    "type": "Audio cassette",
+    "type_original_language": "hangkazetta",
+    "width": 15,
+    "height": 105,
+    "depth": 95,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 5,
+  "fields": {
+    "type": "BetaSP NTSC",
+    "type_original_language": "BetaSP NTSC",
+    "width": 30,
+    "height": 110,
+    "depth": 170,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 6,
+  "fields": {
+    "type": "VHS PAL",
+    "type_original_language": "VHS PAL",
+    "width": 25,
+    "height": 105,
+    "depth": 190,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 7,
+  "fields": {
+    "type": "CD-ROM",
+    "type_original_language": "CD",
+    "width": 10,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 8,
+  "fields": {
+    "type": "Rolls of 35 mm microfilm in microfilm cabinet",
+    "type_original_language": "mikrofilm tekercs 35mm",
+    "width": 50,
+    "height": 105,
+    "depth": 105,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 9,
+  "fields": {
+    "type": "Rolls of 16 mm microfilm in microfilm cabinet",
+    "type_original_language": "mikrofilm tekercs 16mm",
+    "width": 23,
+    "height": 100,
+    "depth": 100,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 10,
+  "fields": {
+    "type": "SVHS",
+    "type_original_language": "videokazetta S-VHS",
+    "width": 25,
+    "height": 105,
+    "depth": 170,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 11,
+  "fields": {
+    "type": "Plastic card box",
+    "type_original_language": "muanyag kartyadoboz",
+    "width": 245,
+    "height": 55,
+    "depth": 235,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 12,
+  "fields": {
+    "type": "Floppy 3.5",
+    "type_original_language": "floppy 3\"",
+    "width": 1,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 13,
+  "fields": {
+    "type": "Floppy 5.25",
+    "type_original_language": "floppy 5\"",
+    "width": 1,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 14,
+  "fields": {
+    "type": "DVD-ROM",
+    "type_original_language": "DVD-ROM",
+    "width": 10,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 15,
+  "fields": {
+    "type": "SDLT I",
+    "type_original_language": "magnesszalag SDLT",
+    "width": 34,
+    "height": 110,
+    "depth": 110,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 16,
+  "fields": {
+    "type": "Oversized box (40 cm)",
+    "type_original_language": "leveltari doboz tulmeretes",
+    "width": 400,
+    "height": 200,
+    "depth": 150,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 17,
+  "fields": {
+    "type": "SVHS-C",
+    "type_original_language": "videokazetta S-VHS-C",
+    "width": 1,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 18,
+  "fields": {
+    "type": "mini CD-R",
+    "type_original_language": "mini CD-R",
+    "width": 1,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 19,
+  "fields": {
+    "type": "mini DV",
+    "type_original_language": "videokazetta mini DV",
+    "width": 1,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 20,
+  "fields": {
+    "type": "Oversized folder",
+    "type_original_language": "leveltari mappa tulmeretes",
+    "width": 1,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 21,
+  "fields": {
+    "type": "N/A",
+    "type_original_language": "nem elerheto",
+    "width": 1,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 22,
+  "fields": {
+    "type": "Digital container",
+    "type_original_language": "digitalis gyujto",
+    "width": 1,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 23,
+  "fields": {
+    "type": "Blu-Ray",
+    "type_original_language": "Blu-Ray lemez",
+    "width": 10,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 24,
+  "fields": {
+    "type": "HDD",
+    "type_original_language": "merevlemez",
+    "width": 1,
+    "height": null,
+    "depth": null,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 25,
+  "fields": {
+    "type": "BetaSP PAL",
+    "type_original_language": "BetaSP PAL",
+    "width": 30,
+    "height": 110,
+    "depth": 170,
+    "old_id": null
+  }
+},
+{
+  "model": "controlled_list.carriertype",
+  "pk": 26,
+  "fields": {
+    "type": "VHS NTSC",
+    "type_original_language": "VHS NTSC",
+    "width": 25,
+    "height": 10,
+    "depth": 190,
+    "old_id": null
+  }
+}
+]

@@ -1,0 +1,30 @@
+[
+{
+  "model": "controlled_list.accessright",
+  "pk": 1,
+  "fields": {
+    "statement": "Not restricted"
+  }
+},
+{
+  "model": "controlled_list.accessright",
+  "pk": 2,
+  "fields": {
+    "statement": "Partially restricted"
+  }
+},
+{
+  "model": "controlled_list.accessright",
+  "pk": 3,
+  "fields": {
+    "statement": "Restricted"
+  }
+},
+{
+  "model": "controlled_list.accessright",
+  "pk": 4,
+  "fields": {
+    "statement": "Unknown"
+  }
+}
+]

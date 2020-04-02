@@ -1,0 +1,121 @@
+[
+{
+    "model": "authority.country",
+    "pk": 184,
+    "fields": {
+        "alpha2": "US",
+        "alpha3": "USA",
+        "wiki_url": null,
+        "authority_url": null,
+        "country": "United States",
+        "user_created": "",
+        "date_created": "2017-11-24T00:00:00",
+        "user_updated": "",
+        "date_updated": null
+    }
+},
+{
+    "model": "accession.accessioncopyrightstatus",
+    "pk": 8,
+    "fields": {
+        "status": "Unknown"
+    }
+},
+{
+    "model": "donor.donor",
+    "pk": 28,
+    "fields": {
+        "uuid": "2c0f782e-71b1-4b64-9ada-701927fc5d64",
+        "old_id": 83,
+        "name": "Radio Free Europe/Radio Liberty",
+        "first_name": "",
+        "middle_name": "",
+        "last_name": "",
+        "corporation_name": "",
+        "extra_info": "",
+        "postal_code": "N/A",
+        "country": 184,
+        "city": "N/A",
+        "address": "N/A",
+        "email": "N/A",
+        "fax": null,
+        "phone": "1.202.457.6900",
+        "website": "N/A",
+        "note": null,
+        "user_created": "finding.aids",
+        "date_created": "2018-05-07T08:24:21",
+        "user_updated": "",
+        "date_updated": "2018-05-07T08:24:21"
+    }
+},
+{
+    "model": "archival_unit.archivalunit",
+    "pk": 69,
+    "fields": {
+        "uuid": "f61d91a1-c285-409b-95f1-01206e5655f6",
+        "parent": null,
+        "fonds": 300,
+        "subfonds": 0,
+        "series": 0,
+        "sort": "030000000000",
+        "title": "Records of Radio Free Europe/Radio Liberty Research Institute",
+        "title_full": "HU OSA 300 Records of Radio Free Europe/Radio Liberty Research Institute",
+        "title_original": null,
+        "original_locale": null,
+        "acronym": "RFE/RL Research Institute; RFE/RL RI",
+        "reference_code": "HU OSA 300",
+        "reference_code_id": "hu_osa_300",
+        "level": "F",
+        "status": "Final",
+        "ready_to_publish": false,
+        "user_created": "finding.aids",
+        "date_created": "2018-05-07T08:24:23",
+        "user_updated": "",
+        "date_updated": "2018-05-07T08:24:23",
+        "theme": [
+            1
+        ]
+    }
+},
+{
+    "model": "accession.accessionmethod",
+    "pk": 2,
+    "fields": {
+        "method": "Deposit (Non OSF)"
+    }
+},
+{
+    "model": "accession.accession",
+    "pk": 1,
+    "fields": {
+        "uuid": "ff692cb4-742a-4a56-be7f-a6708e009808",
+        "seq": "1995/001",
+        "title": "Records of Radio Free Europe/Radio Liberty Research Institute",
+        "transfer_date": "1995-05-23",
+        "method": 2,
+        "description": "Records of the Research Institute of RFE/RL (1) -including library materials",
+        "access_note": null,
+        "building": null,
+        "module": null,
+        "row": null,
+        "section": null,
+        "shelf": null,
+        "archival_unit": 69,
+        "archival_unit_legacy_number": 300,
+        "archival_unit_legacy_name": "Records of Radio Free Europe/Radio Liberty Research Institute",
+        "donor": 28,
+        "creation_date_from": "1951-07-00",
+        "creation_date_to": "1995-00-00",
+        "custodial_history": null,
+        "copyright_status": 8,
+        "copyright_note": "Unknown",
+        "note": "0 archival box=3257 linear meters folders and binders. 26+19 B&W prints. 2 filing cabinets. AV materials in boxes AV 1-41.  Files on diskette are in MAC format. 3 1/2 diskettes pertain to: 1992 Baltic Security Conference.   21 of the 5 1/4\" diskettes are ",
+        "user_created": "finding.aids",
+        "date_created": "1995-05-22T22:00:00",
+        "user_updated": "csaba.szilagyi",
+        "date_updated": "2018-05-07T08:24:40",
+        "user_approved": "",
+        "date_approved": null
+    }
+}
+]

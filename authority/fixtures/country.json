@@ -1,0 +1,4037 @@
+[
+{
+  "model": "authority.country",
+  "pk": 1,
+  "fields": {
+    "alpha2": "AF",
+    "alpha3": "AFG",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Afghanistan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 2,
+  "fields": {
+    "alpha2": "AL",
+    "alpha3": "ALB",
+    "wiki_url": "http://en.wikipedia.org/wiki/Albania",
+    "authority_url": null,
+    "country": "Albania",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2019-01-18T13:57:23"
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 3,
+  "fields": {
+    "alpha2": "DZ",
+    "alpha3": "DZA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Algeria",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 4,
+  "fields": {
+    "alpha2": "AD",
+    "alpha3": "AND",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Andorra",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 5,
+  "fields": {
+    "alpha2": "AO",
+    "alpha3": "AGO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Angola",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 6,
+  "fields": {
+    "alpha2": "AG",
+    "alpha3": "ATG",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Antigua and Barbuda",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 7,
+  "fields": {
+    "alpha2": "AR",
+    "alpha3": "ARG",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Argentina",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 8,
+  "fields": {
+    "alpha2": "AM",
+    "alpha3": "ARM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Armenia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 9,
+  "fields": {
+    "alpha2": "AU",
+    "alpha3": "AUS",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Australia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 10,
+  "fields": {
+    "alpha2": "AT",
+    "alpha3": "AUT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Austria",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 11,
+  "fields": {
+    "alpha2": "AZ",
+    "alpha3": "AZE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Azerbaijan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 12,
+  "fields": {
+    "alpha2": "BS",
+    "alpha3": "BHS",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Bahamas, The",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 13,
+  "fields": {
+    "alpha2": "BH",
+    "alpha3": "BHR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Bahrain",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 14,
+  "fields": {
+    "alpha2": "BD",
+    "alpha3": "BGD",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Bangladesh",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 15,
+  "fields": {
+    "alpha2": "BB",
+    "alpha3": "BRB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Barbados",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 16,
+  "fields": {
+    "alpha2": "BY",
+    "alpha3": "BLR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Belarus",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 17,
+  "fields": {
+    "alpha2": "BE",
+    "alpha3": "BEL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Belgium",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 18,
+  "fields": {
+    "alpha2": "BZ",
+    "alpha3": "BLZ",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Belize",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 19,
+  "fields": {
+    "alpha2": "BJ",
+    "alpha3": "BEN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Benin",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 20,
+  "fields": {
+    "alpha2": "BT",
+    "alpha3": "BTN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Bhutan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 21,
+  "fields": {
+    "alpha2": "BO",
+    "alpha3": "BOL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Bolivia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 22,
+  "fields": {
+    "alpha2": "BA",
+    "alpha3": "BIH",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Bosnia and Herzegovina",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 23,
+  "fields": {
+    "alpha2": "BW",
+    "alpha3": "BWA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Botswana",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 24,
+  "fields": {
+    "alpha2": "BR",
+    "alpha3": "BRA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Brazil",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 25,
+  "fields": {
+    "alpha2": "BN",
+    "alpha3": "BRN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Brunei",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 26,
+  "fields": {
+    "alpha2": "BG",
+    "alpha3": "BGR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Bulgaria",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 27,
+  "fields": {
+    "alpha2": "BF",
+    "alpha3": "BFA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Burkina Faso",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 28,
+  "fields": {
+    "alpha2": "BI",
+    "alpha3": "BDI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Burundi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 29,
+  "fields": {
+    "alpha2": "KH",
+    "alpha3": "KHM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Cambodia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 30,
+  "fields": {
+    "alpha2": "CM",
+    "alpha3": "CMR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Cameroon",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 31,
+  "fields": {
+    "alpha2": "CA",
+    "alpha3": "CAN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Canada",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 32,
+  "fields": {
+    "alpha2": "CV",
+    "alpha3": "CPV",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Cape Verde",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 33,
+  "fields": {
+    "alpha2": "CF",
+    "alpha3": "CAF",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Central African Republic",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 34,
+  "fields": {
+    "alpha2": "TD",
+    "alpha3": "TCD",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Chad",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 35,
+  "fields": {
+    "alpha2": "CL",
+    "alpha3": "CHL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Chile",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 36,
+  "fields": {
+    "alpha2": "CN",
+    "alpha3": "CHN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "China, People's Republic of",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 37,
+  "fields": {
+    "alpha2": "CO",
+    "alpha3": "COL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Colombia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 38,
+  "fields": {
+    "alpha2": "KM",
+    "alpha3": "COM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Comoros",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 39,
+  "fields": {
+    "alpha2": "CD",
+    "alpha3": "COD",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Congo, (Congo \u00ac\u00f1 Kinshasa)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 40,
+  "fields": {
+    "alpha2": "CG",
+    "alpha3": "COG",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Congo, (Congo \u00ac\u00f1 Brazzaville)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 41,
+  "fields": {
+    "alpha2": "CR",
+    "alpha3": "CRI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Costa Rica",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 42,
+  "fields": {
+    "alpha2": "CI",
+    "alpha3": "CIV",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Cote d'Ivoire (Ivory Coast)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 43,
+  "fields": {
+    "alpha2": "HR",
+    "alpha3": "HRV",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Croatia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 44,
+  "fields": {
+    "alpha2": "CU",
+    "alpha3": "CUB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Cuba",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 45,
+  "fields": {
+    "alpha2": "CY",
+    "alpha3": "CYP",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Cyprus",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 46,
+  "fields": {
+    "alpha2": "CZ",
+    "alpha3": "CZE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Czech Republic",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 47,
+  "fields": {
+    "alpha2": "DK",
+    "alpha3": "DNK",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Denmark",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 48,
+  "fields": {
+    "alpha2": "DJ",
+    "alpha3": "DJI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Djibouti",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 49,
+  "fields": {
+    "alpha2": "DM",
+    "alpha3": "DMA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Dominica",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 50,
+  "fields": {
+    "alpha2": "DO",
+    "alpha3": "DOM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Dominican Republic",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 51,
+  "fields": {
+    "alpha2": "EC",
+    "alpha3": "ECU",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Ecuador",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 52,
+  "fields": {
+    "alpha2": "EG",
+    "alpha3": "EGY",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Egypt",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 53,
+  "fields": {
+    "alpha2": "SV",
+    "alpha3": "SLV",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "El Salvador",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 54,
+  "fields": {
+    "alpha2": "GQ",
+    "alpha3": "GNQ",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Equatorial Guinea",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 55,
+  "fields": {
+    "alpha2": "ER",
+    "alpha3": "ERI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Eritrea",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 56,
+  "fields": {
+    "alpha2": "EE",
+    "alpha3": "EST",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Estonia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 57,
+  "fields": {
+    "alpha2": "ET",
+    "alpha3": "ETH",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Ethiopia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 58,
+  "fields": {
+    "alpha2": "FJ",
+    "alpha3": "FJI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Fiji",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 59,
+  "fields": {
+    "alpha2": "FI",
+    "alpha3": "FIN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Finland",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 60,
+  "fields": {
+    "alpha2": "FR",
+    "alpha3": "FRA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "France",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 61,
+  "fields": {
+    "alpha2": "GA",
+    "alpha3": "GAB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Gabon",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 62,
+  "fields": {
+    "alpha2": "GM",
+    "alpha3": "GMB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Gambia, The",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 63,
+  "fields": {
+    "alpha2": "GE",
+    "alpha3": "GEO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Georgia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 64,
+  "fields": {
+    "alpha2": "DE",
+    "alpha3": "DEU",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Germany",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 65,
+  "fields": {
+    "alpha2": "GH",
+    "alpha3": "GHA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Ghana",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 66,
+  "fields": {
+    "alpha2": "GR",
+    "alpha3": "GRC",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Greece",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 67,
+  "fields": {
+    "alpha2": "GD",
+    "alpha3": "GRD",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Grenada",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 68,
+  "fields": {
+    "alpha2": "GT",
+    "alpha3": "GTM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Guatemala",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 69,
+  "fields": {
+    "alpha2": "GN",
+    "alpha3": "GIN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Guinea",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 70,
+  "fields": {
+    "alpha2": "GW",
+    "alpha3": "GNB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Guinea-Bissau",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 71,
+  "fields": {
+    "alpha2": "GY",
+    "alpha3": "GUY",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Guyana",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 72,
+  "fields": {
+    "alpha2": "HT",
+    "alpha3": "HTI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Haiti",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 73,
+  "fields": {
+    "alpha2": "HN",
+    "alpha3": "HND",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Honduras",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 74,
+  "fields": {
+    "alpha2": "HU",
+    "alpha3": "HUN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Hungary",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 75,
+  "fields": {
+    "alpha2": "IS",
+    "alpha3": "ISL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Iceland",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 76,
+  "fields": {
+    "alpha2": "IN",
+    "alpha3": "IND",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "India",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 77,
+  "fields": {
+    "alpha2": "ID",
+    "alpha3": "IDN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Indonesia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 78,
+  "fields": {
+    "alpha2": "IR",
+    "alpha3": "IRN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Iran",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 79,
+  "fields": {
+    "alpha2": "IQ",
+    "alpha3": "IRQ",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Iraq",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 80,
+  "fields": {
+    "alpha2": "IE",
+    "alpha3": "IRL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Ireland",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 81,
+  "fields": {
+    "alpha2": "IL",
+    "alpha3": "ISR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Israel",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 82,
+  "fields": {
+    "alpha2": "IT",
+    "alpha3": "ITA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Italy",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 83,
+  "fields": {
+    "alpha2": "JM",
+    "alpha3": "JAM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Jamaica",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 84,
+  "fields": {
+    "alpha2": "JP",
+    "alpha3": "JPN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Japan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 85,
+  "fields": {
+    "alpha2": "JO",
+    "alpha3": "JOR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Jordan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 86,
+  "fields": {
+    "alpha2": "KZ",
+    "alpha3": "KAZ",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Kazakhstan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 87,
+  "fields": {
+    "alpha2": "KE",
+    "alpha3": "KEN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Kenya",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 88,
+  "fields": {
+    "alpha2": "KI",
+    "alpha3": "KIR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Kiribati",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 89,
+  "fields": {
+    "alpha2": "KP",
+    "alpha3": "PRK",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Korea, North",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 90,
+  "fields": {
+    "alpha2": "KR",
+    "alpha3": "KOR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Korea, South",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 91,
+  "fields": {
+    "alpha2": "KW",
+    "alpha3": "KWT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Kuwait",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 92,
+  "fields": {
+    "alpha2": "KG",
+    "alpha3": "KGZ",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Kyrgyzstan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 93,
+  "fields": {
+    "alpha2": "LA",
+    "alpha3": "LAO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Laos",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 94,
+  "fields": {
+    "alpha2": "LV",
+    "alpha3": "LVA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Latvia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 95,
+  "fields": {
+    "alpha2": "LB",
+    "alpha3": "LBN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Lebanon",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 96,
+  "fields": {
+    "alpha2": "LS",
+    "alpha3": "LSO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Lesotho",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 97,
+  "fields": {
+    "alpha2": "LR",
+    "alpha3": "LBR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Liberia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 98,
+  "fields": {
+    "alpha2": "LY",
+    "alpha3": "LBY",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Libya",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 99,
+  "fields": {
+    "alpha2": "LI",
+    "alpha3": "LIE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Liechtenstein",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 100,
+  "fields": {
+    "alpha2": "LT",
+    "alpha3": "LTU",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Lithuania",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 101,
+  "fields": {
+    "alpha2": "LU",
+    "alpha3": "LUX",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Luxembourg",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 102,
+  "fields": {
+    "alpha2": "MK",
+    "alpha3": "MKD",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Macedonia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 103,
+  "fields": {
+    "alpha2": "MG",
+    "alpha3": "MDG",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Madagascar",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 104,
+  "fields": {
+    "alpha2": "MW",
+    "alpha3": "MWI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Malawi",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 105,
+  "fields": {
+    "alpha2": "MY",
+    "alpha3": "MYS",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Malaysia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 106,
+  "fields": {
+    "alpha2": "MV",
+    "alpha3": "MDV",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Maldives",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 107,
+  "fields": {
+    "alpha2": "ML",
+    "alpha3": "MLI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Mali",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 108,
+  "fields": {
+    "alpha2": "MT",
+    "alpha3": "MLT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Malta",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 109,
+  "fields": {
+    "alpha2": "MH",
+    "alpha3": "MHL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Marshall Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 110,
+  "fields": {
+    "alpha2": "MR",
+    "alpha3": "MRT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Mauritania",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 111,
+  "fields": {
+    "alpha2": "MU",
+    "alpha3": "MUS",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Mauritius",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 112,
+  "fields": {
+    "alpha2": "MX",
+    "alpha3": "MEX",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Mexico",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 113,
+  "fields": {
+    "alpha2": "FM",
+    "alpha3": "FSM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Micronesia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 114,
+  "fields": {
+    "alpha2": "MD",
+    "alpha3": "MDA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Moldova",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 115,
+  "fields": {
+    "alpha2": "MC",
+    "alpha3": "MCO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Monaco",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 116,
+  "fields": {
+    "alpha2": "MN",
+    "alpha3": "MNG",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Mongolia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 117,
+  "fields": {
+    "alpha2": "ME",
+    "alpha3": "MNE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Montenegro",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 118,
+  "fields": {
+    "alpha2": "MA",
+    "alpha3": "MAR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Morocco",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 119,
+  "fields": {
+    "alpha2": "MZ",
+    "alpha3": "MOZ",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Mozambique",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 120,
+  "fields": {
+    "alpha2": "MM",
+    "alpha3": "MMR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Myanmar (Burma)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 121,
+  "fields": {
+    "alpha2": "NA",
+    "alpha3": "NAM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Namibia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 122,
+  "fields": {
+    "alpha2": "NR",
+    "alpha3": "NRU",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Nauru",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 123,
+  "fields": {
+    "alpha2": "NP",
+    "alpha3": "NPL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Nepal",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 124,
+  "fields": {
+    "alpha2": "NL",
+    "alpha3": "NLD",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Netherlands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 125,
+  "fields": {
+    "alpha2": "NZ",
+    "alpha3": "NZL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "New Zealand",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 126,
+  "fields": {
+    "alpha2": "NI",
+    "alpha3": "NIC",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Nicaragua",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 127,
+  "fields": {
+    "alpha2": "NE",
+    "alpha3": "NER",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Niger",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 128,
+  "fields": {
+    "alpha2": "NG",
+    "alpha3": "NGA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Nigeria",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 129,
+  "fields": {
+    "alpha2": "NO",
+    "alpha3": "NOR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Norway",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 130,
+  "fields": {
+    "alpha2": "OM",
+    "alpha3": "OMN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Oman",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 131,
+  "fields": {
+    "alpha2": "PK",
+    "alpha3": "PAK",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Pakistan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 132,
+  "fields": {
+    "alpha2": "PW",
+    "alpha3": "PLW",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Palau",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 133,
+  "fields": {
+    "alpha2": "PA",
+    "alpha3": "PAN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Panama",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 134,
+  "fields": {
+    "alpha2": "PG",
+    "alpha3": "PNG",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Papua New Guinea",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 135,
+  "fields": {
+    "alpha2": "PY",
+    "alpha3": "PRY",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Paraguay",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 136,
+  "fields": {
+    "alpha2": "PE",
+    "alpha3": "PER",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Peru",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 137,
+  "fields": {
+    "alpha2": "PH",
+    "alpha3": "PHL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Philippines",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 138,
+  "fields": {
+    "alpha2": "PL",
+    "alpha3": "POL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Poland",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 139,
+  "fields": {
+    "alpha2": "PT",
+    "alpha3": "PRT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Portugal",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 140,
+  "fields": {
+    "alpha2": "QA",
+    "alpha3": "QAT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Qatar",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 141,
+  "fields": {
+    "alpha2": "RO",
+    "alpha3": "ROU",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Romania",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 142,
+  "fields": {
+    "alpha2": "RU",
+    "alpha3": "RUS",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Russia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 143,
+  "fields": {
+    "alpha2": "RW",
+    "alpha3": "RWA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Rwanda",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 144,
+  "fields": {
+    "alpha2": "KN",
+    "alpha3": "KNA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Saint Kitts and Nevis",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 145,
+  "fields": {
+    "alpha2": "LC",
+    "alpha3": "LCA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Saint Lucia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 146,
+  "fields": {
+    "alpha2": "VC",
+    "alpha3": "VCT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Saint Vincent and the Grenadines",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 147,
+  "fields": {
+    "alpha2": "WS",
+    "alpha3": "WSM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Samoa",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 148,
+  "fields": {
+    "alpha2": "SM",
+    "alpha3": "SMR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "San Marino",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 149,
+  "fields": {
+    "alpha2": "ST",
+    "alpha3": "STP",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Sao Tome and Principe",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 150,
+  "fields": {
+    "alpha2": "SA",
+    "alpha3": "SAU",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Saudi Arabia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 151,
+  "fields": {
+    "alpha2": "SN",
+    "alpha3": "SEN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Senegal",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 152,
+  "fields": {
+    "alpha2": "RS",
+    "alpha3": "SRB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Serbia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 153,
+  "fields": {
+    "alpha2": "SC",
+    "alpha3": "SYC",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Seychelles",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 154,
+  "fields": {
+    "alpha2": "SL",
+    "alpha3": "SLE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Sierra Leone",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 155,
+  "fields": {
+    "alpha2": "SG",
+    "alpha3": "SGP",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Singapore",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 156,
+  "fields": {
+    "alpha2": "SK",
+    "alpha3": "SVK",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Slovakia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 157,
+  "fields": {
+    "alpha2": "SI",
+    "alpha3": "SVN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Slovenia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 158,
+  "fields": {
+    "alpha2": "SB",
+    "alpha3": "SLB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Solomon Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 159,
+  "fields": {
+    "alpha2": "SO",
+    "alpha3": "SOM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Somalia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 160,
+  "fields": {
+    "alpha2": "ZA",
+    "alpha3": "ZAF",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "South Africa",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 161,
+  "fields": {
+    "alpha2": "ES",
+    "alpha3": "ESP",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Spain",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 162,
+  "fields": {
+    "alpha2": "LK",
+    "alpha3": "LKA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Sri Lanka",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 163,
+  "fields": {
+    "alpha2": "SD",
+    "alpha3": "SDN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Sudan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 164,
+  "fields": {
+    "alpha2": "SR",
+    "alpha3": "SUR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Suriname",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 165,
+  "fields": {
+    "alpha2": "SZ",
+    "alpha3": "SWZ",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Swaziland",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 166,
+  "fields": {
+    "alpha2": "SE",
+    "alpha3": "SWE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Sweden",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 167,
+  "fields": {
+    "alpha2": "CH",
+    "alpha3": "CHE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Switzerland",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 168,
+  "fields": {
+    "alpha2": "SY",
+    "alpha3": "SYR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Syria",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 169,
+  "fields": {
+    "alpha2": "TJ",
+    "alpha3": "TJK",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Tajikistan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 170,
+  "fields": {
+    "alpha2": "TZ",
+    "alpha3": "TZA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Tanzania",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 171,
+  "fields": {
+    "alpha2": "TH",
+    "alpha3": "THA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Thailand",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 172,
+  "fields": {
+    "alpha2": "TL",
+    "alpha3": "TLS",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Timor-Leste (East Timor)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 173,
+  "fields": {
+    "alpha2": "TG",
+    "alpha3": "TGO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Togo",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 174,
+  "fields": {
+    "alpha2": "TO",
+    "alpha3": "TON",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Tonga",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 175,
+  "fields": {
+    "alpha2": "TT",
+    "alpha3": "TTO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Trinidad and Tobago",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 176,
+  "fields": {
+    "alpha2": "TN",
+    "alpha3": "TUN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Tunisia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 177,
+  "fields": {
+    "alpha2": "TR",
+    "alpha3": "TUR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Turkey",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 178,
+  "fields": {
+    "alpha2": "TM",
+    "alpha3": "TKM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Turkmenistan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 179,
+  "fields": {
+    "alpha2": "TV",
+    "alpha3": "TUV",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Tuvalu",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 180,
+  "fields": {
+    "alpha2": "UG",
+    "alpha3": "UGA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Uganda",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 181,
+  "fields": {
+    "alpha2": "UA",
+    "alpha3": "UKR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Ukraine",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 182,
+  "fields": {
+    "alpha2": "AE",
+    "alpha3": "ARE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "United Arab Emirates",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 183,
+  "fields": {
+    "alpha2": "GB",
+    "alpha3": "GBR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "United Kingdom",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 184,
+  "fields": {
+    "alpha2": "US",
+    "alpha3": "USA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "United States",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 185,
+  "fields": {
+    "alpha2": "UY",
+    "alpha3": "URY",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Uruguay",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 186,
+  "fields": {
+    "alpha2": "UZ",
+    "alpha3": "UZB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Uzbekistan",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 187,
+  "fields": {
+    "alpha2": "VU",
+    "alpha3": "VUT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Vanuatu",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 188,
+  "fields": {
+    "alpha2": "VA",
+    "alpha3": "VAT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Vatican City",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 189,
+  "fields": {
+    "alpha2": "VE",
+    "alpha3": "VEN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Venezuela",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 190,
+  "fields": {
+    "alpha2": "VN",
+    "alpha3": "VNM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Vietnam",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 191,
+  "fields": {
+    "alpha2": "YE",
+    "alpha3": "YEM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Yemen",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 192,
+  "fields": {
+    "alpha2": "ZM",
+    "alpha3": "ZMB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Zambia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 193,
+  "fields": {
+    "alpha2": "ZW",
+    "alpha3": "ZWE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Zimbabwe",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 194,
+  "fields": {
+    "alpha2": "GE",
+    "alpha3": "GEO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Abkhazia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 195,
+  "fields": {
+    "alpha2": "TW",
+    "alpha3": "TWN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "China, Republic of (Taiwan)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 196,
+  "fields": {
+    "alpha2": "AZ",
+    "alpha3": "AZE",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Nagorno-Karabakh",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 197,
+  "fields": {
+    "alpha2": "CY",
+    "alpha3": "CYP",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Northern Cyprus",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 198,
+  "fields": {
+    "alpha2": "MD",
+    "alpha3": "MDA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Pridnestrovie (Transnistria)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 199,
+  "fields": {
+    "alpha2": "SO",
+    "alpha3": "SOM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Somaliland",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 200,
+  "fields": {
+    "alpha2": "GE",
+    "alpha3": "GEO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "South Ossetia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 201,
+  "fields": {
+    "alpha2": "AU",
+    "alpha3": "AUS",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Ashmore and Cartier Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 202,
+  "fields": {
+    "alpha2": "CX",
+    "alpha3": "CXR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Christmas Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 203,
+  "fields": {
+    "alpha2": "CC",
+    "alpha3": "CCK",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Cocos (Keeling) Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 204,
+  "fields": {
+    "alpha2": "AU",
+    "alpha3": "AUS",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Coral Sea Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 205,
+  "fields": {
+    "alpha2": "HM",
+    "alpha3": "HMD",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Heard Island and McDonald Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 206,
+  "fields": {
+    "alpha2": "NF",
+    "alpha3": "NFK",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Norfolk Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 207,
+  "fields": {
+    "alpha2": "NC",
+    "alpha3": "NCL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "New Caledonia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 208,
+  "fields": {
+    "alpha2": "PF",
+    "alpha3": "PYF",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "French Polynesia",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 209,
+  "fields": {
+    "alpha2": "YT",
+    "alpha3": "MYT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Mayotte",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 210,
+  "fields": {
+    "alpha2": "GP",
+    "alpha3": "GLP",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Saint Barthelemy",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 211,
+  "fields": {
+    "alpha2": "GP",
+    "alpha3": "GLP",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Saint Martin",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 212,
+  "fields": {
+    "alpha2": "PM",
+    "alpha3": "SPM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Saint Pierre and Miquelon",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 213,
+  "fields": {
+    "alpha2": "WF",
+    "alpha3": "WLF",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Wallis and Futuna",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 214,
+  "fields": {
+    "alpha2": "TF",
+    "alpha3": "ATF",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "French Southern and Antarctic Lands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 215,
+  "fields": {
+    "alpha2": "PF",
+    "alpha3": "PYF",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Clipperton Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 216,
+  "fields": {
+    "alpha2": "BV",
+    "alpha3": "BVT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Bouvet Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 217,
+  "fields": {
+    "alpha2": "CK",
+    "alpha3": "COK",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Cook Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 218,
+  "fields": {
+    "alpha2": "NU",
+    "alpha3": "NIU",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Niue",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 219,
+  "fields": {
+    "alpha2": "TK",
+    "alpha3": "TKL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Tokelau",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 220,
+  "fields": {
+    "alpha2": "GG",
+    "alpha3": "GGY",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Guernsey",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 221,
+  "fields": {
+    "alpha2": "IM",
+    "alpha3": "IMN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Isle of Man",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 222,
+  "fields": {
+    "alpha2": "JE",
+    "alpha3": "JEY",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Jersey",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 223,
+  "fields": {
+    "alpha2": "AI",
+    "alpha3": "AIA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Anguilla",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 224,
+  "fields": {
+    "alpha2": "BM",
+    "alpha3": "BMU",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Bermuda",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 225,
+  "fields": {
+    "alpha2": "IO",
+    "alpha3": "IOT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "British Indian Ocean Territory",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 227,
+  "fields": {
+    "alpha2": "VG",
+    "alpha3": "VGB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "British Virgin Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 228,
+  "fields": {
+    "alpha2": "KY",
+    "alpha3": "CYM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Cayman Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 229,
+  "fields": {
+    "alpha2": "FK",
+    "alpha3": "FLK",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Falkland Islands (Islas Malvinas)",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 230,
+  "fields": {
+    "alpha2": "GI",
+    "alpha3": "GIB",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Gibraltar",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 231,
+  "fields": {
+    "alpha2": "MS",
+    "alpha3": "MSR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Montserrat",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 232,
+  "fields": {
+    "alpha2": "PN",
+    "alpha3": "PCN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Pitcairn Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 233,
+  "fields": {
+    "alpha2": "SH",
+    "alpha3": "SHN",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Saint Helena",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 234,
+  "fields": {
+    "alpha2": "GS",
+    "alpha3": "SGS",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "South Georgia & South Sandwich Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 235,
+  "fields": {
+    "alpha2": "TC",
+    "alpha3": "TCA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Turks and Caicos Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 236,
+  "fields": {
+    "alpha2": "MP",
+    "alpha3": "MNP",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Northern Mariana Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 237,
+  "fields": {
+    "alpha2": "PR",
+    "alpha3": "PRI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Puerto Rico",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 238,
+  "fields": {
+    "alpha2": "AS",
+    "alpha3": "ASM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "American Samoa",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 239,
+  "fields": {
+    "alpha2": "UM",
+    "alpha3": "UMI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Baker Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 240,
+  "fields": {
+    "alpha2": "GU",
+    "alpha3": "GUM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Guam",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 241,
+  "fields": {
+    "alpha2": "UM",
+    "alpha3": "UMI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Howland Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 242,
+  "fields": {
+    "alpha2": "UM",
+    "alpha3": "UMI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Jarvis Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 243,
+  "fields": {
+    "alpha2": "UM",
+    "alpha3": "UMI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Johnston Atoll",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 244,
+  "fields": {
+    "alpha2": "UM",
+    "alpha3": "UMI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Kingman Reef",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 245,
+  "fields": {
+    "alpha2": "UM",
+    "alpha3": "UMI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Midway Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 246,
+  "fields": {
+    "alpha2": "UM",
+    "alpha3": "UMI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Navassa Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 247,
+  "fields": {
+    "alpha2": "UM",
+    "alpha3": "UMI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Palmyra Atoll",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 248,
+  "fields": {
+    "alpha2": "VI",
+    "alpha3": "VIR",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "U.S. Virgin Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 249,
+  "fields": {
+    "alpha2": "UM",
+    "alpha3": "UMI",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Wake Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 250,
+  "fields": {
+    "alpha2": "HK",
+    "alpha3": "HKG",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Hong Kong",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 251,
+  "fields": {
+    "alpha2": "MO",
+    "alpha3": "MAC",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Macau",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 252,
+  "fields": {
+    "alpha2": "FO",
+    "alpha3": "FRO",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Faroe Islands",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 253,
+  "fields": {
+    "alpha2": "GL",
+    "alpha3": "GRL",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Greenland",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 254,
+  "fields": {
+    "alpha2": "GF",
+    "alpha3": "GUF",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "French Guiana",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 255,
+  "fields": {
+    "alpha2": "GP",
+    "alpha3": "GLP",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Guadeloupe",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 256,
+  "fields": {
+    "alpha2": "MQ",
+    "alpha3": "MTQ",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Martinique",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 257,
+  "fields": {
+    "alpha2": "RE",
+    "alpha3": "REU",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Reunion",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 258,
+  "fields": {
+    "alpha2": "AX",
+    "alpha3": "ALA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Aland",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 259,
+  "fields": {
+    "alpha2": "AW",
+    "alpha3": "ABW",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Aruba",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 260,
+  "fields": {
+    "alpha2": "AN",
+    "alpha3": "ANT",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Netherlands Antilles",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 261,
+  "fields": {
+    "alpha2": "SJ",
+    "alpha3": "SJM",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Svalbard",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 262,
+  "fields": {
+    "alpha2": "AC",
+    "alpha3": "ASC",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Ascension",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 263,
+  "fields": {
+    "alpha2": "TA",
+    "alpha3": "TAA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Tristan da Cunha",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 268,
+  "fields": {
+    "alpha2": "AQ",
+    "alpha3": "ATA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Australian Antarctic Territory",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 269,
+  "fields": {
+    "alpha2": "AQ",
+    "alpha3": "ATA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Ross Dependency",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 270,
+  "fields": {
+    "alpha2": "AQ",
+    "alpha3": "ATA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Peter I Island",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 271,
+  "fields": {
+    "alpha2": "AQ",
+    "alpha3": "ATA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Queen Maud Land",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 272,
+  "fields": {
+    "alpha2": "AQ",
+    "alpha3": "ATA",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "British Antarctic Territory",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 273,
+  "fields": {
+    "alpha2": "XK",
+    "alpha3": "XKX",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "Kosovo",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+},
+{
+  "model": "authority.country",
+  "pk": 274,
+  "fields": {
+    "alpha2": "na",
+    "alpha3": "naa",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "n/a",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
+}
+]

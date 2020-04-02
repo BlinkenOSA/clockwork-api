@@ -105,3 +105,6 @@ venv.bak/
 
 # PyCharm
 .idea
+
+# Local config
+/clockwork_api/settings_components/local.py

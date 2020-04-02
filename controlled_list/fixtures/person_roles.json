@@ -1,0 +1,244 @@
+[
+{
+  "model": "controlled_list.personrole",
+  "pk": 1,
+  "fields": {
+    "role": "Director",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-06-08T13:21:36",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2019-03-20T15:22:29"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 2,
+  "fields": {
+    "role": "Script writer",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-06-08T13:51:58",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2019-03-20T15:23:18"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 3,
+  "fields": {
+    "role": "Interviewer",
+    "user_created": "judit.hegedus",
+    "date_created": "2018-06-21T15:20:53",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2019-03-20T15:23:03"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 4,
+  "fields": {
+    "role": "creator_test",
+    "user_created": "ors.tari",
+    "date_created": "2018-06-22T15:02:13",
+    "user_updated": "ors.tari",
+    "date_updated": "2018-06-22T15:03:16"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 5,
+  "fields": {
+    "role": "Collector",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-06-28T09:50:35",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2019-03-20T15:22:20"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 6,
+  "fields": {
+    "role": "Author",
+    "user_created": "judit.hegedus",
+    "date_created": "2018-07-02T10:23:43",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2019-03-20T15:22:11"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 7,
+  "fields": {
+    "role": "Producer",
+    "user_created": "",
+    "date_created": "2019-02-01T14:08:27",
+    "user_updated": "",
+    "date_updated": "2019-02-01T14:08:27"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 8,
+  "fields": {
+    "role": "Appears in",
+    "user_created": "",
+    "date_created": "2019-02-01T15:32:41",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:32:41"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 9,
+  "fields": {
+    "role": "Camera",
+    "user_created": "",
+    "date_created": "2019-02-01T15:32:41",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:32:41"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 10,
+  "fields": {
+    "role": "Editor",
+    "user_created": "",
+    "date_created": "2019-02-01T15:32:41",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:32:41"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 11,
+  "fields": {
+    "role": "Editor-in-Chief",
+    "user_created": "",
+    "date_created": "2019-02-01T15:32:41",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:32:41"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 12,
+  "fields": {
+    "role": "Interviewee",
+    "user_created": "",
+    "date_created": "2019-02-01T15:32:41",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:32:41"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 13,
+  "fields": {
+    "role": "Presenter",
+    "user_created": "",
+    "date_created": "2019-02-01T15:32:42",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:32:42"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 14,
+  "fields": {
+    "role": "Actor",
+    "user_created": "",
+    "date_created": "2019-02-01T15:32:53",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:32:53"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 15,
+  "fields": {
+    "role": "Music",
+    "user_created": "",
+    "date_created": "2019-02-01T15:33:27",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:33:27"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 16,
+  "fields": {
+    "role": "Copyright holder",
+    "user_created": "",
+    "date_created": "2019-02-01T15:42:01",
+    "user_updated": "",
+    "date_updated": "2019-02-01T15:42:01"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 17,
+  "fields": {
+    "role": "Reporter",
+    "user_created": "",
+    "date_created": "2019-02-01T16:05:32",
+    "user_updated": "",
+    "date_updated": "2019-02-01T16:05:32"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 18,
+  "fields": {
+    "role": "Creator/Author",
+    "user_created": "",
+    "date_created": "2019-02-01T16:05:56",
+    "user_updated": "",
+    "date_updated": "2019-02-01T16:05:56"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 19,
+  "fields": {
+    "role": "Narrator",
+    "user_created": "",
+    "date_created": "2019-02-01T16:30:02",
+    "user_updated": "",
+    "date_updated": "2019-02-01T16:30:02"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 20,
+  "fields": {
+    "role": "Investigator",
+    "user_created": "",
+    "date_created": "2019-02-01T16:31:22",
+    "user_updated": "",
+    "date_updated": "2019-02-01T16:31:22"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 21,
+  "fields": {
+    "role": "Researcher",
+    "user_created": "",
+    "date_created": "2019-02-01T16:45:02",
+    "user_updated": "",
+    "date_updated": "2019-02-01T16:45:02"
+  }
+},
+{
+  "model": "controlled_list.personrole",
+  "pk": 22,
+  "fields": {
+    "role": "Donor",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2019-02-25T11:24:55",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2019-02-25T11:24:55"
+  }
+}
+]

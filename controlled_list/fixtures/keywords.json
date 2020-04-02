@@ -1,0 +1,145 @@
+[
+{
+  "model": "controlled_list.keyword",
+  "pk": 1,
+  "fields": {
+    "keyword": "humanitarian aid",
+    "user_created": "ors.tari",
+    "date_created": "2018-06-22T15:14:26",
+    "user_updated": "ors.tari",
+    "date_updated": "2018-06-22T15:14:26"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 2,
+  "fields": {
+    "keyword": "air support",
+    "user_created": "ors.tari",
+    "date_created": "2018-06-22T15:15:28",
+    "user_updated": "ors.tari",
+    "date_updated": "2018-06-22T15:15:28"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 3,
+  "fields": {
+    "keyword": "media junk",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-06-27T11:27:16",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-06-27T11:27:16"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 4,
+  "fields": {
+    "keyword": "fishing",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-06-27T11:27:35",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-06-27T11:27:35"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 5,
+  "fields": {
+    "keyword": "environmental protection",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-06-27T11:29:26",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-06-27T11:29:26"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 6,
+  "fields": {
+    "keyword": "terrorism",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-06-27T11:30:04",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-06-27T11:30:04"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 7,
+  "fields": {
+    "keyword": "demonstartion",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-06-28T09:59:52",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-06-28T09:59:52"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 8,
+  "fields": {
+    "keyword": "parade",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-07-04T09:25:12",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-07-04T09:25:12"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 9,
+  "fields": {
+    "keyword": "United Nations UN",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-07-04T10:27:25",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-07-04T10:27:25"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 10,
+  "fields": {
+    "keyword": "family",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-08-07T07:53:32",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-08-07T07:53:32"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 11,
+  "fields": {
+    "keyword": "art",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-08-07T07:53:53",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-08-07T07:53:53"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 12,
+  "fields": {
+    "keyword": "French Foreign Legion",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2018-08-27T14:53:14",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2018-08-27T14:53:14"
+  }
+},
+{
+  "model": "controlled_list.keyword",
+  "pk": 13,
+  "fields": {
+    "keyword": "amateur film",
+    "user_created": "zsuzsa.zadori",
+    "date_created": "2019-03-20T14:24:22",
+    "user_updated": "zsuzsa.zadori",
+    "date_updated": "2019-03-20T14:24:22"
+  }
+}
+]

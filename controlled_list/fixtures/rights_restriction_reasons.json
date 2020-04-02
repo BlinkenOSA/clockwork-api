@@ -1,0 +1,30 @@
+[
+{
+  "model": "controlled_list.rightsrestrictionreason",
+  "pk": 1,
+  "fields": {
+    "reason": "data protection"
+  }
+},
+{
+  "model": "controlled_list.rightsrestrictionreason",
+  "pk": 2,
+  "fields": {
+    "reason": "donor requirements"
+  }
+},
+{
+  "model": "controlled_list.rightsrestrictionreason",
+  "pk": 3,
+  "fields": {
+    "reason": "ethical"
+  }
+},
+{
+  "model": "controlled_list.rightsrestrictionreason",
+  "pk": 4,
+  "fields": {
+    "reason": "government classification"
+  }
+}
+]
