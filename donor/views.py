@@ -26,8 +26,6 @@ class DonorFilterClass(filters.FilterSet):
 
 
 class DonorList(MethodSerializerMixin, generics.ListCreateAPIView):
-    authentication_classes = []
-    permission_classes = [AllowAny]
     queryset = Donor.objects.all().order_by('name')
     filter_class = DonorFilterClass
     filter_backends = [OrderingFilter, filters.DjangoFilterBackend]

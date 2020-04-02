@@ -1,8 +1,11 @@
+from datetime import date
+
 from django.db.models.query_utils import Q
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import AllowAny
 from django_filters import rest_framework as filters
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from accession.models import Accession
 from accession.serializers import AccessionSelectSerializer, AccessionReadSerializer, AccessionWriteSerializer
@@ -38,8 +41,6 @@ class AccessionFilterClass(filters.FilterSet):
 
 
 class AccessionList(MethodSerializerMixin, generics.ListCreateAPIView):
-    authentication_classes = []
-    permission_classes = [AllowAny]
     queryset = Accession.objects.all()
     filter_class = AccessionFilterClass
     filter_backends = [OrderingFilter, filters.DjangoFilterBackend]
@@ -48,6 +49,16 @@ class AccessionList(MethodSerializerMixin, generics.ListCreateAPIView):
         ('GET', ): AccessionReadSerializer,
         ('POST', ): AccessionWriteSerializer
     }
+
+
+class AccessionPreCreate(APIView):
+    def get(self, request, format=None):
+        year = date.today().year
+        sequence = Accession.objects.filter(date_created__year=year).count()
+        response = {
+            'seq': '%d/%03d' % (year, sequence + 1)
+        }
+        return Response(response)
 
 
 class AccessionDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
