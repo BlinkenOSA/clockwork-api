@@ -33,6 +33,8 @@ urlpatterns = [
     path('v1/isad/', include('isad.urls', namespace='isad-v1')),
     path('admin/', admin.site.urls),
 
+    path('auth/accounts/me'),
+
     # Swagger endpoints
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None),
       name='schema-json'),
@@ -40,7 +42,7 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=None), name='schema-redoc'),
 
     # JWT endpoints
-    path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\
   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

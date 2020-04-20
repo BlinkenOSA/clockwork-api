@@ -15,6 +15,10 @@ CORS_ORIGIN_WHITELIST = []
 
 USE_TZ = False
 
+DATE_EXTENSIONS_DATE_INPUT_FORMATS = "Y-m-d"
+DATE_EXTENSIONS_MONTH_INPUT_FORMATS = "Y-m"
+DATE_EXTENSIONS_YEAR_INPUT_FORMATS = "Y"
+
 DATE_EXTENSIONS_OUTPUT_FORMAT_DAY_MONTH_YEAR = "Y-m-d"
 DATE_EXTENSIONS_OUTPUT_FORMAT_MONTH_YEAR = "Y-m"
 DATE_EXTENSIONS_OUTPUT_FORMAT_YEAR = "Y"
@@ -33,4 +37,14 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10,
+}
+
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+DJOSER = {
+    'SERIALIZERS': {
+        'current_user': 'accounts.serializers.CurrentUserSerializer',
+    },
 }
