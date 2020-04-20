@@ -33,8 +33,6 @@ urlpatterns = [
     path('v1/isad/', include('isad.urls', namespace='isad-v1')),
     path('admin/', admin.site.urls),
 
-    path('auth/accounts/me'),
-
     # Swagger endpoints
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None),
       name='schema-json'),
