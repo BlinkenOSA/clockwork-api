@@ -1,35 +1,29 @@
-from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
-from rest_framework.test import APITestCase
 
 from archival_unit.models import ArchivalUnit
+from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from controlled_list.models import ArchivalUnitTheme
 
 
-class ArchivalUnitViewTest(APITestCase):
+class ArchivalUnitViewTest(TestViewsBaseClass):
     """ Testing ArchivalUnit endpoint """
     fixtures = ['archival_unit_themes']
 
     def setUp(self):
+        self.init()
         self.fonds = ArchivalUnit.objects.create(
             fonds=206,
             level='F',
             title='Records of the Open Society Archives at Central European University'
         )
         self.fonds.theme.add(ArchivalUnitTheme.objects.get(theme='Human Rights'))
-        self.user = User.objects.create_superuser(username='testuser',
-                                                  email='testuser@eqar.eu',
-                                                  password='testpassword')
-        self.user.save()
-        self.token = Token.objects.get(user__username='testuser')
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token.key)
 
     def test_mixin_for_read_serializer(self):
-        response = self.client.get(reverse('archival_unit-v1:archival_unit-list'))
+        response = self.client.get(reverse('archival_unit-v1:archival_unit-detail', kwargs={'pk': self.fonds.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['results'][0]['theme'][0]['id'], 2)
+        print(response.data)
+        self.assertEqual(response.data['theme'][0]['id'], 2)
 
     def test_mixin_for_view_serializer(self):
         subfonds = {
