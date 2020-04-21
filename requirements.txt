@@ -16,7 +16,7 @@ django-templated-mail==1.1.1
 djangorestframework==3.9.4
 djangorestframework-simplejwt==4.4.0
 djangorestframework-stubs==0.4.2
-djoser==1.7.0
+djoser==2.0.3
 drf-writable-nested==0.5.1
 drf-yasg==1.16.0
 hashids==1.2.0

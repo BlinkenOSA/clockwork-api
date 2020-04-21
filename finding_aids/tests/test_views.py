@@ -1,23 +1,17 @@
-from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
-from rest_framework.test import APITestCase
+from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 
 
-class FindingAidsPublishTest(APITestCase):
+class FindingAidsPublishTest(TestViewsBaseClass):
     """ Testing Finding Aids publishing endpoints"""
     fixtures = ['finding_aids', 'carrier_types', 'primary_types']
 
     def setUp(self):
-        self.user = User.objects.create_superuser(username='testuser',
-                                                  email='testuser@eqar.eu',
-                                                  password='testpassword')
+        self.init()
         self.user.save()
         self.container_id = 5675
         self.series_id = 908
-        self.token = Token.objects.get(user__username='testuser')
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token.key)
 
     def test_fa_create(self):
         finding_aids = {
