@@ -1,11 +1,36 @@
+from django.db.models.query_utils import Q
 from rest_framework import generics
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
 
 from archival_unit.models import ArchivalUnit
 from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnitReadSerializer, \
-    ArchivalUnitWriteSerializer, ArchivalUnitFondsSerializer, ArchivalUnitSeriesSerializer
+    ArchivalUnitWriteSerializer, ArchivalUnitFondsSerializer, ArchivalUnitSeriesSerializer, \
+    ArchivalUnitPreCreateSerializer
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
+
+
+class ArchivalUnitFilterClass(filters.FilterSet):
+    search = filters.CharFilter(label='Search', method='search_filter')
+
+    def search_filter(self, queryset, name, value):
+        return ArchivalUnit.objects.filter(
+            (
+                Q(title__icontains=value) |
+                Q(children__title__icontains=value) |
+                Q(children__children__title__icontains=value)
+            ) & Q(level='F')
+        ).distinct()
+
+    class Meta:
+        model = ArchivalUnit
+        fields = ('fonds',)
+
+
+class ArchivalUnitPreCreate(generics.RetrieveAPIView):
+    queryset = ArchivalUnit.objects.all()
+    serializer_class = ArchivalUnitPreCreateSerializer
 
 
 class ArchivalUnitList(MethodSerializerMixin, generics.ListCreateAPIView):
@@ -14,9 +39,8 @@ class ArchivalUnitList(MethodSerializerMixin, generics.ListCreateAPIView):
         ('GET', ): ArchivalUnitFondsSerializer,
         ('POST', ): ArchivalUnitWriteSerializer
     }
-    filter_backends = (SearchFilter, DjangoFilterBackend)
-    filterset_fields = ('fonds',)
-    search_fields = ['title_full', 'title_original']
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = ArchivalUnitFilterClass
 
 
 class ArchivalUnitDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):

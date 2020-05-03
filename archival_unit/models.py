@@ -1,6 +1,5 @@
 import uuid as uuid
 from django.db import models
-from django.utils import timezone
 
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 

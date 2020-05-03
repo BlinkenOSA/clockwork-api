@@ -16,10 +16,8 @@ class ArchivalUnitSubfondsSerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
 
     def get_children(self, obj):
-        series = ArchivalUnit.objects.filter(fonds=obj.fonds, subfonds=obj.subfonds, level='S')
-        serializer = ArchivalUnitSeriesSerializer(series, many=True)
-        if series.count() > 0:
-            return serializer.data
+        if obj.children.count() > 0:
+            return ArchivalUnitSeriesSerializer(obj.children, many=True).data
         else:
             return None
 
@@ -32,10 +30,8 @@ class ArchivalUnitFondsSerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
 
     def get_children(self, obj):
-        subfonds = ArchivalUnit.objects.filter(fonds=obj.fonds, level='SF')
-        serializer = ArchivalUnitSubfondsSerializer(subfonds, many=True)
-        if subfonds.count() > 0:
-            return serializer.data
+        if obj.children.count() > 0:
+            return ArchivalUnitSubfondsSerializer(obj.children, many=True).data
         else:
             return None
 
@@ -44,13 +40,57 @@ class ArchivalUnitFondsSerializer(serializers.ModelSerializer):
         fields = ('id', 'fonds', 'subfonds', 'series', 'level', 'children', 'reference_code', 'title', 'is_removable')
 
 
+class ArchivalUnitPreCreateSerializer(serializers.ModelSerializer):
+    parent = serializers.IntegerField(source='pk')
+    fonds_title = serializers.SerializerMethodField()
+    fonds_acronym = serializers.SerializerMethodField()
+    subfonds_title = serializers.SerializerMethodField()
+    subfonds_acronym = serializers.SerializerMethodField()
+    level = serializers.SerializerMethodField()
+
+    def get_fonds_title(self, obj):
+        if obj.level == 'F':
+            return obj.title
+        elif obj.level == 'SF':
+            return obj.parent.title
+
+    def get_fonds_acronym(self, obj):
+        if obj.level == 'F':
+            return obj.acronym
+        elif obj.level == 'SF':
+            return obj.parent.acronym
+
+    def get_subfonds_title(self, obj):
+        if obj.level == 'SF':
+            return obj.title
+        elif obj.level == 'S':
+            return obj.parent.title
+
+    def get_subfonds_acronym(self, obj):
+        if obj.level == 'SF':
+            return obj.acronym
+        elif obj.level == 'S':
+            return obj.parent.acronym
+
+    def get_level(self, obj):
+        if obj.level == 'F':
+            return 'SF'
+        elif obj.level == 'SF':
+            return 'S'
+
+    class Meta:
+        model = ArchivalUnit
+        fields = ('parent',
+                  'fonds', 'fonds_title', 'fonds_acronym',
+                  'subfonds', 'subfonds_title', 'subfonds_acronym',
+                  'series', 'level')
+
+
 class ArchivalUnitReadSerializer(serializers.ModelSerializer):
     fonds_title = serializers.SerializerMethodField()
     fonds_acronym = serializers.SerializerMethodField()
     subfonds_title = serializers.SerializerMethodField()
     subfonds_acronym = serializers.SerializerMethodField()
-    theme = ArchivalUnitThemeSerializer(many=True)
-    original_locale = LocaleSerializer()
 
     def get_fonds_title(self, obj):
         if obj.level == 'F':
