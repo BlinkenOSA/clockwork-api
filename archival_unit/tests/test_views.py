@@ -22,8 +22,7 @@ class ArchivalUnitViewTest(TestViewsBaseClass):
     def test_mixin_for_read_serializer(self):
         response = self.client.get(reverse('archival_unit-v1:archival_unit-detail', kwargs={'pk': self.fonds.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print(response.data)
-        self.assertEqual(response.data['theme'][0]['id'], 2)
+        self.assertEqual(response.data['theme'][0], 2)
 
     def test_mixin_for_view_serializer(self):
         subfonds = {
