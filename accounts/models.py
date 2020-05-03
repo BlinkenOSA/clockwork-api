@@ -13,4 +13,4 @@ class UserProfile(models.Model):
         return self.allowed_archival_units.count()
 
     class Meta:
-        db_table = 'user_profiles'
+        db_table = 'accounts_user_profile'
