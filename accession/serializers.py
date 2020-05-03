@@ -4,8 +4,6 @@ from accession.models import Accession, AccessionItem, AccessionMethod, Accessio
 from archival_unit.serializers import ArchivalUnitSelectSerializer
 from clockwork_api.fields import ApproximateDateSerializerField
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
-from controlled_list.serializers import BuildingSelectSerializer
-from donor.serializers import DonorSelectSerializer
 
 
 class AccessionMethodSelectSerializer(serializers.ModelSerializer):
@@ -27,11 +25,6 @@ class AccessionItemSerializer(serializers.ModelSerializer):
 
 
 class AccessionReadSerializer(serializers.ModelSerializer):
-    method = AccessionMethodSelectSerializer()
-    building = BuildingSelectSerializer()
-    archival_unit = ArchivalUnitSelectSerializer()
-    donor = DonorSelectSerializer()
-    copyright_status = AccessionCopyrightStatusSelectSerializer()
     items = AccessionItemSerializer(many=True, source='accessionitem_set')
 
     class Meta:
