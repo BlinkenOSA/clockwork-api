@@ -7,7 +7,7 @@ from django_date_extensions.fields import ApproximateDateField
 
 class Isad(models.Model):
     id = models.AutoField(primary_key=True)
-    archival_unit = models.OneToOneField('archival_unit.ArchivalUnit', on_delete=models.PROTECT)
+    archival_unit = models.OneToOneField('archival_unit.ArchivalUnit', on_delete=models.PROTECT, related_name='isad')
     original_locale = models.ForeignKey('controlled_list.Locale', blank=True, null=True, on_delete=models.PROTECT)
     legacy_id = models.IntegerField(blank=True, null=True)
 

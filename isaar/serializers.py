@@ -66,7 +66,6 @@ class IsaarReadSerializer(serializers.ModelSerializer):
     standardized_names = IsaarStandardizedNameSerializer(many=True, source='isaarstandardizedname_set')
     corporate_body_identifiers = IsaarCorporateBodyIdentifierSerizlier(many=True, source='isaarcorporatebodyidentifier_set')
     places = IsaarPlaceReadSerializer(many=True, source='isaarplace_set')
-    language = LanguageSelectSerializer(many=True)
 
     class Meta:
         model = Isaar

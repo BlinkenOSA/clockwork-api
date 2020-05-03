@@ -22,7 +22,6 @@ class DonorWriteSerializer(UserDataSerializerMixin, serializers.ModelSerializer)
 
 
 class DonorReadSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
-    country = CountrySelectSerializer()
     is_removable = serializers.BooleanField()
 
     class Meta:
