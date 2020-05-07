@@ -3,7 +3,8 @@ from rest_framework.exceptions import ValidationError
 
 from archival_unit.models import ArchivalUnit
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
-from controlled_list.serializers import ArchivalUnitThemeSerializer, LocaleSerializer
+from container.models import Container
+from finding_aids.models import FindingAidsEntity
 
 
 class ArchivalUnitSeriesSerializer(serializers.ModelSerializer):
@@ -149,6 +150,21 @@ class ArchivalUnitWriteSerializer(UserDataSerializerMixin, serializers.ModelSeri
 
 
 class ArchivalUnitSelectSerializer(serializers.ModelSerializer):
+    container_count = serializers.SerializerMethodField()
+    folder_count = serializers.SerializerMethodField()
+
+    def get_container_count(self, obj):
+        if obj.level == 'S':
+            return Container.objects.filter(archival_unit=obj).count()
+        else:
+            return None
+
+    def get_folder_count(self, obj):
+        if obj.level == 'S':
+            return FindingAidsEntity.objects.filter(archival_unit=obj).exclude(is_template=True).count()
+        else:
+            return None
+
     class Meta:
         model = ArchivalUnit
-        fields = ('id', 'reference_code', 'title', 'title_full')
+        fields = ('id', 'reference_code', 'title', 'title_full', 'container_count', 'folder_count')
