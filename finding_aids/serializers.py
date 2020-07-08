@@ -136,6 +136,12 @@ class FindingAidsEntityAlternativeTitleSerializer(serializers.ModelSerializer):
         exclude = ('fa_entity',)
 
 
+class FindingAidsEntityListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FindingAidsEntity
+        fields = ('id', 'archival_reference_code', 'title', 'level', 'date_from')
+
+
 class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     places_of_creation = FindingAidsEntityPlaceOfCreationSerializer(
         many=True, source='findingaidsentityplaceofcreation_set')

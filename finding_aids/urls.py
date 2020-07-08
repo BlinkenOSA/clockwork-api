@@ -1,10 +1,11 @@
 from django.urls import path, re_path
 from finding_aids.views.finding_aids_views import FindingAidsSelectList, FindingAidsCreate, FindingAidsDetail, \
-    FindingAidsPublish
+    FindingAidsPublish, FindingAidsList
 
 app_name = 'finding_aids'
 
 urlpatterns = [
+    path('', FindingAidsList.as_view(), name='finding_aids-list'),
     path('<int:pk>', FindingAidsDetail.as_view(), name='finding_aids-detail'),
     path('create/<int:container_id>/', FindingAidsCreate.as_view(), name='finding_aids-create'),
     path('select/<int:container_id>/', FindingAidsSelectList.as_view(), name='finding_aids-select'),

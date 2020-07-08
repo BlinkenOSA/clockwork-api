@@ -2,7 +2,6 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import AllowAny
 
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from donor.models import Donor

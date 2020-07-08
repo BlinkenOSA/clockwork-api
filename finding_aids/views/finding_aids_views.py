@@ -8,7 +8,18 @@ from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from container.models import Container
 from finding_aids.models import FindingAidsEntity
 from finding_aids.serializers import FindingAidsSelectSerializer, \
-    FindingAidsEntityReadSerializer, FindingAidsEntityWriteSerializer
+    FindingAidsEntityReadSerializer, FindingAidsEntityWriteSerializer, FindingAidsEntityListSerializer
+
+
+class FindingAidsList(generics.ListAPIView):
+    serializer_class = FindingAidsEntityListSerializer
+
+    def get_queryset(self):
+        container_id = self.request.query_params.get('container', None)
+        if container_id:
+            return FindingAidsEntity.objects.filter(container_id=container_id, is_template=False)
+        else:
+            return FindingAidsEntity.objects.none()
 
 
 class FindingAidsCreate(generics.CreateAPIView):
