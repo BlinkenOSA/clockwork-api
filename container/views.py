@@ -1,4 +1,3 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -55,6 +54,20 @@ class ContainerDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIVi
         for container in containers.iterator():
             container.container_no -= 1
             container.save()
+
+
+class ContainerPublishAll(APIView):
+    def put(self, request, *args, **kwargs):
+        action = self.kwargs.get('action', None)
+        archival_unit_id = self.request.query_params.get('archival_unit', None)
+
+        finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit_id=archival_unit_id)
+        for finding_aids in finding_aids_entities.iterator():
+            if action == 'publish':
+                finding_aids.publish(request.user)
+            else:
+                finding_aids.unpublish()
+        return Response(status=status.HTTP_200_OK)
 
 
 class ContainerPublish(APIView):

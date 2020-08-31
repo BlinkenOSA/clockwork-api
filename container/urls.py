@@ -1,7 +1,7 @@
 from django.urls import re_path, path
 
 from container.views import ContainerList, ContainerDetail, ContainerDetailByBarcode, \
-    ContainerCreate, ContainerPreCreate, ContainerPublish
+    ContainerCreate, ContainerPreCreate, ContainerPublish, ContainerPublishAll
 
 app_name = 'container'
 
@@ -11,6 +11,8 @@ urlpatterns = [
     path('create/', ContainerCreate.as_view(), name='container-create'),
     path('<int:pk>/', ContainerDetail.as_view(), name='container-detail'),
 
+    re_path(r'(?P<action>["publish"|"unpublish"]+)/all/',
+            ContainerPublishAll.as_view(), name='container-publish-all'),
     re_path(r'(?P<action>["publish"|"unpublish"]+)/(?P<pk>[0-9]+)/$',
             ContainerPublish.as_view(), name='container-publish'),
 
