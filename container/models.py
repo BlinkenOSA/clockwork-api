@@ -30,7 +30,8 @@ class Container(models.Model, DetectProtectedMixin):
     def save(self, *args, **kwargs):
         if self.pk is None:
             container = Container.objects.filter(archival_unit=self.archival_unit).reverse().first()
-            self.container_no = container.container_no + 1
+            if container:
+                self.container_no = container.container_no + 1
         super(Container, self).save()
 
     class Meta:
