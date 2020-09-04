@@ -68,6 +68,10 @@ class IsadReadSerializer(serializers.ModelSerializer):
     related_finding_aids = IsadRelatedFindingAidsSerializer(many=True, source='isadrelatedfindingaids_set')
     location_of_originals = IsadLocationOfOriginalsSerializer(many=True, source='isadlocationoforiginals_set')
     location_of_copies = IsadLocationOfCopiesSerializer(many=True, source='isadlocationofcopies_set')
+    title_full = serializers.SerializerMethodField()
+
+    def get_title_full(self, obj):
+        return obj.archival_unit.title_full
 
     class Meta:
         model = Isad
