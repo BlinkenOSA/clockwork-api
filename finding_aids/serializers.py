@@ -163,6 +163,14 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
     )
     languges = FindingAidsEntityLanguageReadSerializer(many=True, source='findingaidsentitylanguage_set')
     extents = FindingAidsEntityExtentReadSerializer(many=True, source='findingaidsentityextent_set')
+    archival_unit_title = serializers.SerializerMethodField()
+    container_title = serializers.SerializerMethodField()
+
+    def get_archival_unit_title(self, obj):
+        return obj.archival_unit.title_full
+
+    def get_container_title(self, obj):
+        return '%s #%s' % (obj.container.carrier_type.type, obj.container.container_no)
 
     class Meta:
         model = FindingAidsEntity

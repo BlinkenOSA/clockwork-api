@@ -88,7 +88,7 @@ class CorporationSerializer(UserDataSerializerMixin, WritableNestedModelSerializ
 class CorporationSelectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Corporation
-        fields = ('id', '__str__')
+        fields = ('id', 'name')
 
 
 # Genre serializers
