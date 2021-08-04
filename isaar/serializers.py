@@ -1,11 +1,10 @@
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
-from authority.serializers import LanguageSelectSerializer
 from clockwork_api.fields import ApproximateDateSerializerField
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from isaar.models import Isaar, IsaarParallelName, IsaarOtherName, IsaarStandardizedName, IsaarCorporateBodyIdentifier, \
-    IsaarPlace, IsaarPlaceQualifier
+    IsaarPlace, IsaarPlaceQualifier, IsaarRelationship
 
 
 class IsaarOtherNameSerializer(serializers.ModelSerializer):
@@ -91,3 +90,8 @@ class IsaarSelectSerializer(serializers.ModelSerializer):
         model = Isaar
         fields = ('id', 'name', 'type', 'status')
 
+
+class IsaarRelationshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IsaarRelationship
+        fields = ('id', 'relationship')
