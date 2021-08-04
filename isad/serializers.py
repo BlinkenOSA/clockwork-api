@@ -80,7 +80,7 @@ class IsadReadSerializer(serializers.ModelSerializer):
 
 class IsadWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     creators = IsadCreatorSerializer(many=True, source='isadcreator_set')
-    carriers = IsadCarrierWriteSerializer(many=True, source='isadcarrier_set')
+    carriers = IsadCarrierWriteSerializer(many=True, source='isadcarrier_set', required=False)
     extents = IsadExtentWriteSerializer(many=True, source='isadextent_set')
     related_finding_aids = IsadRelatedFindingAidsSerializer(many=True, source='isadrelatedfindingaids_set')
     location_of_originals = IsadLocationOfOriginalsSerializer(many=True, source='isadlocationoforiginals_set')
@@ -130,11 +130,15 @@ class IsadFondsSerializer(IsadArchivalUnitSerializerMixin, serializers.ModelSeri
 
 
 class IsadPreCreateSerializer(serializers.ModelSerializer):
+    archival_unit = serializers.SerializerMethodField()
     description_level = serializers.CharField(source='level')
+
+    def get_archival_unit(self, obj):
+        return obj.id
 
     class Meta:
         model = ArchivalUnit
-        fields = ('reference_code', 'title', 'description_level')
+        fields = ('archival_unit', 'reference_code', 'title', 'description_level')
 
 
 class IsadSelectSerializer(serializers.ModelSerializer):
