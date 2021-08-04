@@ -30,6 +30,9 @@ urlpatterns = [
     path('v1/finding_aids/', include('finding_aids.urls', namespace='finding_aids-v1')),
     path('v1/isaar/', include('isaar.urls', namespace='isaar-v1')),
     path('v1/isad/', include('isad.urls', namespace='isad-v1')),
+    path('v1/mlr/', include('mlr.urls', namespace='mlr-v1')),
+    path('v1/digitization/', include('digitization.urls', namespace='digitization-v1')),
+    path('v1/dashboard/', include('dashboard.urls', namespace='dashboard-v1')),
     path('admin/', admin.site.urls),
 
     # Swagger endpoints

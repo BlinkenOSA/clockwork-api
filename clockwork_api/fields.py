@@ -11,7 +11,12 @@ class ApproximateDateSerializerField(serializers.Field):
 
     def to_internal_value(self, data):
         year, month, day = [0, 0, 0]
+
+        if data == "":
+            return None
+
         dates = data.split('-')
+
         if len(dates) == 1:
             year = dates[0]
             month = 0
