@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accession.models import Accession
-from accession.serializers import AccessionSelectSerializer, AccessionReadSerializer, AccessionWriteSerializer
+from accession.serializers import AccessionSelectSerializer, AccessionListSerializer, \
+    AccessionReadSerializer, AccessionWriteSerializer
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 
 
@@ -42,11 +43,11 @@ class AccessionFilterClass(filters.FilterSet):
 
 class AccessionList(MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = Accession.objects.all()
-    filter_class = AccessionFilterClass
+    filterset_class = AccessionFilterClass
     filter_backends = [OrderingFilter, filters.DjangoFilterBackend]
     ordering_fields = ['seq', 'transfer_date', 'archival_unit__fonds', 'archival_unit_legacy_number']
     method_serializer_classes = {
-        ('GET', ): AccessionReadSerializer,
+        ('GET', ): AccessionListSerializer,
         ('POST', ): AccessionWriteSerializer
     }
 
@@ -56,7 +57,8 @@ class AccessionPreCreate(APIView):
         year = date.today().year
         sequence = Accession.objects.filter(date_created__year=year).count()
         response = {
-            'seq': '%d/%03d' % (year, sequence + 1)
+            'seq': '%d/%03d' % (year, sequence + 1),
+            'items': [""]
         }
         return Response(response)
 

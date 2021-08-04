@@ -1,7 +1,7 @@
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 from accession.models import Accession, AccessionItem, AccessionMethod, AccessionCopyrightStatus
-from archival_unit.serializers import ArchivalUnitSelectSerializer
+from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnitReadSerializer
 from clockwork_api.fields import ApproximateDateSerializerField
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 
@@ -30,6 +30,14 @@ class AccessionReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accession
         fields = '__all__'
+
+
+class AccessionListSerializer(serializers.ModelSerializer):
+    archival_unit = ArchivalUnitReadSerializer()
+
+    class Meta:
+        model = Accession
+        fields = ['id', 'seq', 'transfer_date', 'title', 'archival_unit']
 
 
 class AccessionWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
