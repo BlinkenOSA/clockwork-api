@@ -54,8 +54,8 @@ class PersonOtherFormatSerializer(serializers.ModelSerializer):
 
 
 class PersonSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
-    name = serializers.CharField(source='__str__')
-    person_other_formats = PersonOtherFormatSerializer(many=True, source='personotherformat_set')
+    name = serializers.CharField(source='__str__', read_only=True)
+    person_other_formats = PersonOtherFormatSerializer(many=True, required=False, source='personotherformat_set')
 
     class Meta:
         model = Person
@@ -78,7 +78,7 @@ class CorporationOtherFormatSerializer(serializers.ModelSerializer):
 
 
 class CorporationSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
-    corporation_other_formats = CorporationOtherFormatSerializer(many=True, source='corporationotherformat_set')
+    corporation_other_formats = CorporationOtherFormatSerializer(many=True, required=False, source='corporationotherformat_set')
 
     class Meta:
         model = Corporation
