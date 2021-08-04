@@ -8,8 +8,6 @@ from finding_aids.models import FindingAidsEntity
 
 
 class ContainerReadSerializer(serializers.ModelSerializer):
-    carrier_type = serializers.SlugRelatedField(slug_field='type', queryset=CarrierType.objects.all())
-
     class Meta:
         model = Container
         fields = '__all__'
@@ -34,7 +32,7 @@ class ContainerListSerializer(serializers.ModelSerializer):
         return FindingAidsEntity.objects.filter(container=obj, published=True).exclude(is_template=True).count()
 
     def get_reference_code(self, obj):
-        return "%s/%s" % (obj.archival_unit.reference_code, obj.container_no)
+        return "%s:%s" % (obj.archival_unit.reference_code, obj.container_no)
 
     class Meta:
         model = Container

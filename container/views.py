@@ -31,7 +31,7 @@ class ContainerList(generics.ListAPIView):
     serializer_class = ContainerListSerializer
 
     def get_queryset(self):
-        archival_unit_id = self.request.query_params.get('archival_unit', None)
+        archival_unit_id = self.kwargs.get('series_id', None)
         if archival_unit_id:
             return Container.objects.filter(archival_unit_id=archival_unit_id)
         else:
@@ -59,7 +59,7 @@ class ContainerDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIVi
 class ContainerPublishAll(APIView):
     def put(self, request, *args, **kwargs):
         action = self.kwargs.get('action', None)
-        archival_unit_id = self.request.query_params.get('archival_unit', None)
+        archival_unit_id = self.kwargs.get('series', None)
 
         finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit_id=archival_unit_id)
         for finding_aids in finding_aids_entities.iterator():
