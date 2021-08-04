@@ -8,6 +8,8 @@ from controlled_list.serializers import KeywordSerializer, KeywordSelectSerializ
 class KeywordList(generics.ListCreateAPIView):
     queryset = Keyword.objects.all()
     serializer_class = KeywordSerializer
+    filter_backends = (SearchFilter,)
+    search_fields = ('keyword',)
 
 
 class KeywordDetail(generics.RetrieveUpdateDestroyAPIView):

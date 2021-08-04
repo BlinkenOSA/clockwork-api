@@ -49,7 +49,8 @@ class BuildingSelectSerializer(serializers.ModelSerializer):
 class CarrierTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarrierType
-        fields = ('id', 'type', 'is_removable')
+        fields = ('id', 'type', 'type_original_language',
+                  'width', 'height', 'depth', 'jasper_file', 'is_removable')
 
 
 class CarrierTypeSelectSerializer(serializers.ModelSerializer):

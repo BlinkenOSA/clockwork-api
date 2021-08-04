@@ -38,6 +38,7 @@ class CarrierType(models.Model, DetectProtectedMixin):
     height = models.IntegerField(blank=True, null=True)
     depth = models.IntegerField(blank=True, null=True)
     old_id = models.IntegerField(blank=True, null=True)
+    jasper_file = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         db_table = 'controlled_carrier_types'
