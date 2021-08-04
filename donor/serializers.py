@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from authority.serializers import CountrySelectSerializer
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from donor.models import Donor
 

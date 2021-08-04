@@ -26,7 +26,7 @@ class DonorFilterClass(filters.FilterSet):
 
 class DonorList(MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = Donor.objects.all().order_by('name')
-    filter_class = DonorFilterClass
+    filterset_class = DonorFilterClass
     filter_backends = [OrderingFilter, filters.DjangoFilterBackend]
     ordering_fields = ['name']
     method_serializer_classes = {
