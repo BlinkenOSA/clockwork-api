@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from archival_unit.models import ArchivalUnit
 from authority.serializers import LanguageSelectSerializer
+from clockwork_api.fields import ApproximateDateSerializerField
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from container.models import Container
 from controlled_list.serializers import DateTypeSelectSerializer, CorporationRoleSelectSerializer, \
@@ -43,8 +44,6 @@ class FindingAidsEntityLanguageWriteSerializer(serializers.ModelSerializer):
 
 
 class FindingAidsEntityAssociatedPlaceReadSerializer(serializers.ModelSerializer):
-    role = GeoRoleSelectSerializer()
-
     class Meta:
         model = FindingAidsEntityAssociatedPlace
         exclude = ('fa_entity',)
@@ -57,8 +56,6 @@ class FindingAidsEntityAssociatedPlaceWriteSerializer(serializers.ModelSerialize
 
 
 class FindingAidsEntityAssociatedCountryReadSerializer(serializers.ModelSerializer):
-    role = GeoRoleSelectSerializer()
-
     class Meta:
         model = FindingAidsEntityAssociatedCountry
         exclude = ('fa_entity',)
@@ -71,8 +68,6 @@ class FindingAidsEntityAssociatedCountryWriteSerializer(serializers.ModelSeriali
 
 
 class FindingAidsEntityAssociatedCorporationReadSerializer(serializers.ModelSerializer):
-    role = CorporationRoleSelectSerializer()
-
     class Meta:
         model = FindingAidsEntityAssociatedCorporation
         exclude = ('fa_entity',)
@@ -85,8 +80,6 @@ class FindingAidsEntityAssociatedCorporationWriteSerializer(serializers.ModelSer
 
 
 class FindingAidsEntityAssociatedPersonReadSerializer(serializers.ModelSerializer):
-    role = PersonRoleSelectSerializer()
-
     class Meta:
         model = FindingAidsEntityAssociatedPerson
         exclude = ('fa_entity',)
@@ -117,6 +110,8 @@ class FindingAidsEntityCreatorSerializer(serializers.ModelSerializer):
 
 
 class FindingAidsEntityDateReadSerializer(serializers.ModelSerializer):
+    date_from = ApproximateDateSerializerField()
+    date_to = ApproximateDateSerializerField()
     date_type = DateTypeSelectSerializer()
 
     class Meta:
@@ -125,6 +120,9 @@ class FindingAidsEntityDateReadSerializer(serializers.ModelSerializer):
 
 
 class FindingAidsEntityDateWriteSerializer(serializers.ModelSerializer):
+    date_from = ApproximateDateSerializerField()
+    date_to = ApproximateDateSerializerField()
+
     class Meta:
         model = FindingAidsEntityDate
         exclude = ('fa_entity',)
@@ -147,6 +145,8 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
     places_of_creation = FindingAidsEntityPlaceOfCreationSerializer(
         many=True, source='findingaidsentityplaceofcreation_set')
     creators = FindingAidsEntityCreatorSerializer(many=True, source='findingaidsentitycreator_set')
+    date_from = ApproximateDateSerializerField()
+    date_to = ApproximateDateSerializerField()
     dates = FindingAidsEntityDateWriteSerializer(many=True, source='findingaidsentitydate_set')
     alternative_titles = FindingAidsEntityAlternativeTitleSerializer(
         many=True, source='findingaidsentityalternativetitle_set')
@@ -154,7 +154,7 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
     associated_people = FindingAidsEntityAssociatedPersonReadSerializer(
         many=True, source='findingaidsentityassociatedperson_set')
     associated_corporations = FindingAidsEntityAssociatedCorporationReadSerializer(
-        many=True, source='findingaidsentityassociatedperson_set')
+        many=True, source='findingaidsentityassociatedcorporation_set')
     associated_places = FindingAidsEntityAssociatedPlaceReadSerializer(
         many=True, source='findingaidsentityassociatedplace_set'
     )
@@ -170,7 +170,7 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
         return obj.archival_unit.title_full
 
     def get_container_title(self, obj):
-        return '%s #%s' % (obj.container.carrier_type.type, obj.container.container_no)
+        return '%s #%s' % (obj.container.carrier_type.type, obj.container.container_no) if not obj.is_template else ''
 
     class Meta:
         model = FindingAidsEntity
@@ -183,6 +183,8 @@ class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedMo
     places_of_creation = FindingAidsEntityPlaceOfCreationSerializer(
         many=True, source='findingaidsentityplaceofcreation_set', required=False)
     creators = FindingAidsEntityCreatorSerializer(many=True, source='findingaidsentitycreator_set', required=False)
+    date_from = ApproximateDateSerializerField()
+    date_to = ApproximateDateSerializerField()
     dates = FindingAidsEntityDateWriteSerializer(many=True, source='findingaidsentitydate_set', required=False)
     alternative_titles = FindingAidsEntityAlternativeTitleSerializer(
         many=True, source='findingaidsentityalternativetitle_set', required=False)
@@ -190,7 +192,7 @@ class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedMo
     associated_people = FindingAidsEntityAssociatedPersonWriteSerializer(
         many=True, source='findingaidsentityassociatedperson_set', required=False)
     associated_corporations = FindingAidsEntityAssociatedCorporationWriteSerializer(
-        many=True, source='findingaidsentityassociatedperson_set', required=False)
+        many=True, source='findingaidsentityassociatedcorporation_set', required=False)
     associated_places = FindingAidsEntityAssociatedPlaceWriteSerializer(
         many=True, source='findingaidsentityassociatedplace_set', required=False
     )
