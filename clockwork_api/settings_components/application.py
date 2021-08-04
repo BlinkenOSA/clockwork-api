@@ -16,6 +16,9 @@ INSTALLED_APPS = [
     'finding_aids',
     'isaar',
     'isad',
+    'mlr',
+    'digitization',
+    'dashboard',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -81,4 +84,7 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 

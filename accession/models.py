@@ -7,7 +7,7 @@ from django_date_extensions.fields import ApproximateDateField
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 
-class Accession(models.Model):
+class Accession(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     seq = models.CharField(unique=True, max_length=10, blank=True, null=True)

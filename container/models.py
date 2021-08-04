@@ -1,13 +1,15 @@
 from django.db import models
 
+from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
-class Container(models.Model):
+
+class Container(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
 
     archival_unit = models.ForeignKey('archival_unit.ArchivalUnit', on_delete=models.CASCADE)
     carrier_type = models.ForeignKey('controlled_list.CarrierType', on_delete=models.PROTECT)
 
-    container_no = models.IntegerField(default=1)
+    container_no = models.IntegerField()
     container_label = models.CharField(max_length=255, blank=True, null=True)
 
     permanent_id = models.CharField(max_length=50, blank=True, null=True)
@@ -24,6 +26,13 @@ class Container(models.Model):
 
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            container = Container.objects.filter(archival_unit=self.archival_unit).reverse().first()
+            if container:
+                self.container_no = container.container_no + 1
+        super(Container, self).save()
 
     class Meta:
         db_table = 'containers'

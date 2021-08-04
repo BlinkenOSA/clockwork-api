@@ -18,11 +18,12 @@ class LCSHMixin(object):
             session = requests.Session()
             session.trust_env = False
 
-            r = session.get('http://id.loc.gov/search/?q=%s&q=cs:%s&format=json'
-                            % (query, rt))
+            r = session.get('http://id.loc.gov/search/?q=%s&q=cs:%s&format=json' % (query, rt))
             if r.status_code == 200:
+                session.close()
                 return self.assemble_data_stream(json.loads(r.text))
             else:
+                session.close()
                 return []
 
     @staticmethod

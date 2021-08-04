@@ -4,8 +4,9 @@ from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
-from isaar.models import Isaar
-from isaar.serializers import IsaarSelectSerializer, IsaarReadSerializer, IsaarWriteSerializer, IsaarListSerializer
+from isaar.models import Isaar, IsaarRelationship, IsaarPlaceQualifier
+from isaar.serializers import IsaarSelectSerializer, IsaarReadSerializer, IsaarWriteSerializer, IsaarListSerializer, \
+    IsaarRelationshipSerializer, IsaarPlaceQualifierSerializer
 
 
 class IsaarList(MethodSerializerMixin, generics.ListCreateAPIView):
@@ -35,3 +36,19 @@ class IsaarSelectList(generics.ListAPIView):
     filterset_fields = ('type',)
     search_fields = ('name',)
     queryset = Isaar.objects.all().order_by('name')
+
+
+class IsaarRelationshipSelectList(generics.ListAPIView):
+    serializer_class = IsaarRelationshipSerializer
+    pagination_class = None
+    filter_backends = (SearchFilter,)
+    search_fields = ('theme',)
+    queryset = IsaarRelationship.objects.all().order_by('relationship')
+
+
+class IsaarPlaceQualifierSelectList(generics.ListAPIView):
+    serializer_class = IsaarPlaceQualifierSerializer
+    pagination_class = None
+    filter_backends = (SearchFilter,)
+    search_fields = ('place',)
+    queryset = IsaarPlaceQualifier.objects.all().order_by('qualifier')

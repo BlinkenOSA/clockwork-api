@@ -4,12 +4,10 @@ from rest_framework import serializers
 
 from container.models import Container
 from controlled_list.models import CarrierType
-from controlled_list.serializers import CarrierTypeSelectSerializer
+from finding_aids.models import FindingAidsEntity
 
 
 class ContainerReadSerializer(serializers.ModelSerializer):
-    carrier_type = CarrierTypeSelectSerializer()
-
     class Meta:
         model = Container
         fields = '__all__'
@@ -18,7 +16,28 @@ class ContainerReadSerializer(serializers.ModelSerializer):
 class ContainerWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Container
-        fields = '__all__'
+        exclude = ('container_no', )
+
+
+class ContainerListSerializer(serializers.ModelSerializer):
+    carrier_type = serializers.SlugRelatedField(slug_field='type', queryset=CarrierType.objects.all())
+    reference_code = serializers.SerializerMethodField(source='container_no')
+    total_number = serializers.SerializerMethodField()
+    total_published_number = serializers.SerializerMethodField()
+
+    def get_total_number(self, obj):
+        return FindingAidsEntity.objects.filter(container=obj).exclude(is_template=True).count()
+
+    def get_total_published_number(self, obj):
+        return FindingAidsEntity.objects.filter(container=obj, published=True).exclude(is_template=True).count()
+
+    def get_reference_code(self, obj):
+        return "%s:%s" % (obj.archival_unit.reference_code, obj.container_no)
+
+    class Meta:
+        model = Container
+        fields = ('id', 'reference_code', 'barcode', 'carrier_type', 'total_number', 'total_published_number',
+                  'is_removable')
 
 
 class ContainerSelectSerializer(serializers.ModelSerializer):

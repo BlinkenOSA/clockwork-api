@@ -97,8 +97,8 @@ class FindingAidsTest(TestCase):
         self.findings_aids_folder.set_confidential()
         self.assertTrue(self.findings_aids_folder.confidential)
 
-    def test_unset_confidential(self):
-        self.findings_aids_folder.unset_confidential()
+    def test_set_non_confidential(self):
+        self.findings_aids_folder.set_non_confidential()
         self.assertFalse(self.findings_aids_folder.confidential)
 
     def test_set_catalog_id(self):

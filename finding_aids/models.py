@@ -2,12 +2,14 @@ import uuid as uuid
 from django.utils import timezone
 
 from django.db import models
-from django_cloneable import CloneableMixin
 from django_date_extensions.fields import ApproximateDateField
 from hashids import Hashids
+from model_clone import CloneMixin
+
+from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 
-class FindingAidsEntity(CloneableMixin, models.Model):
+class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4)
     archival_unit = models.ForeignKey('archival_unit.ArchivalUnit', on_delete=models.PROTECT)
@@ -87,6 +89,9 @@ class FindingAidsEntity(CloneableMixin, models.Model):
     # Published
     published = models.BooleanField(default=False)
 
+    # Digital Version
+    digital_version_exists = models.BooleanField(default=False)
+
     confidential_display_text = models.CharField(max_length=300, blank=True, null=True)
     confidential = models.BooleanField(default=False)
 
@@ -98,6 +103,12 @@ class FindingAidsEntity(CloneableMixin, models.Model):
 
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True)
+
+    # Clone fields
+    _clone_excluded_model_fields = ['id', 'uuid', 'legacy_id', 'archival_reference_code', 'old_id', 'catalog_id']
+    _clone_many_to_many_fields = ['genre', 'spatial_coverage_country', 'spatial_coverage_place',
+                                  'subject_person', 'subject_corporation', 'subject_keyword']
+    _clone_many_to_one_or_one_to_many_fields = ['archival_unit', 'container', 'original_locale', 'primary_type']
 
     class Meta:
         db_table = 'finding_aids_entities'
@@ -118,7 +129,7 @@ class FindingAidsEntity(CloneableMixin, models.Model):
         self.confidential = True
         self.save()
 
-    def unset_confidential(self):
+    def set_non_confidential(self):
         self.confidential = False
         self.save()
 

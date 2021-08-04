@@ -5,7 +5,6 @@ from django.conf.urls.static import static
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -31,6 +30,9 @@ urlpatterns = [
     path('v1/finding_aids/', include('finding_aids.urls', namespace='finding_aids-v1')),
     path('v1/isaar/', include('isaar.urls', namespace='isaar-v1')),
     path('v1/isad/', include('isad.urls', namespace='isad-v1')),
+    path('v1/mlr/', include('mlr.urls', namespace='mlr-v1')),
+    path('v1/digitization/', include('digitization.urls', namespace='digitization-v1')),
+    path('v1/dashboard/', include('dashboard.urls', namespace='dashboard-v1')),
     path('admin/', admin.site.urls),
 
     # Swagger endpoints

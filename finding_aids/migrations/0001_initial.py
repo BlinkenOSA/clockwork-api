@@ -66,6 +66,7 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('user_updated', models.CharField(blank=True, max_length=100)),
                 ('date_updated', models.DateTimeField(blank=True, null=True)),
+                ('digital_version_exists', models.BooleanField(default=False)),
                 ('archival_unit', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='archival_unit.ArchivalUnit')),
                 ('container', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='container.Container')),
                 ('genre', models.ManyToManyField(blank=True, to='authority.Genre')),

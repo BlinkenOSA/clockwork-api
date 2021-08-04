@@ -2,7 +2,6 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import AllowAny
 
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from donor.models import Donor
@@ -27,7 +26,7 @@ class DonorFilterClass(filters.FilterSet):
 
 class DonorList(MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = Donor.objects.all().order_by('name')
-    filter_class = DonorFilterClass
+    filterset_class = DonorFilterClass
     filter_backends = [OrderingFilter, filters.DjangoFilterBackend]
     ordering_fields = ['name']
     method_serializer_classes = {
