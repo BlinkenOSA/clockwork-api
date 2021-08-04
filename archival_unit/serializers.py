@@ -167,4 +167,4 @@ class ArchivalUnitSelectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ArchivalUnit
-        fields = ('id', 'reference_code', 'title', 'title_full', 'container_count', 'folder_count')
+        fields = ('id', 'level', 'reference_code', 'title', 'title_full', 'container_count', 'folder_count')

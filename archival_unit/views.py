@@ -58,3 +58,17 @@ class ArchivalUnitSelectList(generics.ListAPIView):
     filterset_fields = ('fonds', 'subfonds', 'series', 'level', 'parent')
     search_fields = ['title', 'reference_code']
     queryset = ArchivalUnit.objects.all().order_by('fonds', 'subfonds', 'series')
+
+
+class ArchivalUnitSelectByParentList(generics.ListAPIView):
+    serializer_class = ArchivalUnitSelectSerializer
+    pagination_class = None
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    search_fields = ['title', 'reference_code']
+
+    def get_queryset(self):
+        parent_id = self.kwargs.get('parent_id', None)
+        if parent_id:
+            return ArchivalUnit.objects.filter(parent_id=parent_id)
+        else:
+            return ArchivalUnit.objects.none()
