@@ -25,8 +25,10 @@ class VIAFMixin(object):
             r = session.get('http://www.viaf.org/viaf/search?query=%s&sortKeys=holdingscount&maximumRecords=5&httpAccept'
                             '=application/json&recordSchema=http://viaf.org/BriefVIAFCluster' % query)
             if r.status_code == 200:
+                session.close()
                 return self.assemble_data_stream(json.loads(r.text))
             else:
+                session.close()
                 return []
 
 
