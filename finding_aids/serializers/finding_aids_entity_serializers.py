@@ -15,8 +15,6 @@ from finding_aids.models import FindingAidsEntity, FindingAidsEntityAlternativeT
 
 
 class FindingAidsEntityExtentReadSerializer(serializers.ModelSerializer):
-    extent_unit = ExtentUnitSelectSerializer()
-
     class Meta:
         model = FindingAidsEntityExtent
         exclude = ('fa_entity',)
