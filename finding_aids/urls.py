@@ -1,7 +1,7 @@
 from django.urls import path, re_path
 
-from finding_aids.serializers.finding_aids_template_serializers import FindingAidsTemplateListSerializer
 from finding_aids.views.finding_aids_grid_views import FindingAidsGridList
+from finding_aids.views.finding_aids_label_views import FindingAidsLabelDataView, FindingAidsCarrierTypeDataView
 from finding_aids.views.finding_aids_template_views import FindingAidsTemplateList, FindingAidsTemplateSelect, \
     FindingAidsTemplateDetail, FindingAidsTemplateCreate, FindingAidsTemplatePreCreate
 from finding_aids.views.finding_aids_views import FindingAidsSelectList, FindingAidsCreate, FindingAidsDetail, \
@@ -28,6 +28,13 @@ urlpatterns = [
 
     path('grid/list/<int:series_id>/', FindingAidsGridList.as_view(), name='finding_aids-grid-list'),
 
+    # Label data
+    path('labels/<int:carrier_type_id>/<int:series_id>/', FindingAidsLabelDataView.as_view(),
+         name='finding_aids_label_data_view'),
+    # Carrier Type data
+    path('carriers/<int:series_id>/', FindingAidsCarrierTypeDataView.as_view(),
+         name='finding_aids_carrier_type_data_view'),
+
     re_path(r'(?P<action>["publish"|"unpublish"|"set_confidential"|"set_non_confidential"]+)/(?P<pk>[0-9]+)/',
-            FindingAidsAction.as_view(), name='finding_aids-publish'),
+            FindingAidsAction.as_view(), name='finding_aids-publish')
 ]

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 5.5.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="labels" columnCount="2" printOrder="Horizontal" pageWidth="595" pageHeight="842" columnWidth="297" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="8cad2d12-7e4e-40c1-bf3a-43199bb6d312">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="JsonDataAdapter.xml"/>
+	<queryString language="JSON">
+		<![CDATA[]]>
+	</queryString>
+	<field name="restrictedText" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="restrictionText"/>
+		<fieldDescription><![CDATA[restrictedText]]></fieldDescription>
+	</field>
+	<field name="lastFolderTitle" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="lastFolderName"/>
+		<fieldDescription><![CDATA[lastFolderTitle]]></fieldDescription>
+	</field>
+	<field name="firstFolderTitle" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="startFolderName"/>
+		<fieldDescription><![CDATA[firstFolderTitle]]></fieldDescription>
+	</field>
+	<field name="f" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="f"/>
+		<fieldDescription><![CDATA[f]]></fieldDescription>
+	</field>
+	<field name="seriesTitle" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="series"/>
+		<fieldDescription><![CDATA[seriesTitle]]></fieldDescription>
+	</field>
+	<field name="startFolderDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="startFolderDate"/>
+		<fieldDescription><![CDATA[startFolderDate]]></fieldDescription>
+	</field>
+	<field name="fondTitle" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="fondName"/>
+		<fieldDescription><![CDATA[fondTitle]]></fieldDescription>
+	</field>
+	<field name="s" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="s"/>
+		<fieldDescription><![CDATA[s]]></fieldDescription>
+	</field>
+	<field name="subFondTitle" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="subFondName"/>
+		<fieldDescription><![CDATA[subFondTitle]]></fieldDescription>
+	</field>
+	<field name="sf" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="sf"/>
+		<fieldDescription><![CDATA[sf]]></fieldDescription>
+	</field>
+	<field name="endFolderDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="lastFolderDate"/>
+		<fieldDescription><![CDATA[endFolderDate]]></fieldDescription>
+	</field>
+	<field name="boxNo" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="boxNo"/>
+		<fieldDescription><![CDATA[boxNo]]></fieldDescription>
+	</field>
+	<detail>
+		<band height="210">
+			<frame>
+				<reportElement x="0" y="0" width="290" height="210" uuid="57cca1a2-e2a3-4629-affe-6bc9acf65a1d"/>
+				<staticText>
+					<reportElement x="10" y="20" width="79" height="20" uuid="b4a7291a-85b0-46c9-9819-4185ee92c126"/>
+					<textElement textAlignment="Right">
+						<font fontName="Serif" size="15"/>
+					</textElement>
+					<text><![CDATA[HU OSA]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="190" y="20" width="46" height="20" uuid="a702c165-a8e5-4527-8601-31f1300a6597"/>
+					<textElement textAlignment="Right">
+						<font fontName="Serif" size="16"/>
+					</textElement>
+					<text><![CDATA[Box]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="92" y="20" width="92" height="20" uuid="5714c9bf-79ce-4b4c-aa0a-738d59790d0d"/>
+					<textElement textAlignment="Left">
+						<font fontName="Serif" size="15"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{f}.toString()+"-"+$F{sf}.toString()+"-"+$F{s}.toString()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="240" y="20" width="41" height="20" uuid="0473cc12-7383-481b-9876-59f6078f0778"/>
+					<textElement textAlignment="Left">
+						<font fontName="Serif" size="16"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{boxNo}]]></textFieldExpression>
+				</textField>
+				<frame>
+					<reportElement positionType="Float" x="10" y="50" width="230" height="20" uuid="908301c5-9d33-4f50-861a-5e549e28ace9"/>
+					<textField>
+						<reportElement x="0" y="0" width="30" height="20" uuid="e21949bb-f830-417e-8af6-5885eed6707f"/>
+						<textElement textAlignment="Right">
+							<font fontName="Serif" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{f}]]></textFieldExpression>
+					</textField>
+					<textField>
+						<reportElement x="34" y="0" width="196" height="20" uuid="0b8303a0-53b7-484f-af11-913d8103cecd"/>
+						<textElement textAlignment="Left">
+							<font fontName="Serif" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{fondTitle}.length()>70? $F{fondTitle}.substring( 0,70) + "..." : $F{fondTitle}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="10" y="70" width="230" height="20" uuid="d31e4e56-3642-4fb5-97ef-e7350f2d8a93"/>
+					<textField>
+						<reportElement x="0" y="0" width="30" height="20" uuid="08afc7eb-2b53-406d-9418-096130752d55"/>
+						<textElement textAlignment="Right">
+							<font fontName="Serif" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{sf}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true">
+						<reportElement x="34" y="0" width="196" height="20" uuid="0e769071-f517-4b15-a9fc-a9218e854e25"/>
+						<textElement>
+							<font fontName="Serif" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{subFondTitle}.length()>70 ? $F{subFondTitle}.substring( 0,70) + "..." : $F{subFondTitle}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="10" y="90" width="230" height="20" uuid="4fc8bc09-332e-4874-a81e-4ccfc8b317a0"/>
+					<textField>
+						<reportElement x="0" y="0" width="30" height="20" uuid="0aa8f76f-b2b1-407e-88e1-9607ba09e5fd"/>
+						<textElement textAlignment="Right">
+							<font fontName="Serif" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{s}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true">
+						<reportElement x="34" y="0" width="196" height="20" uuid="79cc7748-23a3-4ac3-92a8-d4ee606196a3"/>
+						<textElement>
+							<font fontName="Serif" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{seriesTitle}.length()>70 ? $F{seriesTitle}.substring( 0,70) + "..." : $F{seriesTitle}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="10" y="120" width="260" height="20" uuid="5215cd12-cf32-4948-a804-a108c0c4deae"/>
+					<staticText>
+						<reportElement x="0" y="0" width="30" height="20" uuid="00339d86-3915-48da-b862-1388d60dd68b"/>
+						<textElement textAlignment="Right">
+							<font fontName="Serif" size="8" isBold="true"/>
+						</textElement>
+						<text><![CDATA[From:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true">
+						<reportElement x="34" y="0" width="226" height="20" uuid="cfa18cdd-656f-47e6-a4b4-7f7ce6fce465"/>
+						<textElement>
+							<font fontName="Serif" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[($F{firstFolderTitle}.length()>40 ? $F{firstFolderTitle}.substring( 0,40) + "..." : $F{firstFolderTitle})+ ", \n" +$F{startFolderDate}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement positionType="Float" x="10" y="140" width="260" height="20" uuid="f2574c26-1c0f-4209-8ddc-1c3c1334464c"/>
+					<staticText>
+						<reportElement x="0" y="0" width="30" height="20" uuid="fa946600-0b4d-47a3-b783-c33a6a2283cd"/>
+						<textElement textAlignment="Right">
+							<font fontName="Serif" size="8" isBold="true"/>
+						</textElement>
+						<text><![CDATA[To:]]></text>
+					</staticText>
+					<textField isStretchWithOverflow="true">
+						<reportElement x="34" y="0" width="226" height="20" uuid="e2c04a6e-e004-4643-89b6-b30d92ddbb91"/>
+						<textElement>
+							<font fontName="Serif" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[($F{lastFolderTitle}.length()>40 ? $F{lastFolderTitle}.substring( 0,40) + "..." : $F{lastFolderTitle})+ ",\n " + $F{endFolderDate}]]></textFieldExpression>
+					</textField>
+				</frame>
+				<frame>
+					<reportElement stretchType="RelativeToBandHeight" x="10" y="180" width="268" height="20" uuid="de988d69-e1d3-469f-a8a0-2f1d46c1962a">
+						<printWhenExpression><![CDATA[!$F{restrictedText}.equals("Not restricted")&& !$F{restrictedText}.equals("Unknown")]]></printWhenExpression>
+					</reportElement>
+					<staticText>
+						<reportElement x="0" y="0" width="70" height="20" uuid="5872c2b5-ce3b-4ff3-91ec-1aa350c71e4a"/>
+						<textElement textAlignment="Right">
+							<font fontName="Serif" size="10" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Restriction:]]></text>
+					</staticText>
+					<textField>
+						<reportElement x="79" y="0" width="189" height="20" uuid="593631fc-b19f-4bfa-bc41-6e73263f99a7"/>
+						<textElement>
+							<font fontName="Serif" size="10"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{restrictedText}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>
