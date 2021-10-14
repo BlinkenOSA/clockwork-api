@@ -29,8 +29,8 @@ class Accession(models.Model, DetectProtectedMixin):
     archival_unit_legacy_name = models.CharField(max_length=300, blank=True, null=True)
 
     donor = models.ForeignKey('donor.Donor', on_delete=models.PROTECT)
-    creation_date_from = ApproximateDateField(blank=True)
-    creation_date_to = ApproximateDateField(blank=True)
+    creation_date_from = ApproximateDateField(blank=True, null=True)
+    creation_date_to = ApproximateDateField(blank=True, null=True)
     custodial_history = models.TextField(blank=True, null=True)
     copyright_status = models.ForeignKey('AccessionCopyrightStatus', on_delete=models.PROTECT, blank=True, null=True)
     copyright_note = models.TextField(blank=True, null=True)

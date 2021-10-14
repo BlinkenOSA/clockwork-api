@@ -1,5 +1,7 @@
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
 from accession.models import Accession, AccessionItem, AccessionMethod, AccessionCopyrightStatus
 from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnitReadSerializer
 from clockwork_api.fields import ApproximateDateSerializerField
@@ -42,9 +44,17 @@ class AccessionListSerializer(serializers.ModelSerializer):
 
 class AccessionWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     transfer_date = ApproximateDateSerializerField()
-    creation_date_from = ApproximateDateSerializerField()
-    creation_date_to = ApproximateDateSerializerField()
+    creation_date_from = ApproximateDateSerializerField(required=False)
+    creation_date_to = ApproximateDateSerializerField(required=False)
     items = AccessionItemSerializer(many=True, source='accessionitem_set')
+
+    def validate(self, data):
+        creation_date_from = data.get('creation_date_from', None)
+        creation_date_to = data.get('creation_date_to', None)
+        if creation_date_to:
+            if creation_date_from > creation_date_to:
+                raise ValidationError("Date from value is bigger than date to value.")
+        return data
 
     class Meta:
         model = Accession
