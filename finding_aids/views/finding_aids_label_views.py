@@ -8,6 +8,7 @@ from django.utils import dateformat
 from pyreportjasper import JasperPy
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -20,6 +21,8 @@ from isad.models import Isad
 
 
 class FindingAidsLabelDataView(APIView):
+    permission_classes = [AllowAny,]
+
     def get(self, request, *args, **kwargs):
         carrier_type = get_object_or_404(CarrierType, pk=kwargs['carrier_type_id'])
         archival_unit = get_object_or_404(ArchivalUnit, pk=kwargs['series_id'])
