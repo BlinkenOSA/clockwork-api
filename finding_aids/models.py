@@ -1,5 +1,8 @@
 import uuid as uuid
+
+from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from django.db import models
 from django_date_extensions.fields import ApproximateDateField

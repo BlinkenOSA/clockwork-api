@@ -58,7 +58,6 @@ class AccessionPreCreate(APIView):
         sequence = Accession.objects.filter(date_created__year=year).count()
         response = {
             'seq': '%d/%03d' % (year, sequence + 1),
-            'items': [""]
         }
         return Response(response)
 

@@ -1,5 +1,6 @@
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from archival_unit.models import ArchivalUnit
 from authority.serializers import LanguageSelectSerializer
@@ -182,7 +183,7 @@ class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedMo
         many=True, source='findingaidsentityplaceofcreation_set', required=False)
     creators = FindingAidsEntityCreatorSerializer(many=True, source='findingaidsentitycreator_set', required=False)
     date_from = ApproximateDateSerializerField()
-    date_to = ApproximateDateSerializerField()
+    date_to = ApproximateDateSerializerField(required=False)
     dates = FindingAidsEntityDateWriteSerializer(many=True, source='findingaidsentitydate_set', required=False)
     alternative_titles = FindingAidsEntityAlternativeTitleSerializer(
         many=True, source='findingaidsentityalternativetitle_set', required=False)
@@ -199,6 +200,14 @@ class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedMo
     )
     languges = FindingAidsEntityLanguageWriteSerializer(many=True, source='findingaidsentitylanguage_set', required=False)
     extents = FindingAidsEntityExtentWriteSerializer(many=True, source='findingaidsentityextent_set', required=False)
+
+    def validate(self, data):
+        date_from = data.get('date_from', None)
+        date_to = data.get('date_to', None)
+        if date_to:
+            if date_from > date_to:
+                raise ValidationError("Date from value is bigger than date to value.")
+        return data
 
     class Meta:
         model = FindingAidsEntity

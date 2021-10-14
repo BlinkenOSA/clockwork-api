@@ -1,5 +1,6 @@
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from archival_unit.models import ArchivalUnit
 from clockwork_api.fields import ApproximateDateSerializerField
@@ -42,6 +43,14 @@ class FindingAidsTemplateWriteSerializer(UserDataSerializerMixin, WritableNested
     )
     languges = FindingAidsEntityLanguageWriteSerializer(many=True, source='findingaidsentitylanguage_set', required=False)
     extents = FindingAidsEntityExtentWriteSerializer(many=True, source='findingaidsentityextent_set', required=False)
+
+    def validate(self, data):
+        date_from = data.get('date_from', None)
+        date_to = data.get('date_to', None)
+        if date_to:
+            if date_from > date_to:
+                raise ValidationError("Date from value is bigger than date to value.")
+        return data
 
     class Meta:
         model = FindingAidsEntity
