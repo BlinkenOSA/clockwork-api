@@ -83,6 +83,9 @@ class ArchivalUnit(models.Model, DetectProtectedMixin):
             self.reference_code = 'HU OSA ' + str(self.fonds) + '-' + str(self.subfonds) + '-' + str(self.series)
             self.reference_code_id = 'hu_osa_' + str(self.fonds) + '-' + str(self.subfonds) + '-' + str(self.series)
 
+    def __str__(self):
+        return ' '.join((self.reference_code, self.title))
+
     def save(self, **kwargs):
         super(ArchivalUnit, self).save()
         self.set_sort()

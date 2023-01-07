@@ -1,5 +1,6 @@
 from django.urls import path, re_path
 
+from finding_aids.views.finding_aids_excel_views import FindingAidsExcelExport
 from finding_aids.views.finding_aids_grid_views import FindingAidsGridList
 from finding_aids.views.finding_aids_label_views import FindingAidsLabelDataView, FindingAidsCarrierTypeDataView
 from finding_aids.views.finding_aids_template_views import FindingAidsTemplateList, FindingAidsTemplateSelect, \
@@ -31,9 +32,13 @@ urlpatterns = [
     # Label data
     path('labels/<int:carrier_type_id>/<int:series_id>/', FindingAidsLabelDataView.as_view(),
          name='finding_aids_label_data_view'),
+
     # Carrier Type data
     path('carriers/<int:series_id>/', FindingAidsCarrierTypeDataView.as_view(),
          name='finding_aids_carrier_type_data_view'),
+
+    # Excel import / export
+    path('excel/export/<int:series_id>/', FindingAidsExcelExport.as_view(), name='finding_aids-excel-export'),
 
     re_path(r'(?P<action>["publish"|"unpublish"|"set_confidential"|"set_non_confidential"]+)/(?P<pk>[0-9]+)/',
             FindingAidsAction.as_view(), name='finding_aids-publish')

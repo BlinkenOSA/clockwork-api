@@ -1,4 +1,3 @@
-from django.conf.urls import url
 from django.urls import path
 
 from controlled_list.views.access_right_views import AccessRightList, AccessRightDetail, AccessRightSelectList
@@ -14,6 +13,7 @@ from controlled_list.views.geo_role_views import GeoRoleList, GeoRoleDetail, Geo
 from controlled_list.views.keyword_views import KeywordList, KeywordDetail, KeywordSelectList
 from controlled_list.views.language_usage_views import LanguageUsageList, LanguageUsageDetail, LanguageUsageSelectList
 from controlled_list.views.locale_views import LocaleList, LocaleDetail, LocaleSelectList
+from controlled_list.views.nationality_views import NationalityList, NationalityDetail, NationalitySelectList
 from controlled_list.views.person_role_views import PersonRoleList, PersonRoleDetail, PersonRoleSelectList
 from controlled_list.views.primary_type_views import PrimaryTypeList, PrimaryTypeDetail, PrimaryTypeSelectList
 from controlled_list.views.reproduction_right_views import ReproductionRightList, ReproductionRightDetail, \
@@ -78,6 +78,11 @@ urlpatterns = [
     path('locales/', LocaleList.as_view(), name='locale-list'),
     path('locales/<int:pk>/', LocaleDetail.as_view(), name='locale-detail'),
     path('select/locales/', LocaleSelectList.as_view(), name='locale-select-list'),
+
+    # Nationality URLs
+    path('nationalities/', NationalityList.as_view(), name='locale-list'),
+    path('nationalities/<int:pk>/', NationalityDetail.as_view(), name='locale-detail'),
+    path('select/nationalities/', NationalitySelectList.as_view(), name='locale-select-list'),
 
     # Person Role URLs
     path('person_roles/', PersonRoleList.as_view(), name='person_role-list'),

@@ -126,6 +126,15 @@ class Locale(models.Model, DetectProtectedMixin):
         ordering = ['locale_name']
 
 
+class Nationality(models.Model, DetectProtectedMixin):
+    id = models.AutoField(primary_key=True)
+    nationality = models.CharField(unique=True, max_length=150)
+
+    class Meta:
+        db_table = 'controlled_nationalities'
+        ordering = ['nationality']
+
+
 class PersonRole(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     role = models.CharField(unique=True, max_length=100)

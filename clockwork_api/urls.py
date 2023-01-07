@@ -16,7 +16,7 @@ schema_view = get_schema_view(
    ),
    validators=['flex'],
    public=True,
-   permission_classes=(permissions.AllowAny,),
+   permission_classes=[permissions.AllowAny]
 )
 
 
@@ -33,11 +33,14 @@ urlpatterns = [
     path('v1/mlr/', include('mlr.urls', namespace='mlr-v1')),
     path('v1/digitization/', include('digitization.urls', namespace='digitization-v1')),
     path('v1/dashboard/', include('dashboard.urls', namespace='dashboard-v1')),
+    path('v1/catalog/', include('catalog.urls', namespace='catalog-v1')),
+    path('v1/workflow/', include('workflow.urls', namespace='workflow-v1')),
+    path('v1/research/', include('research.urls', namespace='research-v1')),
+
     path('admin/', admin.site.urls),
 
     # Swagger endpoints
-    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None),
-      name='schema-json'),
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=None), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=None), name='schema-redoc'),
 
