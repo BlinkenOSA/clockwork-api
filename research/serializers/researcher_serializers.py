@@ -1,4 +1,7 @@
 from rest_framework import serializers
+
+from authority.models import Country
+from controlled_list.models import Nationality
 from research.models import Researcher
 
 
@@ -6,7 +9,8 @@ class ResearcherReadSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     card_number = serializers.SerializerMethodField()
     date_created = serializers.SerializerMethodField()
-    country = serializers.SerializerMethodField()
+    country = serializers.SlugRelatedField(slug_field='country', queryset=Country.objects.all())
+    citizenship = serializers.SlugRelatedField(slug_field='nationality', queryset=Nationality.objects.all())
 
     def get_card_number(self, obj):
         return "%06d" % obj.card_number
@@ -14,12 +18,9 @@ class ResearcherReadSerializer(serializers.ModelSerializer):
     def get_date_created(self, obj):
         return obj.date_created.strftime("%Y-%m-%d %H:%M")
 
-    def get_country(self, obj):
-        return obj.country.country if obj.country else None
-
     class Meta:
         model = Researcher
-        fields = '__all__'
+        fields = ('id', 'name', 'email', 'card_number', 'country', 'citizenship', 'date_created')
 
 
 class ResearcherWriteSerializer(serializers.ModelSerializer):
