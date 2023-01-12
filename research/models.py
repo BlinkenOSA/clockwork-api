@@ -1,8 +1,10 @@
 from django.db import models
 
+from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
+
 
 # Create your models here.
-class Researcher(models.Model):
+class Researcher(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     card_number = models.IntegerField(blank=True, null=True)
     first_name = models.CharField(max_length=100)

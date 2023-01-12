@@ -60,10 +60,10 @@ class IsadFilterClass(filters.FilterSet):
 
 
 class IsadList(generics.ListAPIView):
-    queryset = ArchivalUnit.objects.filter(level='F')
+    queryset = ArchivalUnit.objects.filter(level='F').all()
     serializer_class = IsadFondsSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_class = IsadFilterClass
+    filterset_class = IsadFilterClass
 
 
 class IsadPreCreate(generics.RetrieveAPIView):

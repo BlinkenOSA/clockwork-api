@@ -20,7 +20,8 @@ class ResearcherReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Researcher
-        fields = ('id', 'name', 'email', 'card_number', 'country', 'citizenship', 'date_created')
+        fields = ('id', 'name', 'email', 'card_number', 'country', 'citizenship', 'date_created',
+                  'active', 'approved', 'is_removable')
 
 
 class ResearcherWriteSerializer(serializers.ModelSerializer):
