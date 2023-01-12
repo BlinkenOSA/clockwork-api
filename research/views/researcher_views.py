@@ -14,7 +14,7 @@ from controlled_list.models import Nationality
 from controlled_list.serializers import NationalitySelectSerializer
 from research.models import Researcher
 from research.serializers.researcher_serializers import ResearcherReadSerializer, ResearcherWriteSerializer, \
-    ResearcherSelectSerializer
+    ResearcherSelectSerializer, ResearcherListSerializer
 
 
 class ResearcherList(MethodSerializerMixin, generics.ListCreateAPIView):
@@ -24,7 +24,7 @@ class ResearcherList(MethodSerializerMixin, generics.ListCreateAPIView):
     ordering_fields = ['last_name', 'first_name', 'card_number', 'country__country', 'citizenship__nationality', 'date_created']
     search_fields = ('first_name', 'last_name',)
     method_serializer_classes = {
-        ('GET', ): ResearcherReadSerializer,
+        ('GET', ): ResearcherListSerializer,
         ('POST', ): ResearcherWriteSerializer
     }
 

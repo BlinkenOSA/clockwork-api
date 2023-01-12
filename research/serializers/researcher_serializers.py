@@ -5,7 +5,7 @@ from controlled_list.models import Nationality
 from research.models import Researcher
 
 
-class ResearcherReadSerializer(serializers.ModelSerializer):
+class ResearcherListSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     card_number = serializers.SerializerMethodField()
     date_created = serializers.SerializerMethodField()
@@ -22,6 +22,17 @@ class ResearcherReadSerializer(serializers.ModelSerializer):
         model = Researcher
         fields = ('id', 'name', 'email', 'card_number', 'country', 'citizenship', 'date_created',
                   'active', 'approved', 'is_removable')
+
+
+class ResearcherReadSerializer(serializers.ModelSerializer):
+    card_number = serializers.SerializerMethodField()
+
+    def get_card_number(self, obj):
+        return "%06d" % obj.card_number
+
+    class Meta:
+        model = Researcher
+        fields = '__all__'
 
 
 class ResearcherWriteSerializer(serializers.ModelSerializer):
