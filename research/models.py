@@ -54,7 +54,7 @@ class Researcher(models.Model, DetectProtectedMixin):
         super(Researcher, self).save()
 
     class Meta:
-        db_table = 'research_researcher'
+        db_table = 'research_researchers'
 
 
 class ResearcherDegree(models.Model):
@@ -62,16 +62,30 @@ class ResearcherDegree(models.Model):
     degree = models.CharField(max_length=100, unique=True)
 
     class Meta:
-        db_table = 'research_degree'
+        db_table = 'research_researcher_degrees'
+
+
+class ResearcherVisit(models.Model):
+    id = models.AutoField(primary_key=True)
+    researcher = models.ForeignKey('Researcher', on_delete=models.PROTECT)
+    check_in = models.DateTimeField(auto_now_add=True)
+    check_out = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'research_researcher_visits'
 
 
 class Request(models.Model):
     id = models.AutoField(primary_key=True)
     researcher = models.ForeignKey('Researcher', on_delete=models.PROTECT)
+    STATUS_VALUES = [('N', 'New'), ('P', 'Processed and prepared'), ('F', 'Finished')]
+    status = models.CharField(max_length=1, default='N')
     request_date = models.DateTimeField(blank=True, auto_now_add=True)
+    processed_date = models.DateTimeField(blank=True, null=True)
+    finishing_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        db_table = 'research_request'
+        db_table = 'research_requests'
 
 
 class RequestItems(models.Model):
@@ -82,8 +96,7 @@ class RequestItems(models.Model):
     archival_reference_number = models.CharField(max_length=30)
     identifier = models.CharField(max_length=20)
     title = models.CharField(max_length=200, blank=True, null=True)
-    request_date = models.DateTimeField(blank=True, auto_now_add=True)
-    closing_date = models.DateTimeField(blank=True, null=True)
+    reshelve_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         db_table = 'research_request_items'

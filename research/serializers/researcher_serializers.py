@@ -44,5 +44,5 @@ class ResearcherWriteSerializer(serializers.ModelSerializer):
 class ResearcherSelectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Researcher
-        fields = ('id', 'last_name', 'first_name')
+        fields = ('id', 'name')
 
