@@ -9,7 +9,7 @@ from catalog.views.research_request_views.researcher_registration import Researc
 from catalog.views.tree_views.archival_units_tree_quick_view import ArchivalUnitsTreeQuickView
 from catalog.views.tree_views.archival_units_tree_view import ArchivalUnitsTreeView
 from research.views.researcher_views import ResearcherCountrySelectList, ResearcherNationalitySelectList
-from research.views.researher_degree_views import ResearcherDegreeSelectList
+from research.views.researcher_degree_views import ResearcherDegreeSelectList
 
 app_name = 'catalog'
 

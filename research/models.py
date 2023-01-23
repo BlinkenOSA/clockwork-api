@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
@@ -78,25 +80,57 @@ class ResearcherVisit(models.Model):
 class Request(models.Model):
     id = models.AutoField(primary_key=True)
     researcher = models.ForeignKey('Researcher', on_delete=models.PROTECT)
-    STATUS_VALUES = [('N', 'New'), ('P', 'Processed and prepared'), ('F', 'Finished')]
-    status = models.CharField(max_length=1, default='N')
-    request_date = models.DateTimeField(blank=True, auto_now_add=True)
-    processed_date = models.DateTimeField(blank=True, null=True)
-    finishing_date = models.DateTimeField(blank=True, null=True)
+    created_date = models.DateTimeField(blank=True, auto_now_add=True)
+    request_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         db_table = 'research_requests'
 
 
-class RequestItems(models.Model):
+class RequestItem(models.Model):
     id = models.AutoField(primary_key=True)
     request = models.ForeignKey('Request', on_delete=models.PROTECT)
+    STATUS_VALUES = [('1', 'In Queue'), ('2', 'Pending'), ('3', 'Processed and prepared'), ('4', 'Reshelved')]
+    status = models.CharField(max_length=1, default='1')
     ORIGIN = [('FA', 'Finding Aids'), ('L', 'Library'), ('FL', 'Film Library')]
     item_origin = models.CharField(max_length=3, choices=ORIGIN)
-    archival_reference_number = models.CharField(max_length=30)
-    identifier = models.CharField(max_length=20)
+    archival_unit = models.CharField(max_length=20, blank=True, null=True)
+    archival_reference_number = models.CharField(max_length=30, blank=True, null=True)
+    identifier = models.CharField(max_length=20, blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
     reshelve_date = models.DateTimeField(blank=True, null=True)
+
+    def save(self, **kwargs):
+        researcher = self.request.researcher
+        requested_items_count = RequestItem.objects.filter(
+            request__researcher=researcher,
+            item_origin=self.item_origin,
+            status='2'
+        ).count()
+
+        # Check if there are one free slots from 10 for the newly created item. If yes, change status to 2.
+        if self.status == '1':
+            if requested_items_count < 10:
+                self.status = '2'
+
+        # Check if there are free slots from 10 for the newly created item. If yes, change their status to 2.
+        if self.status == '3':
+            if requested_items_count < 10:
+                requested_item_next_in_queue = RequestItem.objects.filter(
+                    request__researcher=researcher,
+                    item_origin=self.item_origin,
+                    status='1'
+                ).order_by('request__request_date').first()
+                if len(requested_item_next_in_queue) > 0:
+                    requested_item_next_in_queue[0].status = '2'
+                    requested_item_next_in_queue[0].save()
+
+        # If reshelving is happening, write the reshelving date into the record.
+        if self.status == '4':
+            if not self.reshelve_date:
+                self.reshelve_date = datetime.datetime.now()
+
+        super(RequestItem, self).save(**kwargs)
 
     class Meta:
         db_table = 'research_request_items'

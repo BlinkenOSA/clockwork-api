@@ -4,7 +4,7 @@ from research.views.researcher_views import ResearcherList, ResearcherDetail, Re
     ResearcherCountrySelectList, ResearcherNationalitySelectList, ResearcherActivate, ResearcherApprove, \
     ResearcherCountryActiveSelectList, ResearcherNationalityActiveSelectList
 from research.views.researcher_visit_views import ResearcherVisitsList
-from research.views.researher_degree_views import ResearcherDegreeList, ResearcherDegreeDetail, \
+from research.views.researcher_degree_views import ResearcherDegreeList, ResearcherDegreeDetail, \
     ResearcherDegreeSelectList
 
 app_name = 'research'
