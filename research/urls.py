@@ -1,5 +1,6 @@
 from django.urls.conf import path, re_path
 
+from research.views.requests_views import RequestsList, RequestItemStatusStep, RequestsListForPrint
 from research.views.researcher_views import ResearcherList, ResearcherDetail, ResearcherSelectList, \
     ResearcherCountrySelectList, ResearcherNationalitySelectList, ResearcherActivate, ResearcherApprove, \
     ResearcherCountryActiveSelectList, ResearcherNationalityActiveSelectList
@@ -22,6 +23,11 @@ urlpatterns = [
     path('visits', ResearcherVisitsList.as_view(), name='researcher-visits-list'),
     path('visits/check-in/<int:researcher_id>', ResearcherVisitsCheckIn.as_view(), name='researcher-visits-check-in'),
     path('visits/check-out/<int:pk>', ResearcherVisitsCheckOut.as_view(), name='researcher-visits-check-out'),
+
+    path('requests', RequestsList.as_view(), name='requests-list'),
+    path('requests/print', RequestsListForPrint.as_view(), name='requests-list-for-print'),
+    re_path(r'requests/(?P<action>["next"|"previous"]+)/(?P<request_item_id>[0-9]+)/$', RequestItemStatusStep.as_view(),
+            name='request-item-status-change'),
 
     path('country/select/', ResearcherCountrySelectList.as_view(), name='researcher-country-select-list'),
     path('nationality/select/', ResearcherNationalitySelectList.as_view(), name='researcher-nationality-select-list'),
