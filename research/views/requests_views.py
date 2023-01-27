@@ -27,7 +27,7 @@ class RequestsListForPrint(generics.ListAPIView):
     def get_queryset(self):
         return RequestItem.objects.filter(
             status='2'
-        )
+        ).order_by('request__request_date')
 
 class RequestItemStatusStep(APIView):
     def put(self, request, *args, **kwargs):
