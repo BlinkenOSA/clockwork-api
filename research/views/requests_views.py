@@ -1,13 +1,17 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
-from rest_framework.filters import OrderingFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from archival_unit.models import ArchivalUnit
+from archival_unit.serializers import ArchivalUnitSeriesSerializer
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
+from container.models import Container
+from container.serializers import ContainerSelectSerializer
 from research.models import RequestItem
-from research.serializers.requests_serializers import RequestListSerializer
+from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer
 
 
 class RequestsList(MethodSerializerMixin, generics.ListCreateAPIView):
@@ -28,6 +32,7 @@ class RequestsListForPrint(generics.ListAPIView):
         return RequestItem.objects.filter(
             status='2'
         ).order_by('request__request_date')
+
 
 class RequestItemStatusStep(APIView):
     def put(self, request, *args, **kwargs):
@@ -50,3 +55,12 @@ class RequestItemStatusStep(APIView):
                 return Response(status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_200_OK)
+
+
+class RequestSeriesSelect(generics.ListAPIView):
+    queryset = ArchivalUnit.objects.filter(level='S').order_by('sort')
+    filter_backends = [SearchFilter]
+    search_fields = ['title_full']
+    pagination_class = None
+    serializer_class = ArchivalUnitSeriesSerializer
+

@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
+from container.models import Container
 from mlr.models import MLREntity
 from research.models import RequestItem
 
@@ -26,3 +27,14 @@ class RequestListSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItem
         fields = '__all__'
+
+
+class ContainerListSerializer(serializers.ModelSerializer):
+    reference_code = serializers.SerializerMethodField()
+
+    def get_reference_code(self, obj):
+        return "%s:%s" % (obj.archival_unit.reference_code, obj.container_no)
+
+    class Meta:
+        model = Container
+        fields = ('id', 'reference_code')
