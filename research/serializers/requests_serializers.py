@@ -1,9 +1,10 @@
 from django.core.exceptions import ObjectDoesNotExist
+from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
 from container.models import Container
 from mlr.models import MLREntity
-from research.models import RequestItem
+from research.models import RequestItem, Request
 
 
 class RequestListSerializer(serializers.ModelSerializer):
@@ -15,6 +16,22 @@ class RequestListSerializer(serializers.ModelSerializer):
 
     def get_mlr(self, obj):
         if obj.item_origin == 'FA':
+            same_archival_request = RequestItem.objects.filter(
+                item_origin='FA', container=obj.container).exclude(id=obj.id)
+            if same_archival_request.filter(status='3').exists():
+                return 'Currently used'
+            if same_archival_request.filter(status='4').exists():
+                return 'Waiting to be reshelved'
+
+        else:
+            same_library_request = RequestItem.objects.filter(
+                identifier=obj.identifier).exclude(id=obj.id, item_origin='FA')
+            if same_library_request.filter(status='3').exists():
+                return 'Currently used'
+            if same_library_request.filter(status='4').exists():
+                return 'Waiting to be reshelved'
+
+        if obj.item_origin == 'FA':
             series = obj.container.archival_unit
             carrier_type = obj.container.carrier_type
             try:
@@ -22,6 +39,7 @@ class RequestListSerializer(serializers.ModelSerializer):
                 return mlr.get_locations()
             except ObjectDoesNotExist:
                 return ''
+
         return 'Library Record'
 
     class Meta:
@@ -30,11 +48,26 @@ class RequestListSerializer(serializers.ModelSerializer):
 
 
 class ContainerListSerializer(serializers.ModelSerializer):
-    reference_code = serializers.SerializerMethodField()
+    container_label = serializers.SerializerMethodField()
 
-    def get_reference_code(self, obj):
-        return "%s:%s" % (obj.archival_unit.reference_code, obj.container_no)
+    def get_container_label(self, obj):
+        return "%s (%s)" % (obj.container_no, obj.carrier_type.type)
 
     class Meta:
         model = Container
-        fields = ('id', 'reference_code')
+        fields = ('id', 'container_label')
+
+
+class RequestItemWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestItem
+        fields = ('id', 'item_origin', 'container', 'identifier', 'title')
+
+
+class RequestWriteSerializer(WritableNestedModelSerializer):
+    request_items = RequestItemWriteSerializer(many=True, source='requestitem_set')
+
+    class Meta:
+        model = Request
+        fields = ('researcher', 'request_date', 'request_items')
+

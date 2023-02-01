@@ -1,7 +1,7 @@
 from django.urls.conf import path, re_path
 
 from research.views.requests_views import RequestsList, RequestItemStatusStep, RequestsListForPrint, \
-    RequestSeriesSelect
+    RequestSeriesSelect, RequestContainerSelect, RequestsCreate
 from research.views.researcher_views import ResearcherList, ResearcherDetail, ResearcherSelectList, \
     ResearcherCountrySelectList, ResearcherNationalitySelectList, ResearcherActivate, ResearcherApprove, \
     ResearcherCountryActiveSelectList, ResearcherNationalityActiveSelectList
@@ -26,10 +26,12 @@ urlpatterns = [
     path('visits/check-out/<int:pk>', ResearcherVisitsCheckOut.as_view(), name='researcher-visits-check-out'),
 
     path('requests', RequestsList.as_view(), name='requests-list'),
-    path('requests/print', RequestsListForPrint.as_view(), name='requests-list-for-print'),
+    path('requests/create/', RequestsCreate.as_view(), name='requests-create'),
+    path('requests/print/', RequestsListForPrint.as_view(), name='requests-list-for-print'),
     re_path(r'requests/(?P<action>["next"|"previous"]+)/(?P<request_item_id>[0-9]+)/$', RequestItemStatusStep.as_view(),
             name='request-item-status-change'),
     path('requests/series/select/', RequestSeriesSelect.as_view(), name='requests-series-select'),
+    path('requests/container/select/<int:series_id>', RequestContainerSelect.as_view(), name='requests-container-select'),
 
     path('country/select/', ResearcherCountrySelectList.as_view(), name='researcher-country-select-list'),
     path('nationality/select/', ResearcherNationalitySelectList.as_view(), name='researcher-nationality-select-list'),

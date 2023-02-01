@@ -90,7 +90,7 @@ class Request(models.Model):
 class RequestItem(models.Model):
     id = models.AutoField(primary_key=True)
     request = models.ForeignKey('Request', on_delete=models.PROTECT)
-    STATUS_VALUES = [('1', 'In Queue'), ('2', 'Pending'), ('3', 'Processed and prepared'), ('4', 'Reshelved')]
+    STATUS_VALUES = [('1', 'In Queue'), ('2', 'Pending'), ('3', 'Processed and prepared'), ('4', 'Returned'), ('5', 'Reshelved')]
     status = models.CharField(max_length=1, choices=STATUS_VALUES, default='1')
     ORIGIN = [('FA', 'Finding Aids'), ('L', 'Library'), ('FL', 'Film Library')]
     item_origin = models.CharField(max_length=3, choices=ORIGIN)
@@ -99,6 +99,7 @@ class RequestItem(models.Model):
     archival_reference_number = models.CharField(max_length=30, blank=True, null=True)
     identifier = models.CharField(max_length=20, blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
+    return_date = models.DateTimeField(blank=True, null=True)
     reshelve_date = models.DateTimeField(blank=True, null=True)
 
     def save(self, **kwargs):
@@ -114,8 +115,8 @@ class RequestItem(models.Model):
             if requested_items_count < 10:
                 self.status = '2'
 
-        # Check if there are free slots from 10 for the newly created item. If yes, change their status to 2.
-        if self.status == '3':
+        # If return is happening, write the return date into the record.
+        if self.status == '4':
             if requested_items_count < 10:
                 requested_items_next_in_queue = RequestItem.objects.filter(
                     request__researcher=researcher,
@@ -127,8 +128,10 @@ class RequestItem(models.Model):
                     requested_item_next_in_queue.status = '2'
                     requested_item_next_in_queue.save()
 
-        # If reshelving is happening, write the reshelving date into the record.
-        if self.status == '4':
+            if not self.return_date:
+                self.return_date = datetime.datetime.now()
+
+        if self.status == '5':
             if not self.reshelve_date:
                 self.reshelve_date = datetime.datetime.now()
 
