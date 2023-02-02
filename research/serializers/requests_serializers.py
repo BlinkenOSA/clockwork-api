@@ -12,6 +12,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     created_date = serializers.SlugRelatedField(slug_field='created_date', read_only=True, source='request')
     request_date = serializers.SlugRelatedField(slug_field='request_date', read_only=True, source='request')
     carrier_type = serializers.SlugRelatedField(slug_field='type', read_only=True, source='container.carrier_type')
+    archival_reference_number = serializers.SerializerMethodField()
     mlr = serializers.SerializerMethodField()
 
     def get_mlr(self, obj):
@@ -42,6 +43,12 @@ class RequestListSerializer(serializers.ModelSerializer):
 
         return 'Library Record'
 
+    def get_archival_reference_number(self, obj):
+        if obj.item_origin == 'FA':
+            return "%s:%s" % (obj.container.archival_unit.reference_code, obj.container.container_no)
+        else:
+            return ''
+
     class Meta:
         model = RequestItem
         fields = '__all__'
@@ -58,16 +65,28 @@ class ContainerListSerializer(serializers.ModelSerializer):
         fields = ('id', 'container_label')
 
 
-class RequestItemWriteSerializer(serializers.ModelSerializer):
+class RequestItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItem
         fields = ('id', 'item_origin', 'container', 'identifier', 'title')
 
 
-class RequestWriteSerializer(WritableNestedModelSerializer):
-    request_items = RequestItemWriteSerializer(many=True, source='requestitem_set')
+class RequestCreateSerializer(WritableNestedModelSerializer):
+    request_items = RequestItemCreateSerializer(many=True, source='requestitem_set')
 
     class Meta:
         model = Request
         fields = ('researcher', 'request_date', 'request_items')
 
+
+class RequestItemWriteSerializer(serializers.ModelSerializer):
+    researcher = serializers.CharField(source='request.researcher.name', read_only=True)
+    request_date = serializers.CharField(source='request.request_date', read_only=True)
+    archival_unit = serializers.SerializerMethodField()
+
+    def get_archival_unit(self, obj):
+        return obj.container.archival_unit.id
+
+    class Meta:
+        model = RequestItem
+        fields = ('id', 'archival_unit', 'researcher', 'request_date', 'item_origin', 'container', 'identifier', 'title')

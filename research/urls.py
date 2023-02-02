@@ -1,7 +1,7 @@
 from django.urls.conf import path, re_path
 
-from research.views.requests_views import RequestsList, RequestItemStatusStep, RequestsListForPrint, \
-    RequestSeriesSelect, RequestContainerSelect, RequestsCreate
+from research.views.requests_views import RequestsList, RequestsListForPrint, \
+    RequestSeriesSelect, RequestContainerSelect, RequestsCreate, RequestItemStatusStep, RequestItemUpdate
 from research.views.researcher_views import ResearcherList, ResearcherDetail, ResearcherSelectList, \
     ResearcherCountrySelectList, ResearcherNationalitySelectList, ResearcherActivate, ResearcherApprove, \
     ResearcherCountryActiveSelectList, ResearcherNationalityActiveSelectList
@@ -32,6 +32,8 @@ urlpatterns = [
             name='request-item-status-change'),
     path('requests/series/select/', RequestSeriesSelect.as_view(), name='requests-series-select'),
     path('requests/container/select/<int:series_id>', RequestContainerSelect.as_view(), name='requests-container-select'),
+
+    path('request_item/<int:pk>/', RequestItemUpdate.as_view(), name='request-item-update'),
 
     path('country/select/', ResearcherCountrySelectList.as_view(), name='researcher-country-select-list'),
     path('nationality/select/', ResearcherNationalitySelectList.as_view(), name='researcher-nationality-select-list'),

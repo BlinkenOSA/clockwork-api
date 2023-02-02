@@ -95,8 +95,6 @@ class RequestItem(models.Model):
     ORIGIN = [('FA', 'Finding Aids'), ('L', 'Library'), ('FL', 'Film Library')]
     item_origin = models.CharField(max_length=3, choices=ORIGIN)
     container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.CASCADE)
-    archival_unit = models.CharField(max_length=20, blank=True, null=True)
-    archival_reference_number = models.CharField(max_length=30, blank=True, null=True)
     identifier = models.CharField(max_length=20, blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
     return_date = models.DateTimeField(blank=True, null=True)

@@ -3,17 +3,14 @@ from rest_framework import generics, status
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import get_object_or_404, CreateAPIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
 from archival_unit.serializers import ArchivalUnitSeriesSerializer
-from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from container.models import Container
-from container.serializers import ContainerSelectSerializer
 from research.models import RequestItem, Request
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
-    RequestWriteSerializer, RequestItemWriteSerializer
+    RequestCreateSerializer, RequestItemWriteSerializer
 
 
 class RequestsList(generics.ListAPIView):
@@ -25,41 +22,13 @@ class RequestsList(generics.ListAPIView):
 
 
 class RequestsCreate(CreateAPIView):
-    serializer_class = RequestWriteSerializer
+    serializer_class = RequestCreateSerializer
     queryset = Request.objects.all()
 
-    def perform_create(self, serializer):
-        pass
 
-
-class RequestsCreateBackup(APIView):
-    def post(self, request, *args, **kwargs):
-        # Create Request
-        req = {
-            'researcher': request.data.get('researcher', None),
-            'request_date': request.data.get('request_date', None)
-        }
-        serializer = RequestWriteSerializer(data=req)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        req_record = serializer.instance
-
-        # Create Request Item
-        request_items = request.data.get('request_items', [])
-        for request_item in request_items:
-            request_item['request'] = req_record.id
-            serializer = RequestItemWriteSerializer(data=request_item)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            req_item_record = serializer.instance
-            if req_item_record.item_origin == 'FA':
-                req_item_record.archival_unit = req_item_record.container.archival_unit.reference_code
-                req_item_record.archival_reference_number = \
-                    "%s:%s" % (req_item_record.container.archival_unit.reference_code,
-                               req_item_record.container.container_no)
-                req_item_record.save()
-
-        return Response("OK", status=HTTP_200_OK)
+class RequestItemUpdate(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = RequestItemWriteSerializer
+    queryset = RequestItem.objects.all()
 
 
 class RequestsListForPrint(generics.ListAPIView):
