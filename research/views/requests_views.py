@@ -49,19 +49,21 @@ class RequestItemStatusStep(APIView):
         st = int(request_item.status)
 
         if action == 'next':
-            if st < 5:
-                request_item.status = str(st+1)
-                request_item.save()
-                return Response(status=status.HTTP_200_OK)
+            # Handle digital version
+            if request_item.container.has_digital_version:
+                if st == 2:
+                    request_item.status = '9'
+                    request_item.save()
             else:
-                return Response(status=status.HTTP_200_OK)
+                if st < 5:
+                    request_item.status = str(st+1)
+                    request_item.save()
+            return Response(status=status.HTTP_200_OK)
         if action == 'previous':
-            if st > 1:
+            if 1 < st < 5:
                 request_item.status = str(st-1)
                 request_item.save()
-                return Response(status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
 
 
 class RequestSeriesSelect(generics.ListAPIView):

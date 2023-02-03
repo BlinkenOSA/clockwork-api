@@ -1,6 +1,7 @@
 from django.db import models
 
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
+from finding_aids.models import FindingAidsEntity
 
 
 class Container(models.Model, DetectProtectedMixin):
@@ -33,6 +34,16 @@ class Container(models.Model, DetectProtectedMixin):
             if container:
                 self.container_no = container.container_no + 1
         super(Container, self).save()
+
+    @property
+    def has_digital_version(self):
+        if self.digital_version_exists:
+            return True
+        if FindingAidsEntity.objects.filter(
+                container=self,
+                digital_version_exists=True).exists():
+            return True
+        return False
 
     class Meta:
         db_table = 'containers'
