@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='user_profile', to=settings.AUTH_USER_MODEL, verbose_name='user')),
             ],
             options={
-                'db_table': 'accounts_user_profile',
+                'db_table': 'accounts_userprofile',
             },
         ),
     ]

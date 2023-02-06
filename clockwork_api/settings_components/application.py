@@ -19,6 +19,9 @@ INSTALLED_APPS = [
     'mlr',
     'digitization',
     'dashboard',
+    'catalog',
+    'workflow',
+    'research',
 
     'rest_framework',
     'rest_framework.authtoken',
