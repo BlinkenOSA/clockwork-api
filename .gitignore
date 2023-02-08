@@ -110,3 +110,5 @@ venv.bak/
 /clockwork_api/settings_components/local.py
 
 .DS_STORE
+
+/research/management
