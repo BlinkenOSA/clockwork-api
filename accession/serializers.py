@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 
 from accession.models import Accession, AccessionItem, AccessionMethod, AccessionCopyrightStatus
 from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnitReadSerializer
-from clockwork_api.fields import ApproximateDateSerializerField
+from clockwork_api.fields.approximate_date_serializer_field import ApproximateDateSerializerField
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 
 

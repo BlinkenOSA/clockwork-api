@@ -2,6 +2,7 @@ import datetime
 
 from django.db import models
 
+from clockwork_api.fields.email_null_field import EmailNullField
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 
@@ -17,9 +18,9 @@ class Researcher(models.Model, DetectProtectedMixin):
     city_hungary = models.CharField(max_length=100, blank=True, null=True)
     city_abroad = models.CharField(max_length=100, blank=True, null=True)
     country = models.ForeignKey('authority.Country', on_delete=models.PROTECT, blank=True, null=True)
-    citizenship = models.ForeignKey('controlled_list.Nationality', on_delete=models.PROTECT)
+    citizenship = models.ForeignKey('controlled_list.Nationality', on_delete=models.PROTECT, blank=True, null=True)
     id_number = models.CharField(max_length=50)
-    email = models.EmailField(max_length=100, unique=True)
+    email = EmailNullField(max_length=100, unique=True, blank=True, null=True)
 
     OCCUPATION_CHOICES = [('ceu', 'CEU'), ('other', 'Other')]
     occupation = models.CharField(max_length=20, choices=OCCUPATION_CHOICES, default='ceu')
