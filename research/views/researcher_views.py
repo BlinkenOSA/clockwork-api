@@ -40,7 +40,7 @@ class ResearcherSelectList(generics.ListAPIView):
     pagination_class = None
     filter_backends = (SearchFilter,)
     search_fields = ['first_name', 'last_name']
-    queryset = Researcher.objects.all().order_by('last_name', 'first_name')
+    queryset = Researcher.objects.filter(active=True, approved=True).order_by('last_name', 'first_name')
 
 
 class ResearcherCountrySelectList(generics.ListAPIView):
