@@ -4033,5 +4033,19 @@
     "user_updated": "",
     "date_updated": null
   }
+}, {
+  "model": "authority.country",
+  "pk": 275,
+  "fields": {
+    "alpha2": "ps",
+    "alpha3": "naa",
+    "wiki_url": null,
+    "authority_url": null,
+    "country": "State of Palestine",
+    "user_created": "",
+    "date_created": "2017-11-24T00:00:00",
+    "user_updated": "",
+    "date_updated": null
+  }
 }
 ]

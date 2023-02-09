@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from archival_unit.models import ArchivalUnit
-from clockwork_api.fields import ApproximateDateSerializerField
+from clockwork_api.fields.approximate_date_serializer_field import ApproximateDateSerializerField
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from finding_aids.models import FindingAidsEntity
 from finding_aids.serializers.finding_aids_entity_serializers import FindingAidsEntityPlaceOfCreationSerializer, \

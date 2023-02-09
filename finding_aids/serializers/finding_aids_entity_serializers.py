@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 
 from archival_unit.models import ArchivalUnit
 from authority.serializers import LanguageSelectSerializer
-from clockwork_api.fields import ApproximateDateSerializerField
+from clockwork_api.fields.approximate_date_serializer_field import ApproximateDateSerializerField
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from container.models import Container
 from controlled_list.serializers import DateTypeSelectSerializer, CorporationRoleSelectSerializer, \
