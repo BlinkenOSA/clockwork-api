@@ -15,7 +15,8 @@ class ResearcherVisitsList(ListAPIView):
     queryset = ResearcherVisit.objects.all().order_by('-check_in')
     filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter)
     filterset_fields = ['researcher']
-    ordering_fields = ['last_name', 'first_name', 'check_in', 'check_out']
+    search_fields = ['researcher__last_name', 'researcher__first_name', 'researcher__email', 'researcher__card_number']
+    ordering_fields = ['researcher__last_name', 'researcher__first_name', 'researcher__card_number', 'researcher__email', 'check_in', 'check_out']
     serializer_class = ResearcherVisitListSerializer
 
 
