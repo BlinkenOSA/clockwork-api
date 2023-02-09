@@ -1,0 +1,44 @@
+[
+{
+    "model": "research.researcherdegree",
+    "pk": 2,
+    "fields": {
+        "degree": "High School"
+    }
+},
+{
+    "model": "research.researcherdegree",
+    "pk": 3,
+    "fields": {
+        "degree": "Undergraduate university student"
+    }
+},
+{
+    "model": "research.researcherdegree",
+    "pk": 4,
+    "fields": {
+        "degree": "BA. Higher education degree"
+    }
+},
+{
+    "model": "research.researcherdegree",
+    "pk": 5,
+    "fields": {
+        "degree": "MA. Higher education degree"
+    }
+},
+{
+    "model": "research.researcherdegree",
+    "pk": 6,
+    "fields": {
+        "degree": "Ph.D. Advanced degree"
+    }
+},
+{
+    "model": "research.researcherdegree",
+    "pk": 7,
+    "fields": {
+        "degree": "Highest education degree"
+    }
+}
+]
