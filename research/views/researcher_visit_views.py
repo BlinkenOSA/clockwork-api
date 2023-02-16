@@ -48,7 +48,7 @@ class ResearcherVisitsCheckOut(APIView):
         # else check out should happen on the same day at 18:00
         else:
             ci = visit.check_in
-            visit.check_out = datetime.datetime(ci.year, ci.month, ci.day, 18, 00, 00)
+            visit.check_out = datetime.datetime(ci.year, ci.month, ci.day, 17, 45, 00)
 
         visit.save()
         return Response(status=status.HTTP_200_OK)
