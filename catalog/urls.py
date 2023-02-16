@@ -15,19 +15,19 @@ app_name = 'catalog'
 
 urlpatterns = [
     # Archival Unit Views
-    path('archival-units/<str:archival_unit_id>', ArchivalUnitsDetailView.as_view(),
+    path('archival-units/<str:archival_unit_id>/', ArchivalUnitsDetailView.as_view(),
          name='archival-units-full-view'),
 
     # Finding Aids Views
-    path('finding-aids/<str:fa_entity_catalog_id>', FindingAidsEntityDetailView.as_view(),
+    path('finding-aids/<str:fa_entity_catalog_id>/', FindingAidsEntityDetailView.as_view(),
          name='finding-aids-full-view'),
-    path('finding-aids-location/<str:fa_entity_catalog_id>', FindingAidsEntityLocationView.as_view(),
+    path('finding-aids-location/<str:fa_entity_catalog_id>/', FindingAidsEntityLocationView.as_view(),
          name='finding-aids-location-view'),
 
     # Tree Views
-    path('archival-units-tree/<str:archival_unit_id>', ArchivalUnitsTreeView.as_view(),
+    path('archival-units-tree/<str:archival_unit_id>/', ArchivalUnitsTreeView.as_view(),
          name='archival-units-tree'),
-    path('archival-units-tree-quick-view/<str:archival_unit_id>', ArchivalUnitsTreeQuickView.as_view(),
+    path('archival-units-tree-quick-view/<str:archival_unit_id>/', ArchivalUnitsTreeQuickView.as_view(),
          name='archival-units-tree-quick-view'),
 
     # IIIF manifests

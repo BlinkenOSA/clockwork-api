@@ -41,6 +41,14 @@ class ResearcherVisitsCheckOut(APIView):
     def put(self, request, *args, **kwargs):
         visit_id = self.kwargs.get('pk')
         visit = get_object_or_404(ResearcherVisit, pk=visit_id)
-        visit.check_out = datetime.datetime.now()
+
+        # If check out is on the same day, then current date:
+        if visit.check_in.day == datetime.datetime.now().day:
+            visit.check_out = datetime.datetime.now()
+        # else check out should happen on the same day at 18:00
+        else:
+            ci = visit.check_in
+            visit.check_out = datetime.datetime(ci.year, ci.month, ci.day, 18, 00, 00)
+
         visit.save()
         return Response(status=status.HTTP_200_OK)

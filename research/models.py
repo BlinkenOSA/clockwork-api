@@ -53,7 +53,8 @@ class Researcher(models.Model, DetectProtectedMixin):
         return "%s, %s" % (self.last_name, self.first_name)
 
     def save(self, **kwargs):
-        self.card_number = self.get_next_card_number()
+        if not self.card_number:
+            self.card_number = self.get_next_card_number()
         super(Researcher, self).save()
 
     class Meta:
