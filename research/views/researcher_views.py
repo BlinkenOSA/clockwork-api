@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from authority.models import Country
 from authority.serializers import CountrySelectSerializer
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
+from clockwork_api.pagination import DropDownResultSetPagination
 from controlled_list.models import Nationality
 from controlled_list.serializers import NationalitySelectSerializer
 from research.models import Researcher
@@ -16,7 +17,7 @@ from research.serializers.researcher_serializers import ResearcherReadSerializer
 
 
 class ResearcherList(MethodSerializerMixin, generics.ListCreateAPIView):
-    queryset = Researcher.objects.all().order_by('-date_created')
+    queryset = Researcher.objects.all().order_by('-date_created', 'last_name', 'first_name')
     filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter)
     filterset_fields = ['country', 'citizenship', 'active', 'approved']
     ordering_fields = ['last_name', 'first_name', 'card_number', 'country__country', 'citizenship__nationality', 'date_created']

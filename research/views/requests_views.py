@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
 from archival_unit.serializers import ArchivalUnitSeriesSerializer
+from clockwork_api.pagination import DropDownResultSetPagination
 from container.models import Container
 from research.models import RequestItem, Request
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
@@ -70,14 +71,14 @@ class RequestSeriesSelect(generics.ListAPIView):
     queryset = ArchivalUnit.objects.filter(level='S').order_by('sort')
     filter_backends = [SearchFilter]
     search_fields = ['title_full']
-    pagination_class = None
+    pagination_class = DropDownResultSetPagination
     serializer_class = ArchivalUnitSeriesSerializer
 
 
 class RequestContainerSelect(generics.ListAPIView):
     filter_backends = [SearchFilter]
     search_fields = ['container_no']
-    pagination_class = None
+    pagination_class = DropDownResultSetPagination
     serializer_class = ContainerListSerializer
 
     def get_queryset(self):
