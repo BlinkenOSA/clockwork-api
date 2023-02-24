@@ -87,14 +87,30 @@ class RequestCreateSerializer(WritableNestedModelSerializer):
         fields = ('researcher', 'request_date', 'request_items')
 
 
-class RequestItemWriteSerializer(serializers.ModelSerializer):
+class RequestItemReadSerializer(serializers.ModelSerializer):
     researcher = serializers.CharField(source='request.researcher.name', read_only=True)
     request_date = serializers.CharField(source='request.request_date', read_only=True)
     archival_unit = serializers.SerializerMethodField()
+    container = serializers.SerializerMethodField()
 
     def get_archival_unit(self, obj):
-        return obj.container.archival_unit.id
+        return {
+            'label': obj.container.archival_unit.reference_code,
+            'value': obj.container.archival_unit.id
+        }
+
+    def get_container(self, obj):
+        return {
+            'label': "%s (%s)" % (obj.container.container_no, obj.container.carrier_type.type),
+            'value': obj.container.id
+        }
 
     class Meta:
         model = RequestItem
-        fields = ('id', 'archival_unit', 'researcher', 'request_date', 'item_origin', 'container', 'identifier', 'title')
+        fields = ('id', 'researcher', 'request_date', 'item_origin', 'archival_unit', 'container', 'identifier', 'title')
+
+
+class RequestItemWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestItem
+        fields = ('id', 'archival_unit', 'item_origin', 'container', 'identifier', 'title')

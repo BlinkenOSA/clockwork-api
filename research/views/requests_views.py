@@ -7,11 +7,12 @@ from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
 from archival_unit.serializers import ArchivalUnitSeriesSerializer
+from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.pagination import DropDownResultSetPagination
 from container.models import Container
 from research.models import RequestItem, Request
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
-    RequestCreateSerializer, RequestItemWriteSerializer
+    RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer
 
 
 class RequestsList(generics.ListAPIView):
@@ -27,8 +28,11 @@ class RequestsCreate(CreateAPIView):
     queryset = Request.objects.all()
 
 
-class RequestItemUpdate(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = RequestItemWriteSerializer
+class RequestItemRetrieveUpdate(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+    method_serializer_classes = {
+        ('GET', ): RequestItemReadSerializer,
+        ('POST', ): RequestItemWriteSerializer
+    }
     queryset = RequestItem.objects.all()
 
 
