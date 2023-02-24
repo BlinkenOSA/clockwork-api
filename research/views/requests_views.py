@@ -7,10 +7,12 @@ from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
 from archival_unit.serializers import ArchivalUnitSeriesSerializer
+from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
+from clockwork_api.pagination import DropDownResultSetPagination
 from container.models import Container
 from research.models import RequestItem, Request
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
-    RequestCreateSerializer, RequestItemWriteSerializer
+    RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer
 
 
 class RequestsList(generics.ListAPIView):
@@ -26,8 +28,11 @@ class RequestsCreate(CreateAPIView):
     queryset = Request.objects.all()
 
 
-class RequestItemUpdate(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = RequestItemWriteSerializer
+class RequestItemRetrieveUpdate(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+    method_serializer_classes = {
+        ('GET', ): RequestItemReadSerializer,
+        ('POST', ): RequestItemWriteSerializer
+    }
     queryset = RequestItem.objects.all()
 
 
@@ -70,14 +75,14 @@ class RequestSeriesSelect(generics.ListAPIView):
     queryset = ArchivalUnit.objects.filter(level='S').order_by('sort')
     filter_backends = [SearchFilter]
     search_fields = ['title_full']
-    pagination_class = None
+    pagination_class = DropDownResultSetPagination
     serializer_class = ArchivalUnitSeriesSerializer
 
 
 class RequestContainerSelect(generics.ListAPIView):
     filter_backends = [SearchFilter]
     search_fields = ['container_no']
-    pagination_class = None
+    pagination_class = DropDownResultSetPagination
     serializer_class = ContainerListSerializer
 
     def get_queryset(self):
