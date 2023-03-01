@@ -3,6 +3,7 @@ from django.urls import path
 from workflow.views.container_views import GetSetDigitizedContainer, GetContainerMetadata, \
     GetContainerMetadataByLegacyID
 from workflow.views.finding_aids_views import GetFAEntityMetadataByItemID
+from workflow.views.translation_view import GetTranslationToOriginal, GetTranslationToEnglish
 
 app_name = 'workflow'
 
@@ -22,4 +23,10 @@ urlpatterns = [
     # Used by research-cloud-upload workflow
     path('finding_aids/by-item-id/<str:item_id>/', GetFAEntityMetadataByItemID.as_view(),
          name='get_fa_entity_by_item_id'),
+
+    # Used by admin UI to translate documents
+    path('translate_to_original/', GetTranslationToOriginal.as_view(),
+         name='get_translation'),
+    path('translate_to_english/', GetTranslationToEnglish.as_view(),
+         name='get_translation')
 ]
