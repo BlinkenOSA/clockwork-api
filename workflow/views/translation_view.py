@@ -15,17 +15,12 @@ class GetTranslationToOriginal(APIView):
         auth_key = getattr(settings, 'DEEPL_AUTH_KEY', None)
         translator = deepl.Translator(auth_key)
 
-        # Check usage limit
-        usage = translator.get_usage()
-        if usage.any_limit_reached:
-            return Response({'Translation monthly limit reached.'}, status=HTTP_400_BAD_REQUEST)
-        else:
-            result = translator.translate_text(
-                text=serializer.english_text,
-                source_lang='EN',
-                target_lang=serializer.original_locale
-            )
-            return Response({'text': result.text}, status=HTTP_200_OK)
+        result = translator.translate_text(
+            text=serializer.data['english_text'],
+            source_lang='EN',
+            target_lang=serializer.data['original_locale']
+        )
+        return Response({'text': result.text}, status=HTTP_200_OK)
 
 
 class GetTranslationToEnglish(APIView):
@@ -36,14 +31,9 @@ class GetTranslationToEnglish(APIView):
         auth_key = getattr(settings, 'DEEPL_AUTH_KEY', None)
         translator = deepl.Translator(auth_key)
 
-        # Check usage limit
-        usage = translator.get_usage()
-        if usage.any_limit_reached:
-            return Response({'Translation monthly limit reached.'}, status=HTTP_400_BAD_REQUEST)
-        else:
-            result = translator.translate_text(
-                text=serializer.data['original_text'],
-                source_lang=serializer.data['original_locale'],
-                target_lang='EN-US'
-            )
-            return Response({'text': result.text}, status=HTTP_200_OK)
+        result = translator.translate_text(
+            text=serializer.data['original_text'],
+            source_lang=serializer.data['original_locale'],
+            target_lang='EN-US'
+        )
+        return Response({'text': result.text}, status=HTTP_200_OK)
