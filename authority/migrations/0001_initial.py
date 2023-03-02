@@ -183,8 +183,4 @@ class Migration(migrations.Migration):
             name='language',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='authority.Language'),
         ),
-        migrations.AlterUniqueTogether(
-            name='personotherformat',
-            unique_together=set([('last_name', 'first_name')]),
-        ),
     ]

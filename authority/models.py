@@ -92,7 +92,7 @@ class PersonOtherFormat(models.Model):
     class Meta:
         db_table = 'authority_people_other_formats'
         ordering = ['last_name', 'first_name']
-        unique_together = ('last_name', 'first_name')
+        unique_together = ('last_name', 'first_name', 'person')
 
 
 class Corporation(models.Model):
