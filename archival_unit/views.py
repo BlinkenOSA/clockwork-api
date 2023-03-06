@@ -9,6 +9,7 @@ from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnit
     ArchivalUnitWriteSerializer, ArchivalUnitFondsSerializer, ArchivalUnitSeriesSerializer, \
     ArchivalUnitPreCreateSerializer
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
+from clockwork_api.mixins.read_write_serializer_mixin import ReadWriteSerializerMixin
 
 
 class ArchivalUnitFilterClass(filters.FilterSet):
@@ -40,7 +41,7 @@ class ArchivalUnitList(MethodSerializerMixin, generics.ListCreateAPIView):
         ('POST', ): ArchivalUnitWriteSerializer
     }
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_class = ArchivalUnitFilterClass
+    filterset_class = ArchivalUnitFilterClass
 
 
 class ArchivalUnitDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
