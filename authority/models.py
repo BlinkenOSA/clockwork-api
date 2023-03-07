@@ -122,6 +122,7 @@ class CorporationOtherFormat(models.Model):
     class Meta:
         db_table = 'authority_corporations_other_formats'
         ordering = ['name']
+        unique_together = ('corporation', 'name')
 
 
 class Genre(models.Model):

@@ -172,11 +172,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='person',
-            unique_together=set([('last_name', 'first_name')]),
+            unique_together={('last_name', 'first_name')},
         ),
         migrations.AlterUniqueTogether(
             name='language',
-            unique_together=set([('iso_639_1', 'iso_639_2')]),
+            unique_together={('iso_639_1', 'iso_639_2')},
         ),
         migrations.AddField(
             model_name='corporationotherformat',
