@@ -164,12 +164,30 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
     extents = FindingAidsEntityExtentReadSerializer(many=True, source='findingaidsentityextent_set')
     archival_unit_title = serializers.SerializerMethodField()
     container_title = serializers.SerializerMethodField()
+    digital_version_exists_container = serializers.SerializerMethodField()
 
     def get_archival_unit_title(self, obj):
         return obj.archival_unit.title_full
 
     def get_container_title(self, obj):
         return '%s #%s' % (obj.container.carrier_type.type, obj.container.container_no) if not obj.is_template else ''
+
+    def get_digital_version_exists_container(self, obj):
+        if obj.container:
+            if obj.container.digital_version_exists:
+                return {
+                    'digital_version': True,
+                    'digital_version_online': obj.container.digital_version_online,
+                    'digital_version_barcode': obj.container.barcode
+                }
+            else:
+                return {
+                    'digital_version': False
+                }
+        else:
+            return {
+                'digital_version': False
+            }
 
     class Meta:
         model = FindingAidsEntity

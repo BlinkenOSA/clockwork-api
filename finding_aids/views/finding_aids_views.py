@@ -47,6 +47,17 @@ class FindingAidsPreCreate(APIView):
                 sequence_no
             )
 
+        if container.digital_version_exists:
+            digital_version_exists_container = {
+                'digital_version': True,
+                'digital_version_online': container.digital_version_online,
+                'digital_version_barcode': container.barcode
+            }
+        else:
+            digital_version_exists_container = {
+                'digital_version': False
+            }
+
         data = {
             'archival_unit': container.archival_unit_id,
             'archival_unit_title_full': container.archival_unit.title_full,
@@ -56,6 +67,7 @@ class FindingAidsPreCreate(APIView):
             'sequence_no': sequence_no,
             'description_level': description_level,
             'archival_reference_code': reference_code,
+            'digital_version_exists_container': digital_version_exists_container,
             'level': level,
             'uuid': guid
         }

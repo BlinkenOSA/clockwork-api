@@ -7,13 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('finding_aids', '0003_auto_20181206_1416'),
+        ('container', '0006_container_digital_version_online'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='findingaidsentitydate',
-            name='date_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='controlled_list.DateType'),
+            model_name='container',
+            name='carrier_type',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='controlled_list.CarrierType'),
         ),
     ]

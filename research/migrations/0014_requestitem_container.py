@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('container', '0007_auto_20200731_0820'),
+        ('container', '0008_auto_20200731_0820'),
         ('research', '0013_requestitem_finding_aids_entity'),
     ]
 

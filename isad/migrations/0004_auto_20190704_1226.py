@@ -7,13 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('container', '0005_auto_20180918_0730'),
+        ('isad', '0003_isad_catalog_id'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='container',
-            name='carrier_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='controlled_list.CarrierType'),
+            model_name='isad',
+            name='archival_unit',
+            field=models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='archival_unit.ArchivalUnit'),
         ),
     ]
