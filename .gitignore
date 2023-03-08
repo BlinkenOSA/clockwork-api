@@ -112,3 +112,4 @@ venv.bak/
 .DS_STORE
 
 /research/management
+/research/fixtures/researcher.json
