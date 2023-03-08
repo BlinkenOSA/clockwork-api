@@ -5,7 +5,7 @@ from rest_framework.filters import SearchFilter
 
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from donor.models import Donor
-from donor.serializers import DonorSelectSerializer, DonorReadSerializer, DonorWriteSerializer
+from donor.serializers import DonorSelectSerializer, DonorReadSerializer, DonorWriteSerializer, DonorListSerializer
 from django_filters import rest_framework as filters
 
 
@@ -28,9 +28,10 @@ class DonorList(MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = Donor.objects.all().order_by('name')
     filterset_class = DonorFilterClass
     filter_backends = [OrderingFilter, filters.DjangoFilterBackend]
-    ordering_fields = ['name']
+    filterset_fields = ['city', 'country']
+    ordering_fields = ['name', 'city', 'country__country']
     method_serializer_classes = {
-        ('GET', ): DonorReadSerializer,
+        ('GET', ): DonorListSerializer,
         ('POST', ): DonorWriteSerializer
     }
 
