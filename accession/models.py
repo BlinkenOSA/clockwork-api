@@ -19,10 +19,10 @@ class Accession(models.Model, DetectProtectedMixin):
 
     access_note = models.TextField(blank=True, null=True)
     building = models.ForeignKey('controlled_list.Building', on_delete=models.PROTECT, blank=True, null=True)
-    module = models.IntegerField(blank=True, null=True)
-    row = models.IntegerField(blank=True, null=True)
-    section = models.IntegerField(blank=True, null=True)
-    shelf = models.IntegerField(blank=True, null=True)
+    module = models.IntegerField(blank=False, null=True)
+    row = models.IntegerField(blank=False, null=True)
+    section = models.IntegerField(blank=False, null=True)
+    shelf = models.IntegerField(blank=False, null=True)
 
     archival_unit = models.ForeignKey('archival_unit.ArchivalUnit', on_delete=models.PROTECT, blank=True, null=True)
     archival_unit_legacy_number = models.IntegerField(blank=True, null=True)

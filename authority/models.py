@@ -117,7 +117,7 @@ class CorporationOtherFormat(models.Model):
     id = models.AutoField(primary_key=True)
     corporation = models.ForeignKey('authority.Corporation', on_delete=models.CASCADE)
     language = models.ForeignKey('authority.Language', blank=True, null=True, on_delete=models.PROTECT)
-    name = models.CharField(max_length=250, unique=True)
+    name = models.CharField(max_length=250)
 
     class Meta:
         db_table = 'authority_corporations_other_formats'
