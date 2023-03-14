@@ -16,10 +16,16 @@ class ContainerPreCreate(APIView):
         archival_unit_id = self.kwargs.get('pk', None)
         archival_unit = get_object_or_404(ArchivalUnit, pk=archival_unit_id)
         container = Container.objects.filter(archival_unit=archival_unit).reverse().first()
-        response = {
-            'archival_unit': archival_unit_id,
-            'container_no': container.container_no + 1
-        }
+        if container:
+            response = {
+                'archival_unit': archival_unit_id,
+                'container_no': container.container_no + 1
+            }
+        else:
+            response = {
+                'archival_unit': archival_unit_id,
+                'container_no': 1
+            }
         return Response(response)
 
 

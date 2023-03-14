@@ -34,6 +34,8 @@ class Container(models.Model, DetectProtectedMixin):
             container = Container.objects.filter(archival_unit=self.archival_unit).reverse().first()
             if container:
                 self.container_no = container.container_no + 1
+            else:
+                self.container_no = 1
         super(Container, self).save()
 
     @property
