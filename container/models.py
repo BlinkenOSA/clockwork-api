@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
@@ -18,11 +19,13 @@ class Container(models.Model, DetectProtectedMixin):
     barcode = models.CharField(max_length=30, blank=True, null=True, unique=True)
     old_id = models.IntegerField(blank=True, null=True)
 
+    # Digital Version fields
     digital_version_exists = models.BooleanField(default=False)
     digital_version_creation_date = models.DateField(blank=True, null=True)
     digital_version_technical_metadata = models.TextField(blank=True, null=True)
+    digital_version_research_cloud = models.BooleanField(default=False)
     digital_version_online = models.BooleanField(default=False)
-    
+
     user_created = models.CharField(max_length=100, blank=True)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
@@ -36,6 +39,8 @@ class Container(models.Model, DetectProtectedMixin):
                 self.container_no = container.container_no + 1
             else:
                 self.container_no = 1
+        if self.digital_version_exists and not self.digital_version_creation_date:
+            self.digital_version_creation_date = datetime.datetime.now()
         super(Container, self).save()
 
     @property

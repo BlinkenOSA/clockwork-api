@@ -1,3 +1,4 @@
+import datetime
 import uuid as uuid
 
 from django.core.exceptions import ValidationError
@@ -94,6 +95,9 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
 
     # Digital Version
     digital_version_exists = models.BooleanField(default=False)
+    digital_version_creation_date = models.DateField(blank=True, null=True)
+    digital_version_technical_metadata = models.TextField(blank=True, null=True)
+    digital_version_research_cloud = models.BooleanField(default=False)
     digital_version_online = models.BooleanField(default=False)
 
     confidential_display_text = models.CharField(max_length=300, blank=True, null=True)
@@ -162,6 +166,8 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         super(FindingAidsEntity, self).save()
         self.set_reference_code()
         self.set_catalog_id()
+        if self.digital_version_exists and not self.digital_version_creation_date:
+            self.digital_version_creation_date = datetime.datetime.now()
         super(FindingAidsEntity, self).save()
 
 
