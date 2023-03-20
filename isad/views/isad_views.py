@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from archival_unit.models import ArchivalUnit
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from isad.models import Isad
-from isad.serializers import IsadSelectSerializer, IsadReadSerializer, IsadWriteSerializer, IsadFondsSerializer, \
+from isad.serializers.isad_serializers import IsadSelectSerializer, IsadReadSerializer, IsadWriteSerializer, IsadFondsSerializer, \
     IsadPreCreateSerializer
 from django_filters import rest_framework as filters
 
