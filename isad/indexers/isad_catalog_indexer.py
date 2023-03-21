@@ -32,9 +32,9 @@ class ISADCatalogIndexer:
         self.create_solr_document()
         try:
             self.solr.add([self.doc])
-            print("Indexing Report No. %s!" % (self.doc['id']))
+            print("Indexing ISAD(G) %s!" % (self.doc['id']))
         except pysolr.SolrError as e:
-            print('Error with Report No. %s! Error: %s' % (self.doc['id'], e))
+            print('Error with ISAD(G) %s! Error: %s' % (self.doc['id'], e))
 
     def delete(self):
         self.solr.delete(id=self.get_solr_id(), commit=True)

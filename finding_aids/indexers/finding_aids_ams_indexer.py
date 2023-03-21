@@ -7,7 +7,7 @@ from isad.models import Isad
 from isad.serializers.isad_ams_indexer_serializers import ISADAMSIndexerSerializer
 
 
-class ISADIndexer:
+class FindingAidsAMSIndexer:
     """
     Class to index ISAD(G) records to Solr.
     """

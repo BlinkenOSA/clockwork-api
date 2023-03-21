@@ -2,6 +2,7 @@ from django.urls import path, re_path
 
 from finding_aids.views.finding_aids_excel_views import FindingAidsExcelExport
 from finding_aids.views.finding_aids_grid_views import FindingAidsGridList, FindingAidsGridListExport
+from finding_aids.views.finding_aids_index_views import FindingAidsEntityIndexTestView
 from finding_aids.views.finding_aids_label_views import FindingAidsLabelDataView, FindingAidsCarrierTypeDataView
 from finding_aids.views.finding_aids_template_views import FindingAidsTemplateList, FindingAidsTemplateSelect, \
     FindingAidsTemplateDetail, FindingAidsTemplateCreate, FindingAidsTemplatePreCreate
@@ -29,6 +30,10 @@ urlpatterns = [
 
     path('grid/list/<int:series_id>/', FindingAidsGridList.as_view(), name='finding_aids-grid-list'),
     path('grid/list/export/<int:series_id>/', FindingAidsGridListExport.as_view(), name='finding_aids-grid-list-export'),
+
+    # Indexing test
+    re_path(r'index/(?P<target>["ams"|"catalog"]+)/(?P<pk>[0-9]+)/$', FindingAidsEntityIndexTestView.as_view(),
+            name='finding-aids-index-test-view'),
 
     # Label data
     path('labels/<int:carrier_type_id>/<int:series_id>/', FindingAidsLabelDataView.as_view(),
