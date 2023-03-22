@@ -23,7 +23,7 @@ class ISADCatalogIndexer:
         self.doc = {}
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG", "osacatalog")
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url)
+        self.solr = pysolr.Solr(self.solr_url, always_commit=True)
 
     def get_solr_document(self):
         return self.doc
@@ -31,10 +31,10 @@ class ISADCatalogIndexer:
     def index(self):
         self.create_solr_document()
         try:
-            self.solr.add([self.doc])
-            print("Indexing ISAD(G) %s!" % (self.doc['id']))
+            self.solr.add(self.doc)
+            print("Indexed ISAD(G) %s!" % self.isad.reference_code)
         except pysolr.SolrError as e:
-            print('Error with ISAD(G) %s! Error: %s' % (self.doc['id'], e))
+            print('Error with ISAD(G) %s! Error: %s' % (self.isad.reference_code, e))
 
     def delete(self):
         self.solr.delete(id=self.get_solr_id(), commit=True)
@@ -213,7 +213,7 @@ class ISADCatalogIndexer:
             if self.isad.access_rights_legacy:
                 j["rightsAccess"] = self.isad.access_rights_legacy_original
 
-            j = dict((k, v) for k, v in j.iteritems() if v)
+            j = dict((k, v) for k, v in iter(j.items()) if v)
             self.json['isad_json_2nd'] = json.dumps(j)
 
     def _make_date_created_search(self, year_from, year_to):
