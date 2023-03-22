@@ -31,7 +31,7 @@ class FindingAidsCatalogIndexer:
         self.doc = {}
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG", "osacatalog")
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url)
+        self.solr = pysolr.Solr(self.solr_url, always_commit=True)
 
     def get_solr_document(self):
         return self.doc
@@ -42,13 +42,14 @@ class FindingAidsCatalogIndexer:
         else:
             self.create_solr_document()
         try:
-            self.solr.add([self.doc])
-            print("Indexing Report No. %s!" % (self.doc['id']))
+            self.solr.add(self.doc)
+            print("Indexed FA Entity %s!" % self.finding_aids.archival_reference_code)
         except pysolr.SolrError as e:
-            print('Error with Report No. %s! Error: %s' % (self.doc['id'], e))
+            print('Error with FA Entity %s! Error: %s' % (self.finding_aids.archival_reference_code, e))
 
     def delete(self):
-        self.solr.delete(id=self.get_solr_id(), commit=True)
+        self.solr.delete(id=self.get_solr_id())
+        print("Deleted FA Entity %s!" % self.finding_aids.archival_reference_code)
 
     def create_solr_document(self):
         self._get_original_locale()
@@ -57,13 +58,13 @@ class FindingAidsCatalogIndexer:
         if self.original_locale != "":
             self._make_json(lang=self.original_locale)
         self.doc["item_json"] = json.dumps(self.json)
-        self.doc["item_json_e"] = b64encode(json.dumps(self.json).encode("utf-8"))
+        self.doc["item_json_e"] = str(b64encode(json.dumps(self.json).encode("utf-8")))
 
     def create_solr_document_confidential(self):
         self._make_solr_confidential_document()
         self._make_confidential_json()
         self.doc["item_json"] = json.dumps(self.json)
-        self.doc["item_json_e"] = b64encode(json.dumps(self.json).encode("utf-8"))
+        self.doc["item_json_e"] = str(b64encode(json.dumps(self.json).encode("utf-8")))
 
     def get_solr_id(self):
         if self.finding_aids.catalog_id:
@@ -81,9 +82,9 @@ class FindingAidsCatalogIndexer:
             self.original_locale = self.finding_aids.original_locale.id.lower()
 
     def _make_solr_document(self):
-        self.doc["id"] = self.get_solr_id(),
-        self.doc["record_origin"] = "Archives",
-        self.doc["record_origin_facet"] = "Archives",
+        self.doc["id"] = self.get_solr_id()
+        self.doc["record_origin"] = "Archives"
+        self.doc["record_origin_facet"] = "Archives"
         self.doc["call_number"] = self.finding_aids.archival_reference_code
 
         self.doc["archival_reference_number_search"] = [
@@ -91,8 +92,8 @@ class FindingAidsCatalogIndexer:
             "%s:%s" % (self.finding_aids.archival_unit.reference_code, self.finding_aids.container.container_no)
         ]
 
-        self.doc["archival_level"] = "Folder/Item",
-        self.doc["archival_level_facet"] = "Folder/Item",
+        self.doc["archival_level"] = "Folder/Item"
+        self.doc["archival_level_facet"] = "Folder/Item"
 
         self.doc["description_level"] = "Folder" if self.finding_aids.level == 'F' else 'Item'
         self.doc["description_level_facet"] = "Folder" if self.finding_aids.level == 'F' else 'Item'
@@ -140,34 +141,35 @@ class FindingAidsCatalogIndexer:
 
         self.doc["duration"] = self._calculate_duration(self.finding_aids.duration)
 
-        genres = [genre.genre for genre in self.finding_aids.genre.all()]
+        genres = list(map(lambda g: str(g), self.finding_aids.genre.all()))
         self.doc["genre_facet"] = genres
 
-        languages = [str(language.language) for language in self.finding_aids.findingaidsentitylanguage_set.all()]
+        languages = list(
+            map(lambda l: str(l.language), self.finding_aids.findingaidsentitylanguage_set.all())
+        )
         self.doc["language_facet"] = languages
 
         # Associated entries
-
         associated_countries = list(
-            map(lambda ac: ac.associated_country, self.finding_aids.findingaidsentityassociatedcountry_set.all())
+            map(lambda ac: str(ac.associated_country), self.finding_aids.findingaidsentityassociatedcountry_set.all())
         )
         self.doc["associated_country_search"] = associated_countries
         self.doc["added_geo_facet"] = associated_countries
 
         associated_places = list(
-            map(lambda apl: apl.associated_place, self.finding_aids.findingaidsentityassociatedplace_set.all())
+            map(lambda apl: str(apl.associated_place), self.finding_aids.findingaidsentityassociatedplace_set.all())
         )
         self.doc["associated_place_search"] = associated_places
         self.doc["added_geo_facet"] = associated_places
 
         associated_people = list(
-            map(lambda ap: ap.associated_person, self.finding_aids.findingaidsentityassociatedperson_set.all())
+            map(lambda ap: str(ap.associated_person), self.finding_aids.findingaidsentityassociatedperson_set.all())
         )
         self.doc["associated_person_search"] = associated_people
         self.doc["added_person_facet"] = associated_people
 
         associated_corporations = list(
-            map(lambda ac: ac.associated_corporation, self.finding_aids.findingaidsentityassociatedcorporation_set.all())
+            map(lambda ac: str(ac.associated_corporation), self.finding_aids.findingaidsentityassociatedcorporation_set.all())
         )
         self.doc["associated_corporation_search"] = associated_corporations
         self.doc["added_corporation_facet"] = associated_corporations
@@ -247,13 +249,13 @@ class FindingAidsCatalogIndexer:
             j["folderNumber"] = self.finding_aids.folder_no
             j["sequenceNumber"] = self.finding_aids.sequence_no
 
-            j["formGenre"] = [genre.genre for genre in self.finding_aids.genre.all()]
+            j["formGenre"] = list(map(lambda g: str(g), self.finding_aids.genre.all()))
             j["note"] = self.finding_aids.note
 
             j["contentsSummary"] = self.finding_aids.contents_summary.replace('\n', '<br />') \
                 if self.finding_aids.contents_summary else None
 
-            j["language"] = [str(language.language) for language in self.finding_aids.findingaidsentitylanguage_set.all()]
+            j["language"] = list(map(lambda l: str(l.language), self.finding_aids.findingaidsentitylanguage_set.all()))
             j["languageStatement"] = self.finding_aids.language_statement
 
             time_start = self.finding_aids.time_start
@@ -284,11 +286,11 @@ class FindingAidsCatalogIndexer:
             )
 
             j["associatedCountry"] = list(
-                map(lambda ac: ac.associated_country.country, self.finding_aids.findingaidsentityassociatedcountry_set.all())
+                map(lambda ac: str(ac.associated_country), self.finding_aids.findingaidsentityassociatedcountry_set.all())
             )
 
             j["associatedPlace"] = list(
-                map(lambda ap: ap.associated_place.place, self.finding_aids.findingaidsentityassociatedplace_set.all())
+                map(lambda ap: str(ap.associated_place), self.finding_aids.findingaidsentityassociatedplace_set.all())
             )
 
             j["dateCreated"] = self._make_date_created_display()
@@ -301,19 +303,19 @@ class FindingAidsCatalogIndexer:
 
             # Subject entries
             j["spatialCoverageCountry"] = list(
-                map(lambda c: c.country, self.finding_aids.spatial_coverage_country.all())
+                map(lambda c: str(c), self.finding_aids.spatial_coverage_country.all())
             )
             j["spatialCoveragePlace"] = list(
-                map(lambda p: p.place, self.finding_aids.spatial_coverage_place.all())
+                map(lambda p: str(p), self.finding_aids.spatial_coverage_place.all())
             )
             j["subjectPeople"] = list(
-                map(lambda p: p.person, self.finding_aids.subject_person.all())
+                map(lambda p: str(p), self.finding_aids.subject_person.all())
             )
             j["subjectCorporation"] = list(
-                map(lambda c: c.corporation, self.finding_aids.subject_corporation.all())
+                map(lambda c: str(c), self.finding_aids.subject_corporation.all())
             )
             j["collectionSpecificTags"] = list(
-                map(lambda k: k.keyword, self.finding_aids.subject_keyword.all())
+                map(lambda k: str(k), self.finding_aids.subject_keyword.all())
             )
 
             # Remove empty json keys
@@ -478,8 +480,8 @@ class FindingAidsCatalogIndexer:
     def _harmonize_roled_names(dataset, name_field, role_field):
         collection = {}
         for data in dataset.iterator():
-            name = getattr(data, name_field)
-            role = getattr(data, role_field)
+            name = str(getattr(data, name_field))
+            role = str(getattr(data, role_field))
             if name not in collection.keys():
                 collection[name] = [role]
             else:

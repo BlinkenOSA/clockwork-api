@@ -23,7 +23,7 @@ class FindingAidsAMSIndexer:
             self.solr_core = getattr(settings, "SOLR_CORE_CATALOG", "catalog")
 
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url)
+        self.solr = pysolr.Solr(self.solr_url, always_commit=True)
         self.doc = {}
 
     def get_solr_document(self):
