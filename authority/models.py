@@ -15,6 +15,9 @@ class Country(models.Model):
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
+    def __str__(self):
+        return self.country
+
     class Meta:
         db_table = 'authority_countries'
         ordering = ['country']
@@ -35,6 +38,9 @@ class Language(models.Model):
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
+    def __str__(self):
+        return self.language
+
     class Meta:
         db_table = 'authority_languages'
         unique_together = ['iso_639_1', 'iso_639_2']
@@ -53,6 +59,9 @@ class Place(models.Model):
 
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
+
+    def __str__(self):
+        return self.place
 
     class Meta:
         db_table = 'authority_places'
@@ -108,6 +117,9 @@ class Corporation(models.Model):
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'authority_corporations'
         ordering = ['name']
@@ -138,6 +150,9 @@ class Genre(models.Model):
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
+    def __str__(self):
+        return self.genre
+
     class Meta:
         db_table = 'authority_genres'
         ordering = ['genre']
@@ -155,6 +170,9 @@ class Subject(models.Model):
 
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
+
+    def __str__(self):
+        return self.subject
 
     class Meta:
         db_table = 'authority_subjects'
