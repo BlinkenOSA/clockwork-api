@@ -9,7 +9,7 @@ class PersonList(generics.ListCreateAPIView):
     queryset = Person.objects.all()
     filter_backends = (OrderingFilter, SearchFilter)
     ordering_fields = ['last_name',]
-    search_fields = ('first_name', 'last_name',)
+    search_fields = ('first_name', 'last_name', 'personotherformat__first_name', 'personotherformat__last_name')
     serializer_class = PersonSerializer
 
 

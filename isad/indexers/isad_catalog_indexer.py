@@ -266,8 +266,12 @@ class ISADCatalogIndexer:
 
         for c in containers:
             if lang == 'hu':
-                extent.append(str(c['number']) + ' ' + c['carrier_type__type_original_language'] + ', ' +
-                              str(round(c['width']/1000.00, 2)) + u' folyóméter')
+                if c['carrier_type__type_original_language']:
+                    extent.append(str(c['number']) + ' ' + c['carrier_type__type_original_language'] + ', ' +
+                                  str(round(c['width']/1000.00, 2)) + u' folyóméter')
+                else:
+                    extent.append(str(c['number']) + ' ' + c['carrier_type__type'] + ', ' +
+                                  str(round(c['width']/1000.00, 2)) + u' folyóméter')
             elif lang == 'pl':
                 extent.append(str(c['number']) + ' ' + c['carrier_type__type'] + ', ' +
                               str(round(c['width']/1000.00, 2)) + u' metr bieżący')

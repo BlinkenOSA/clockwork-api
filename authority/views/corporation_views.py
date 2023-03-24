@@ -9,7 +9,7 @@ class CorporationList(generics.ListCreateAPIView):
     queryset = Corporation.objects.all()
     filter_backends = (OrderingFilter, SearchFilter)
     ordering_fields = ['name',]
-    search_fields = ('name',)
+    search_fields = ('name', 'corporationotherformat__name')
     serializer_class = CorporationSerializer
 
 
