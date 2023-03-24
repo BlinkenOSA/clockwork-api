@@ -44,7 +44,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     title_original = models.CharField(max_length=300, blank=True, null=True)
 
     date_from = ApproximateDateField(blank=True)
-    date_to = ApproximateDateField(blank=True)
+    date_to = ApproximateDateField(blank=True, null=True)
     date_ca_span = models.IntegerField(blank=True, default=0)
 
     contents_summary = models.TextField(blank=True, null=True)
