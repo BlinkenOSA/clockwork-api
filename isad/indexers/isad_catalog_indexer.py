@@ -3,7 +3,7 @@ import json
 
 import pysolr
 from django.db.models import Sum, Count
-from djoser.conf import settings
+from django.conf import settings
 from hashids import Hashids
 
 from container.models import Container
@@ -21,8 +21,8 @@ class ISADCatalogIndexer:
         self.hashids = Hashids(salt="osaarchives", min_length=8)
         self.json = {}
         self.doc = {}
-        self.solr_core = getattr(settings, "SOLR_CORE_CATALOG", "osacatalog")
-        self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
+        self.solr_core = getattr(settings, "SOLR_CORE_CATALOG")
+        self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL"), self.solr_core)
         self.solr = pysolr.Solr(self.solr_url, always_commit=True)
 
     def get_solr_document(self):
