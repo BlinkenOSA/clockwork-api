@@ -24,6 +24,7 @@ class Container(models.Model, DetectProtectedMixin):
     digital_version_creation_date = models.DateField(blank=True, null=True)
     digital_version_technical_metadata = models.TextField(blank=True, null=True)
     digital_version_research_cloud = models.BooleanField(default=False)
+    digital_version_research_cloud_path = models.TextField(blank=True, null=True)
     digital_version_online = models.BooleanField(default=False)
 
     user_created = models.CharField(max_length=100, blank=True)

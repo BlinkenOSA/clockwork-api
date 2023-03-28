@@ -98,6 +98,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     digital_version_creation_date = models.DateField(blank=True, null=True)
     digital_version_technical_metadata = models.TextField(blank=True, null=True)
     digital_version_research_cloud = models.BooleanField(default=False)
+    digital_version_research_cloud_path = models.TextField(blank=True, null=True)
     digital_version_online = models.BooleanField(default=False)
 
     confidential_display_text = models.CharField(max_length=300, blank=True, null=True)
