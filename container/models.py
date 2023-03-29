@@ -8,15 +8,15 @@ from finding_aids.models import FindingAidsEntity
 class Container(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
 
-    archival_unit = models.ForeignKey('archival_unit.ArchivalUnit', on_delete=models.CASCADE)
-    carrier_type = models.ForeignKey('controlled_list.CarrierType', on_delete=models.PROTECT)
+    archival_unit = models.ForeignKey('archival_unit.ArchivalUnit', on_delete=models.CASCADE, db_index=True)
+    carrier_type = models.ForeignKey('controlled_list.CarrierType', on_delete=models.PROTECT, db_index=True)
 
     container_no = models.IntegerField()
     container_label = models.CharField(max_length=255, blank=True, null=True)
 
     permanent_id = models.CharField(max_length=50, blank=True, null=True)
-    legacy_id = models.CharField(max_length=50, blank=True, null=True)
-    barcode = models.CharField(max_length=30, blank=True, null=True, unique=True)
+    legacy_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    barcode = models.CharField(max_length=30, blank=True, null=True, unique=True, db_index=True)
     old_id = models.IntegerField(blank=True, null=True)
 
     # Digital Version fields
