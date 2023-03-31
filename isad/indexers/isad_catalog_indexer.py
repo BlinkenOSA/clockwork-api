@@ -5,6 +5,7 @@ import pysolr
 from django.db.models import Sum, Count
 from django.conf import settings
 from hashids import Hashids
+from requests.auth import HTTPBasicAuth
 
 from container.models import Container
 from controlled_list.models import Locale
@@ -23,8 +24,10 @@ class ISADCatalogIndexer:
         self.doc = {}
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG")
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url, always_commit=True)
-
+        self.solr = pysolr.Solr(self.solr_url, always_commit=True, auth=HTTPBasicAuth(
+            getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+        ))
+        
     def get_solr_document(self):
         return self.doc
 
