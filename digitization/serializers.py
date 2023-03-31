@@ -27,7 +27,9 @@ class DigitizationLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Container
-        fields = ('id', 'container_no', 'barcode', 'digital_version_exists', 'digital_version_creation_date',
+        fields = ('id', 'container_no', 'barcode', 'digital_version_exists',
+                  'digital_version_research_cloud', 'digital_version_online',
+                  'digital_version_creation_date',
                   'duration', 'carrier_type')
 
 

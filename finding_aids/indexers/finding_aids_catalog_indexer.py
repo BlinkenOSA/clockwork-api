@@ -8,6 +8,7 @@ from hashids import Hashids
 
 from controlled_list.models import Locale
 from finding_aids.models import FindingAidsEntity
+from requests.auth import HTTPBasicAuth
 
 PRIMARY_TYPES = {
     'Audio': 'Audio',
@@ -31,7 +32,9 @@ class FindingAidsCatalogIndexer:
         self.doc = {}
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG", "osacatalog")
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url, always_commit=True)
+        self.solr = pysolr.Solr(self.solr_url, always_commit=True, auth=HTTPBasicAuth(
+            getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+        ))
 
     def get_solr_document(self):
         return self.doc

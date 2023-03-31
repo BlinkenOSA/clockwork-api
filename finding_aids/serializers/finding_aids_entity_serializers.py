@@ -174,16 +174,13 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
 
     def get_digital_version_exists_container(self, obj):
         if obj.container:
-            if obj.container.digital_version_exists:
-                return {
-                    'digital_version': True,
-                    'digital_version_online': obj.container.digital_version_online,
-                    'digital_version_barcode': obj.container.barcode
-                }
-            else:
-                return {
-                    'digital_version': False
-                }
+            return {
+                'digital_version': obj.container.digital_version_exists,
+                'digital_version_online': obj.container.digital_version_online,
+                'digital_version_research_cloud': obj.container.digital_version_research_cloud,
+                'digital_version_research_cloud_path': obj.container.digital_version_research_cloud_path,
+                'digital_version_barcode': obj.container.barcode
+            }
         else:
             return {
                 'digital_version': False

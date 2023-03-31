@@ -16,11 +16,11 @@ from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4)
-    archival_unit = models.ForeignKey('archival_unit.ArchivalUnit', on_delete=models.PROTECT)
-    container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.PROTECT)
+    archival_unit = models.ForeignKey('archival_unit.ArchivalUnit', on_delete=models.PROTECT, db_index=True)
+    container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.PROTECT, db_index=True)
     original_locale = models.ForeignKey('controlled_list.Locale', blank=True, null=True, on_delete=models.PROTECT)
-    legacy_id = models.CharField(max_length=200, blank=True, null=True)
-    archival_reference_code = models.CharField(max_length=50, blank=True, null=True)
+    legacy_id = models.CharField(max_length=200, blank=True, null=True, db_index=True)
+    archival_reference_code = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
     old_id = models.CharField(max_length=12, blank=True, null=True)
     catalog_id = models.CharField(max_length=12, blank=True, null=True)
@@ -98,6 +98,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     digital_version_creation_date = models.DateField(blank=True, null=True)
     digital_version_technical_metadata = models.TextField(blank=True, null=True)
     digital_version_research_cloud = models.BooleanField(default=False)
+    digital_version_research_cloud_path = models.TextField(blank=True, null=True)
     digital_version_online = models.BooleanField(default=False)
 
     confidential_display_text = models.CharField(max_length=300, blank=True, null=True)
@@ -120,6 +121,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
 
     class Meta:
         db_table = 'finding_aids_entities'
+
 
     def publish(self, user):
         self.published = True
@@ -163,7 +165,8 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
                 self.catalog_id = hashids.encode(self.id)
 
     def save(self, **kwargs):
-        super(FindingAidsEntity, self).save()
+        if not self.date_created:
+            self.date_created = datetime.datetime.now()
         self.set_reference_code()
         self.set_catalog_id()
         if self.digital_version_exists and not self.digital_version_creation_date:

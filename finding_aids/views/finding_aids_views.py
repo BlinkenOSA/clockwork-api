@@ -51,6 +51,8 @@ class FindingAidsPreCreate(APIView):
             digital_version_exists_container = {
                 'digital_version': True,
                 'digital_version_online': container.digital_version_online,
+                'digital_version_research_cloud': container.digital_version_research_cloud,
+                'digital_version_research_cloud_path': container.digital_version_research_cloud_path,
                 'digital_version_barcode': container.barcode
             }
         else:
