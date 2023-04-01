@@ -61,13 +61,14 @@ class FindingAidsCatalogIndexer:
         if self.original_locale != "":
             self._make_json(lang=self.original_locale)
         self.doc["item_json"] = json.dumps(self.json)
-        self.doc["item_json_e"] = str(b64encode(json.dumps(self.json).encode("utf-8")))
+        self.doc["item_json_e"] = b64encode(json.dumps(self.json).encode("utf-8")).decode("utf-8")
+        print ("a")
 
     def create_solr_document_confidential(self):
         self._make_solr_confidential_document()
         self._make_confidential_json()
         self.doc["item_json"] = json.dumps(self.json)
-        self.doc["item_json_e"] = str(b64encode(json.dumps(self.json).encode("utf-8")))
+        self.doc["item_json_e"] = b64encode(json.dumps(self.json).encode("utf-8")).decode("utf-8")
 
     def get_solr_id(self):
         if self.finding_aids.catalog_id:
