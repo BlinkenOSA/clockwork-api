@@ -62,7 +62,6 @@ class FindingAidsCatalogIndexer:
             self._make_json(lang=self.original_locale)
         self.doc["item_json"] = json.dumps(self.json)
         self.doc["item_json_e"] = b64encode(json.dumps(self.json).encode("utf-8")).decode("utf-8")
-        print ("a")
 
     def create_solr_document_confidential(self):
         self._make_solr_confidential_document()
