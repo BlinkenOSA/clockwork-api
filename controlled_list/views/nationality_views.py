@@ -7,12 +7,12 @@ from controlled_list.serializers import LocaleSerializer, LocaleSelectSerializer
 
 
 class NationalityList(generics.ListCreateAPIView):
-    queryset = Locale.objects.all()
+    queryset = Nationality.objects.all()
     serializer_class = NationalitySerializer
 
 
 class NationalityDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Locale.objects.all()
+    queryset = Nationality.objects.all()
     serializer_class = NationalitySerializer
 
 
