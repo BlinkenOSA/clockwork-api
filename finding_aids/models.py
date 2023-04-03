@@ -175,7 +175,6 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         self.set_catalog_id()
 
 
-
 class FindingAidsEntityAlternativeTitle(models.Model):
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
@@ -191,7 +190,7 @@ class FindingAidsEntityDate(models.Model):
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     date_from = ApproximateDateField()
-    date_to = ApproximateDateField(blank=True)
+    date_to = ApproximateDateField(blank=True, null=True)
     date_type = models.ForeignKey('controlled_list.DateType', on_delete=models.PROTECT)
 
     class Meta:
