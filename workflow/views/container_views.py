@@ -1,8 +1,10 @@
 import re
 
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, get_object_or_404, RetrieveAPIView
 
+from clockwork_api.authentication import BearerAuthentication
 from container.models import Container
 from finding_aids.models import FindingAidsEntity
 from finding_aids.serializers.finding_aids_entity_serializers import FindingAidsEntityReadSerializer
@@ -14,12 +16,14 @@ class GetSetDigitizedContainer(RetrieveUpdateAPIView):
     queryset = Container.objects.all()
     serializer_class = ContainerDigitizedSerializer
     lookup_field = 'barcode'
+    authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
 
 
 class GetContainerMetadata(ListAPIView):
     serializer_class = FindingAidsEntityReadSerializer
     lookup_field = 'barcode'
+    authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
 
     def get_queryset(self):
