@@ -22,5 +22,5 @@ class PersonSelectList(generics.ListAPIView):
     serializer_class = PersonSelectSerializer
     pagination_class = None
     filter_backends = (SearchFilter,)
-    search_fields = ('last_name', 'first_name')
+    search_fields = ('last_name', 'first_name', 'personotherformat__first_name', 'personotherformat__last_name')
     queryset = Person.objects.all().order_by('last_name', 'first_name')
