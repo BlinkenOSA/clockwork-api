@@ -22,5 +22,5 @@ class CorporationSelectList(generics.ListAPIView):
     serializer_class = CorporationSelectSerializer
     pagination_class = None
     filter_backends = (SearchFilter,)
-    search_fields = ('name',)
+    search_fields = ('name', 'corporationotherformat__name')
     queryset = Corporation.objects.all().order_by('name')

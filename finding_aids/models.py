@@ -163,15 +163,17 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
             hashids = Hashids(salt="blinkenosa", min_length=10)
             if not self.catalog_id:
                 self.catalog_id = hashids.encode(self.id)
+                super(FindingAidsEntity, self).save()
 
     def save(self, **kwargs):
         if not self.date_created:
             self.date_created = datetime.datetime.now()
         self.set_reference_code()
-        self.set_catalog_id()
         if self.digital_version_exists and not self.digital_version_creation_date:
             self.digital_version_creation_date = datetime.datetime.now()
         super(FindingAidsEntity, self).save()
+        self.set_catalog_id()
+
 
 
 class FindingAidsEntityAlternativeTitle(models.Model):

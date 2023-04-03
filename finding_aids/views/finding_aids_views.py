@@ -109,6 +109,7 @@ class FindingAidsClone(APIView):
             clone.folder_no += 1
         else:
             clone.sequence_no += 1
+        clone.published = False
         clone.save()
         return Response(status=status.HTTP_200_OK)
 
