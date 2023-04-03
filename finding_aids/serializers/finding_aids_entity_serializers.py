@@ -120,7 +120,7 @@ class FindingAidsEntityDateReadSerializer(serializers.ModelSerializer):
 
 class FindingAidsEntityDateWriteSerializer(serializers.ModelSerializer):
     date_from = ApproximateDateSerializerField()
-    date_to = ApproximateDateSerializerField()
+    date_to = ApproximateDateSerializerField(required=False, default='')
 
     class Meta:
         model = FindingAidsEntityDate
