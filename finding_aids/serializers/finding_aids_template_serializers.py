@@ -7,11 +7,11 @@ from clockwork_api.fields.approximate_date_serializer_field import ApproximateDa
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from finding_aids.models import FindingAidsEntity
 from finding_aids.serializers.finding_aids_entity_serializers import FindingAidsEntityPlaceOfCreationSerializer, \
-    FindingAidsEntityCreatorSerializer, FindingAidsEntityDateWriteSerializer, \
-    FindingAidsEntityAlternativeTitleSerializer, FindingAidsEntityAssociatedPersonWriteSerializer, \
-    FindingAidsEntitySubjectSerializer, FindingAidsEntityAssociatedCorporationWriteSerializer, \
-    FindingAidsEntityAssociatedPlaceWriteSerializer, FindingAidsEntityAssociatedCountryWriteSerializer, \
-    FindingAidsEntityLanguageWriteSerializer, FindingAidsEntityExtentWriteSerializer
+    FindingAidsEntityCreatorSerializer, FindingAidsEntityDateSerializer, \
+    FindingAidsEntityAlternativeTitleSerializer, FindingAidsEntityAssociatedPersonSerializer, \
+    FindingAidsEntitySubjectSerializer, FindingAidsEntityAssociatedCorporationSerializer, \
+    FindingAidsEntityAssociatedPlaceSerializer, FindingAidsEntityAssociatedCountrySerializer, \
+    FindingAidsEntityLanguageSerializer, FindingAidsEntityExtentSerializer
 
 
 class FindingAidsTemplateListSerializer(serializers.ModelSerializer):
@@ -27,22 +27,22 @@ class FindingAidsTemplateWriteSerializer(UserDataSerializerMixin, WritableNested
     creators = FindingAidsEntityCreatorSerializer(many=True, source='findingaidsentitycreator_set', required=False)
     date_from = ApproximateDateSerializerField(required=False)
     date_to = ApproximateDateSerializerField(required=False)
-    dates = FindingAidsEntityDateWriteSerializer(many=True, source='findingaidsentitydate_set', required=False)
+    dates = FindingAidsEntityDateSerializer(many=True, source='findingaidsentitydate_set', required=False)
     alternative_titles = FindingAidsEntityAlternativeTitleSerializer(
         many=True, source='findingaidsentityalternativetitle_set', required=False)
     subjects = FindingAidsEntitySubjectSerializer(many=True, source='findingaidsentitysubject_set', required=False)
-    associated_people = FindingAidsEntityAssociatedPersonWriteSerializer(
+    associated_people = FindingAidsEntityAssociatedPersonSerializer(
         many=True, source='findingaidsentityassociatedperson_set', required=False)
-    associated_corporations = FindingAidsEntityAssociatedCorporationWriteSerializer(
+    associated_corporations = FindingAidsEntityAssociatedCorporationSerializer(
         many=True, source='findingaidsentityassociatedcorporation_set', required=False)
-    associated_places = FindingAidsEntityAssociatedPlaceWriteSerializer(
+    associated_places = FindingAidsEntityAssociatedPlaceSerializer(
         many=True, source='findingaidsentityassociatedplace_set', required=False
     )
-    associated_countries = FindingAidsEntityAssociatedCountryWriteSerializer(
+    associated_countries = FindingAidsEntityAssociatedCountrySerializer(
         many=True, source='findingaidsentityassociatedcountry_set', required=False
     )
-    languges = FindingAidsEntityLanguageWriteSerializer(many=True, source='findingaidsentitylanguage_set', required=False)
-    extents = FindingAidsEntityExtentWriteSerializer(many=True, source='findingaidsentityextent_set', required=False)
+    languges = FindingAidsEntityLanguageSerializer(many=True, source='findingaidsentitylanguage_set', required=False)
+    extents = FindingAidsEntityExtentSerializer(many=True, source='findingaidsentityextent_set', required=False)
 
     def validate(self, data):
         date_from = data.get('date_from', None)
