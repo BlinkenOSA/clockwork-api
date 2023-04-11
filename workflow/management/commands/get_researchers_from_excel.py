@@ -15,7 +15,7 @@ class Command(BaseCommand):
         filename = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ResearchRequests.xlsx')
         wb = load_workbook(filename=filename)
         self.create_researchers(wb)
-        self.add_researcher_extra_data(wb)
+        # self.add_researcher_extra_data(wb)
 
     def get_value(self, row, index):
         if isinstance(row[index].value, str):
@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
     def create_researchers(self, wb):
         researchers = wb['Researcher - Base Data']
-        for row in researchers.iter_rows(min_row=2, max_row=216):
+        for row in researchers.iter_rows(min_row=2, max_row=215):
             last_name = self.get_value(row, 0)
             first_name = self.get_value(row, 1)
             middle_name = self.get_value(row, 2)
@@ -40,28 +40,44 @@ class Command(BaseCommand):
             registration_date = self.get_value(row, 13)
 
             if last_name:
-
                 try:
                     researcher = Researcher.objects.get(
                         card_number=card_no
                     )
+                    print("Researcher: %s is updated!" % researcher.name)
                 except ObjectDoesNotExist:
-                    researcher = Researcher.objects.create(
-                        first_name=first_name,
-                        last_name=last_name,
-                        middle_name=middle_name,
-                        card_number=card_no,
-                        id_number=passport,
-                        email=email,
-                        address_hungary=address_hungary,
-                        address_abroad=address_abroad,
-                        city_hungary=city_hungary,
-                        city_abroad=city_abroad,
-                        date_created=registration_date
-                    )
+                    try:
+                        researcher = Researcher.objects.get(
+                            first_name=first_name,
+                            last_name=last_name
+                        )
+                        print("Researcher: %s is updated!" % researcher.name)
+                    except ObjectDoesNotExist:
+                        researcher = Researcher.objects.create(
+                            first_name=first_name,
+                            last_name=last_name,
+                            middle_name=middle_name,
+                            card_number=card_no,
+                            id_number=passport,
+                            email=email,
+                            address_hungary=address_hungary,
+                            address_abroad=address_abroad,
+                            city_hungary=city_hungary,
+                            city_abroad=city_abroad,
+                            date_created=registration_date
+                        )
+                        print("Researcher: %s is created!" % researcher.name)
+                    except MultipleObjectsReturned:
+                        print("Multiple researchers with name are registered: %s %s" % (first_name, last_name))
+                        researcher = Researcher.objects.filter(
+                            first_name=first_name,
+                            last_name=last_name
+                        ).first()
                 except MultipleObjectsReturned:
                     print("Multiple card numbers are registered: %s" % card_no)
-                    return
+                    researcher = Researcher.objects.filter(
+                        card_number=card_no
+                    ).first()
 
                 try:
                     country = Country.objects.get(

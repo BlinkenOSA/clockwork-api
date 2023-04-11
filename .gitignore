@@ -115,4 +115,5 @@ venv.bak/
 /research/fixtures/researcher.json
 /research/fixtures/researcher_data.json
 
+/workflow/management/commands/ResearchRequests.xlsx
 /workflow/management/commands/certificate.pem
