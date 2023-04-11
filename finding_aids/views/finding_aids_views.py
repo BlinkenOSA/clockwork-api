@@ -1,4 +1,6 @@
 import uuid
+
+from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
@@ -110,6 +112,10 @@ class FindingAidsClone(APIView):
         else:
             clone.sequence_no += 1
         clone.published = False
+        clone.user_created = request.user.username
+        clone.date_created = timezone.now()
+        clone.user_updated = None
+        clone.date_updated = None
         clone.save()
         return Response(status=status.HTTP_200_OK)
 
