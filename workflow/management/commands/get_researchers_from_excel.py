@@ -15,7 +15,7 @@ class Command(BaseCommand):
         filename = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ResearchRequests.xlsx')
         wb = load_workbook(filename=filename)
         self.create_researchers(wb)
-        # self.add_researcher_extra_data(wb)
+        self.add_researcher_extra_data(wb)
 
     def get_value(self, row, index):
         if isinstance(row[index].value, str):
@@ -51,6 +51,11 @@ class Command(BaseCommand):
                             first_name=first_name,
                             last_name=last_name
                         )
+
+                        if registration_date:
+                            researcher.date_created = registration_date
+                            researcher.save()
+
                         print("Researcher: %s is updated!" % researcher.name)
                     except ObjectDoesNotExist:
                         researcher = Researcher.objects.create(
