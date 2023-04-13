@@ -79,12 +79,12 @@ class IsadReadSerializer(serializers.ModelSerializer):
 
 
 class IsadWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
-    creators = IsadCreatorSerializer(many=True, source='isadcreator_set')
+    creators = IsadCreatorSerializer(many=True, source='isadcreator_set', required=False)
     carriers = IsadCarrierWriteSerializer(many=True, source='isadcarrier_set', required=False)
-    extents = IsadExtentWriteSerializer(many=True, source='isadextent_set')
-    related_finding_aids = IsadRelatedFindingAidsSerializer(many=True, source='isadrelatedfindingaids_set')
-    location_of_originals = IsadLocationOfOriginalsSerializer(many=True, source='isadlocationoforiginals_set')
-    location_of_copies = IsadLocationOfCopiesSerializer(many=True, source='isadlocationofcopies_set')
+    extents = IsadExtentWriteSerializer(many=True, source='isadextent_set', required=False)
+    related_finding_aids = IsadRelatedFindingAidsSerializer(many=True, source='isadrelatedfindingaids_set', required=False)
+    location_of_originals = IsadLocationOfOriginalsSerializer(many=True, source='isadlocationoforiginals_set', required=False)
+    location_of_copies = IsadLocationOfCopiesSerializer(many=True, source='isadlocationofcopies_set', required=False)
 
     class Meta:
         model = Isad
