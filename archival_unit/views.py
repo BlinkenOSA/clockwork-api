@@ -72,7 +72,16 @@ class ArchivalUnitSelectByParentList(generics.ListAPIView):
         parent_id = self.kwargs.get('parent_id', None)
         user = self.request.user
         if user.user_profile.allowed_archival_units.count() > 0:
-
+            parent_unit = ArchivalUnit.objects.get(pk=parent_id)
+            if parent_unit.level == 'F':
+                subfonds = ArchivalUnit.objects.filter(parent__id=parent_id)
+                queryset = ArchivalUnit.objects.none()
+                for archival_unit in user.user_profile.allowed_archival_units.all():
+                    queryset |= ArchivalUnit.objects.filter(id=archival_unit.parent.id)
+                return queryset & subfonds
+            if parent_unit.level == 'SF':
+                series = ArchivalUnit.objects.filter(parent__id=parent_id)
+                return series & user.user_profile.allowed_archival_units.all()
         else:
             if parent_id:
                 return ArchivalUnit.objects.filter(parent_id=parent_id)
