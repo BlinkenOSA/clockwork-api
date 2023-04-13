@@ -5,6 +5,6 @@ from digitization.views import DigitizationList, DigitizationDetail
 app_name = 'digitization'
 
 urlpatterns = [
-    path('', DigitizationList.as_view(), name='digitization-list'),
-    path('<int:pk>/', DigitizationDetail.as_view(), name='digitization-detail'),
+    path('container/', DigitizationList.as_view(), name='digitization-list'),
+    path('container/<int:pk>/', DigitizationDetail.as_view(), name='digitization-detail'),
 ]
