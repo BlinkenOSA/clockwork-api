@@ -104,10 +104,23 @@ class IsadSubfondsSerializer(IsadArchivalUnitSerializerMixin, serializers.ModelS
     status = serializers.SerializerMethodField()
 
     def get_children(self, obj):
-        if obj.children.count() > 0:
-            return IsadSeriesSerializer(obj.children, many=True).data
+        user = self.context['user']
+        if user.user_profile.allowed_archival_units.count() > 0:
+            queryset = ArchivalUnit.objects.none()
+            for archival_unit in user.user_profile.allowed_archival_units.filter(
+                fonds=obj.fonds, subfonds=obj.subfonds
+            ):
+                queryset |= ArchivalUnit.objects.filter(
+                    fonds=archival_unit.fonds,
+                    subfonds=archival_unit.subfonds,
+                    series=archival_unit.series,
+                    level='S')
+            return IsadSeriesSerializer(queryset, many=True, context=self.context).data
         else:
-            return None
+            if obj.children.count() > 0:
+                return IsadSeriesSerializer(obj.children, many=True, context=self.context).data
+            else:
+                return None
 
     class Meta:
         model = ArchivalUnit
@@ -119,10 +132,20 @@ class IsadFondsSerializer(IsadArchivalUnitSerializerMixin, serializers.ModelSeri
     status = serializers.SerializerMethodField()
 
     def get_children(self, obj):
-        if obj.children.count() > 0:
-            return IsadSubfondsSerializer(obj.children, many=True).data
+        user = self.context['user']
+        if user.user_profile.allowed_archival_units.count() > 0:
+            queryset = ArchivalUnit.objects.none()
+            for archival_unit in user.user_profile.allowed_archival_units.filter(fonds=obj.fonds):
+                queryset |= ArchivalUnit.objects.filter(
+                    fonds=archival_unit.fonds,
+                    subfonds=archival_unit.subfonds,
+                    level='SF')
+            return IsadSubfondsSerializer(queryset, many=True, context=self.context).data
         else:
-            return None
+            if obj.children.count() > 0:
+                return IsadSubfondsSerializer(obj.children, many=True, context=self.context).data
+            else:
+                return None
 
     class Meta:
         model = ArchivalUnit

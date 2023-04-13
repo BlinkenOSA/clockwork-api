@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
+from clockwork_api.permissons.allowed_archival_unit_permission import AllowedArchivalUnitPermission
 from container.models import Container
 from finding_aids.models import FindingAidsEntity
 from finding_aids.serializers.finding_aids_entity_serializers import FindingAidsSelectSerializer, \
@@ -27,6 +28,8 @@ class FindingAidsList(generics.ListAPIView):
 
 
 class FindingAidsPreCreate(APIView):
+    permission_classes = [AllowedArchivalUnitPermission]
+
     def get(self, request, *args, **kwargs):
         container = get_object_or_404(Container, pk=self.kwargs.get('container_id', None))
         description_level = self.kwargs.get('description_level', 'L1')
@@ -80,6 +83,7 @@ class FindingAidsPreCreate(APIView):
 
 class FindingAidsCreate(generics.CreateAPIView):
     serializer_class = FindingAidsEntityWriteSerializer
+    permission_classes = [AllowedArchivalUnitPermission]
 
     def perform_create(self, serializer):
         container = get_object_or_404(Container, pk=self.kwargs.get('container_id', None))
@@ -88,6 +92,7 @@ class FindingAidsCreate(generics.CreateAPIView):
 
 class FindingAidsDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = FindingAidsEntity.objects.all()
+    permission_classes = [AllowedArchivalUnitPermission]
     method_serializer_classes = {
         ('GET', ): FindingAidsEntityReadSerializer,
         ('PUT', 'PATCH', 'DELETE'): FindingAidsEntityWriteSerializer

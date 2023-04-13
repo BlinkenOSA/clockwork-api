@@ -7,7 +7,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
+from clockwork_api.mixins.allowed_archival_unit_mixin import ListAllowedArchivalUnitMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
+from clockwork_api.permissons.allowed_archival_unit_permission import AllowedArchivalUnitPermission
 from isad.models import Isad
 from isad.serializers.isad_serializers import IsadSelectSerializer, IsadReadSerializer, IsadWriteSerializer, IsadFondsSerializer, \
     IsadPreCreateSerializer
@@ -59,11 +61,16 @@ class IsadFilterClass(filters.FilterSet):
         fields = ('fonds',)
 
 
-class IsadList(generics.ListAPIView):
+class IsadList(ListAllowedArchivalUnitMixin, generics.ListAPIView):
     queryset = ArchivalUnit.objects.filter(level='F').all()
     serializer_class = IsadFondsSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = IsadFilterClass
+
+    def get_serializer_context(self):
+        context = super(IsadList, self).get_serializer_context()
+        context['user'] = self.request.user
+        return context
 
 
 class IsadPreCreate(generics.RetrieveAPIView):
@@ -77,6 +84,7 @@ class IsadCreate(generics.CreateAPIView):
 
 
 class IsadDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [AllowedArchivalUnitPermission]
     queryset = Isad.objects.all()
     method_serializer_classes = {
         ('GET', ): IsadReadSerializer,

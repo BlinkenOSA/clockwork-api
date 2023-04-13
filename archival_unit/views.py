@@ -8,6 +8,7 @@ from archival_unit.models import ArchivalUnit
 from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnitReadSerializer, \
     ArchivalUnitWriteSerializer, ArchivalUnitFondsSerializer, ArchivalUnitSeriesSerializer, \
     ArchivalUnitPreCreateSerializer
+from clockwork_api.mixins.allowed_archival_unit_mixin import ListAllowedArchivalUnitMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.mixins.read_write_serializer_mixin import ReadWriteSerializerMixin
 
@@ -52,7 +53,7 @@ class ArchivalUnitDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAP
     }
 
 
-class ArchivalUnitSelectList(generics.ListAPIView):
+class ArchivalUnitSelectList(ListAllowedArchivalUnitMixin, generics.ListAPIView):
     serializer_class = ArchivalUnitSelectSerializer
     pagination_class = None
     filter_backends = (SearchFilter, DjangoFilterBackend)
@@ -69,7 +70,20 @@ class ArchivalUnitSelectByParentList(generics.ListAPIView):
 
     def get_queryset(self):
         parent_id = self.kwargs.get('parent_id', None)
-        if parent_id:
-            return ArchivalUnit.objects.filter(parent_id=parent_id)
+        user = self.request.user
+        if user.user_profile.allowed_archival_units.count() > 0:
+            parent_unit = ArchivalUnit.objects.get(pk=parent_id)
+            if parent_unit.level == 'F':
+                subfonds = ArchivalUnit.objects.filter(parent__id=parent_id)
+                queryset = ArchivalUnit.objects.none()
+                for archival_unit in user.user_profile.allowed_archival_units.all():
+                    queryset |= ArchivalUnit.objects.filter(id=archival_unit.parent.id)
+                return queryset & subfonds
+            if parent_unit.level == 'SF':
+                series = ArchivalUnit.objects.filter(parent__id=parent_id)
+                return series & user.user_profile.allowed_archival_units.all()
         else:
-            return ArchivalUnit.objects.none()
+            if parent_id:
+                return ArchivalUnit.objects.filter(parent_id=parent_id)
+            else:
+                return ArchivalUnit.objects.none()

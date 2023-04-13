@@ -39,7 +39,15 @@ class ContainerList(generics.ListAPIView):
     def get_queryset(self):
         archival_unit_id = self.kwargs.get('series_id', None)
         if archival_unit_id:
-            return Container.objects.filter(archival_unit_id=archival_unit_id)
+            user = self.request.user
+            if user.user_profile.allowed_archival_units.count() > 0:
+                if user.user_profile.allowed_archival_units.filter(id=archival_unit_id).count() > 0:
+                    allowed_archival_unit = user.user_profile.allowed_archival_units.get(id=archival_unit_id)
+                    return Container.objects.filter(archival_unit_id=allowed_archival_unit.id)
+                else:
+                    return Container.objects.none()
+            else:
+                return Container.objects.filter(archival_unit_id=archival_unit_id)
         else:
             return Container.objects.none()
 
