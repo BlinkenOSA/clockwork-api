@@ -7,7 +7,7 @@ from isad.tasks import index_catalog_isad_record, index_catalog_isad_record_remo
 
 @receiver(post_save, sender=ArchivalUnit)
 def update_isad_when_archival_unit_saved(sender, instance, **kwargs):
-    if instance.isad:
+    if hasattr(instance, 'isad'):
         if instance.isad.published:
             index_catalog_isad_record.delay(isad_id=instance.isad.id)
         else:

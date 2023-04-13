@@ -31,6 +31,24 @@ class DigitizationList(ListAPIView):
         if carrier_type:
             qs = qs.filter(carrier_type=carrier_type)
 
+        digital_version = self.request.query_params.get('digital_version_exists', None)
+        if digital_version == 'yes':
+            qs = qs.filter(digital_version_exists=True)
+        if digital_version == 'no':
+            qs = qs.filter(digital_version_exists=False)
+
+        digital_version_research_cloud = self.request.query_params.get('digital_version_research_cloud', None)
+        if digital_version_research_cloud == 'yes':
+            qs = qs.filter(digital_version_research_cloud=True)
+        if digital_version_research_cloud == 'no':
+            qs = qs.filter(digital_version_research_cloud=False)
+
+        digital_version_online = self.request.query_params.get('digital_version_online', None)
+        if digital_version_online == 'yes':
+            qs = qs.filter(digital_version_research_cloud=True)
+        if digital_version_online == 'no':
+            qs = qs.filter(digital_version_research_cloud=False)
+
         return qs
 
 

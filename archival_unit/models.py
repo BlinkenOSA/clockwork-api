@@ -96,4 +96,4 @@ class ArchivalUnit(models.Model, DetectProtectedMixin):
     class Meta:
         db_table = 'archival_units'
         ordering = ['fonds', 'subfonds', 'series']
-        unique_together = (("fonds", "subfonds", "series", "level"),)
+        unique_together = ("fonds", "subfonds", "series", "level")
