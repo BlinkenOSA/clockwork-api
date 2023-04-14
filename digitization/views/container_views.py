@@ -1,14 +1,16 @@
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from container.models import Container
-from digitization.serializers import DigitizationLogSerializer, DigitizationDataSerializer
+from digitization.serializers.container_serializers import DigitizationContainerLogSerializer, \
+    DigitizationContainerDataSerializer
 
 
-class DigitizationList(ListAPIView):
+class DigitizationContainerList(ListAPIView):
     filter_backends = (SearchFilter, OrderingFilter)
     ordering_fields = ('barcode', 'digital_version_exists', 'digital_version_creation_date')
-    search_fields = ('archival_unit__reference_code', 'barcode',)
-    serializer_class = DigitizationLogSerializer
+    search_fields = ('archival_unit__reference_code', 'barcode',
+                     'findingaidsentity__title', 'findingaidsentity__title_original')
+    serializer_class = DigitizationContainerLogSerializer
 
     def get_queryset(self):
         qs = Container.objects.filter(barcode__isnull=False).exclude(barcode="").order_by('-digital_version_creation_date')
@@ -45,13 +47,13 @@ class DigitizationList(ListAPIView):
 
         digital_version_online = self.request.query_params.get('digital_version_online', None)
         if digital_version_online == 'yes':
-            qs = qs.filter(digital_version_research_cloud=True)
+            qs = qs.filter(digital_version_online=True)
         if digital_version_online == 'no':
-            qs = qs.filter(digital_version_research_cloud=False)
+            qs = qs.filter(digital_version_online=False)
 
         return qs
 
 
-class DigitizationDetail(RetrieveAPIView):
+class DigitizationContainerDetail(RetrieveAPIView):
     queryset = Container.objects.all()
-    serializer_class = DigitizationDataSerializer
+    serializer_class = DigitizationContainerDataSerializer

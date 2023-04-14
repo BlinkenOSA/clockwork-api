@@ -54,7 +54,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     administrative_history = models.TextField(blank=True, null=True)
     administrative_history_original = models.TextField(blank=True, null=True)
 
-    primary_type = models.ForeignKey('controlled_list.PrimaryType', default=1, on_delete=models.PROTECT)
+    primary_type = models.ForeignKey('controlled_list.PrimaryType', default=1, on_delete=models.PROTECT, db_index=True)
     genre = models.ManyToManyField('authority.Genre', blank=True)
 
     # Associated Fields
@@ -94,12 +94,12 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     published = models.BooleanField(default=False)
 
     # Digital Version
-    digital_version_exists = models.BooleanField(default=False)
+    digital_version_exists = models.BooleanField(default=False, db_index=True)
     digital_version_creation_date = models.DateField(blank=True, null=True)
     digital_version_technical_metadata = models.TextField(blank=True, null=True)
-    digital_version_research_cloud = models.BooleanField(default=False)
+    digital_version_research_cloud = models.BooleanField(default=False, db_index=True)
     digital_version_research_cloud_path = models.TextField(blank=True, null=True)
-    digital_version_online = models.BooleanField(default=False)
+    digital_version_online = models.BooleanField(default=False, db_index=True)
 
     confidential_display_text = models.CharField(max_length=300, blank=True, null=True)
     confidential = models.BooleanField(default=False)

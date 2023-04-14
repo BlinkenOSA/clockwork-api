@@ -5,7 +5,7 @@ from container.models import Container
 from controlled_list.models import CarrierType
 
 
-class DigitizationLogSerializer(serializers.ModelSerializer):
+class DigitizationContainerLogSerializer(serializers.ModelSerializer):
     container_no = serializers.SerializerMethodField()
     duration = serializers.SerializerMethodField()
     carrier_type = serializers.SlugRelatedField(slug_field='type', queryset=CarrierType.objects.all())
@@ -33,7 +33,7 @@ class DigitizationLogSerializer(serializers.ModelSerializer):
                   'duration', 'carrier_type')
 
 
-class DigitizationDataSerializer(serializers.ModelSerializer):
+class DigitizationContainerDataSerializer(serializers.ModelSerializer):
     digital_version_technical_metadata = serializers.SerializerMethodField()
 
     def get_digital_version_technical_metadata(self, obj):
