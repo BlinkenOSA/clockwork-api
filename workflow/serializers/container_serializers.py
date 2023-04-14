@@ -15,5 +15,6 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Container
         fields = ['barcode', 'carrier_type', 'container_no', 'digital_version_exists',
+                  'digital_version_research_cloud', 'digital_version_research_cloud_path',
                   'digital_version_technical_metadata', 'digital_version_creation_date', 'archival_unit']
 
