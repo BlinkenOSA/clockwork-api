@@ -24,9 +24,11 @@ class Researcher(models.Model, DetectProtectedMixin):
 
     OCCUPATION_CHOICES = [('ceu', 'CEU'), ('other', 'Other')]
     occupation = models.CharField(max_length=20, choices=OCCUPATION_CHOICES, default='ceu')
+    occupation_other = models.CharField(max_length=300, blank=True, null=True)
 
-    OCCUPATION_TYPE_CHOICES = [('student', 'Student'), ('staff', 'Staff'), ('faculty', 'Faculty')]
+    OCCUPATION_TYPE_CHOICES = [('student', 'Student'), ('staff', 'Staff'), ('faculty', 'Faculty'), ('other', 'Other')]
     occupation_type = models.CharField(max_length=20, blank=True, null=True, choices=OCCUPATION_TYPE_CHOICES)
+    occupation_type_other = models.CharField(max_length=300, blank=True, null=True)
 
     department = models.CharField(max_length=200, blank=True, null=True)
     employer_or_school = models.CharField(max_length=200, blank=True, null=True)
