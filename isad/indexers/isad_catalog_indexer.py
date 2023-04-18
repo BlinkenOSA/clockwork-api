@@ -18,7 +18,7 @@ class ISADCatalogIndexer:
     """
     def __init__(self, isad_id):
         self.isad_id = isad_id
-        self.isad = Isad.objects.get(id=self.isad_id)
+        self.isad = None
         self.hashids = Hashids(salt="osaarchives", min_length=8)
         self.json = {}
         self.doc = {}
@@ -43,6 +43,7 @@ class ISADCatalogIndexer:
         self.solr.delete(id=self.get_solr_id(), commit=True)
 
     def create_solr_document(self):
+        self._get_isad_record()
         self._make_solr_document()
         self._make_json()
         if self.isad.original_locale_id:
@@ -55,6 +56,9 @@ class ISADCatalogIndexer:
             self.isad.archival_unit.subfonds * 1000 +
             self.isad.archival_unit.series
         )
+
+    def _get_isad_record(self):
+        self.isad = Isad.objects.get(id=self.isad_id)
 
     def _make_solr_document(self):
         level = self._return_description_level(self.isad.description_level)
