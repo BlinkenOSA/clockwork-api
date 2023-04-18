@@ -87,10 +87,12 @@ class ArchivalUnit(models.Model, DetectProtectedMixin):
         return ' '.join((self.reference_code, self.title))
 
     def save(self, **kwargs):
-        super(ArchivalUnit, self).save()
         self.set_sort()
         self.set_reference_code()
         self.set_title_full()
+        if self.isad:
+            self.isad.title = self.title
+            self.isad.save()
         super(ArchivalUnit, self).save()
 
     class Meta:
