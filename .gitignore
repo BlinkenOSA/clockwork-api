@@ -111,9 +111,13 @@ venv.bak/
 
 .DS_STORE
 
-/research/management
 /research/fixtures/researcher.json
 /research/fixtures/researcher_data.json
 
-/workflow/management/commands/ResearchRequests.xlsx
-/workflow/management/commands/certificate.pem
+/research/management/commands/ResearchRequests.xlsx
+/research/management/commands/certificate.pem
+/research/management/commands/dobrovits.py
+/research/management/commands/create_researcher_fixtures_from_database.py
+/research/management/commands/access_dumps
+
+
