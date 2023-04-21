@@ -37,7 +37,7 @@ class Command(BaseCommand):
             address_abroad = self.get_value(row, 9)
             city_abroad = self.get_value(row, 11)
             country_abroad = self.get_value(row, 12)
-            registration_date = self.get_value(row, 13)
+            registration_date = self.get_value(row, 14)
 
             if last_name:
                 try:
@@ -75,8 +75,8 @@ class Command(BaseCommand):
                     except MultipleObjectsReturned:
                         print("Multiple researchers with name are registered: %s %s" % (first_name, last_name))
                         researcher = Researcher.objects.filter(
-                            first_name=first_name,
-                            last_name=last_name
+                            first_name=first_name.strip(),
+                            last_name=last_name.strip()
                         ).first()
                 except MultipleObjectsReturned:
                     print("Multiple card numbers are registered: %s" % card_no)
@@ -95,8 +95,9 @@ class Command(BaseCommand):
 
     def add_researcher_extra_data(self, wb):
         topics = wb['Researcher - Topics']
+        occupation_types = ['student', 'staff', 'faculty']
         for row in topics.iter_rows(min_row=2):
-            researcher = self.get_value(row, 0)
+            researcher_name = self.get_value(row, 0)
             research_subject = self.get_value(row, 1)
             status = self.get_value(row, 2)
             status_other = self.get_value(row, 3)
@@ -105,16 +106,19 @@ class Command(BaseCommand):
             occupation = self.get_value(row, 7)
             nationality = self.get_value(row, 8)
 
+            last_name, first_name = researcher_name.split(', ')
+
             try:
                 researcher = Researcher.objects.get(
-                    name=researcher
+                    first_name=first_name.strip(),
+                    last_name=last_name.strip()
                 )
             except ObjectDoesNotExist:
-                print("Can't find researcher in topics tab %s" % researcher)
-                return
+                print("Can't find researcher in topics tab %s" % researcher_name)
+                continue
             except MultipleObjectsReturned:
-                print("Multiple objects returned for %s" % researcher)
-                return
+                print("Multiple objects returned for %s" % researcher_name)
+                continue
 
             researcher.research_subject = research_subject
             researcher.employer_or_school = employer
@@ -130,3 +134,25 @@ class Command(BaseCommand):
                 researcher.nationality = n
             except ObjectDoesNotExist:
                 pass
+
+            # Status
+            if status == 'CEU Students':
+                researcher.status = 'ceu'
+                researcher.occupation_type = 'student'
+
+            if status == 'CEU Staff':
+                researcher.status = 'ceu'
+                researcher.occupation_type = 'staff'
+
+            if status == 'Other':
+                researcher.status = 'other'
+                researcher.status_other = status_other
+
+            # Occupation
+            if occupation in occupation_types:
+                researcher.occupation_type = occupation
+            else:
+                researcher.occupation_type = 'other'
+                researcher.occupation_type_other = occupation
+
+            researcher.save()

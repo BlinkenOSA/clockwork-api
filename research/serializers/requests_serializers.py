@@ -14,7 +14,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     carrier_type = serializers.SlugRelatedField(slug_field='type', read_only=True, source='container.carrier_type')
     archival_reference_number = serializers.SerializerMethodField()
     mlr = serializers.SerializerMethodField()
-    has_digital_version = serializers.BooleanField(source='container.digital_version_exists')
+    has_digital_version = serializers.SerializerMethodField()
     digital_version_barcode = serializers.SerializerMethodField()
 
     def get_mlr(self, obj):
@@ -45,11 +45,18 @@ class RequestListSerializer(serializers.ModelSerializer):
 
         return 'Library Record'
 
-    def get_digital_version_barcode(self, obj):
-        if obj.container.has_digital_version:
-            return obj.container.barcode
+    def get_has_digital_version(self, obj):
+        if obj.container:
+            return obj.container.digital_version_exists
         else:
-            return None
+            return False
+
+    def get_digital_version_barcode(self, obj):
+        if obj.container:
+            if obj.container.has_digital_version:
+                return obj.container.barcode
+            else:
+                return None
 
     def get_archival_reference_number(self, obj):
         if obj.item_origin == 'FA':
