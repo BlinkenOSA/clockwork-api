@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
@@ -12,16 +13,28 @@ from clockwork_api.pagination import DropDownResultSetPagination
 from controlled_list.models import Nationality
 from controlled_list.serializers import NationalitySelectSerializer
 from research.models import Researcher
+from django_filters import rest_framework as filters
 from research.serializers.researcher_serializers import ResearcherReadSerializer, ResearcherWriteSerializer, \
     ResearcherSelectSerializer, ResearcherListSerializer
+
+
+class ResearcherFilterClass(filters.FilterSet):
+    search = filters.CharFilter(label='Search', method='filter_search')
+
+    def filter_search(self, queryset, name, value):
+        return queryset.filter(
+            Q(first_name__icontains=value) |
+            Q(last_name__icontains=value) |
+            Q(middle_name__icontains=value)
+        )
 
 
 class ResearcherList(MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = Researcher.objects.all().order_by('-date_created', 'last_name', 'first_name')
     filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter)
     filterset_fields = ['country', 'citizenship', 'active', 'approved']
+    filterset_class = ResearcherFilterClass
     ordering_fields = ['last_name', 'first_name', 'card_number', 'country__country', 'citizenship__nationality', 'date_created']
-    search_fields = ('first_name', 'last_name',)
     method_serializer_classes = {
         ('GET', ): ResearcherListSerializer,
         ('POST', ): ResearcherWriteSerializer
