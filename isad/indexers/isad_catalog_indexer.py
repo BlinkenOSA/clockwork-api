@@ -100,6 +100,7 @@ class ISADCatalogIndexer:
         self.doc['scope_and_content_abstract_search'] = self.isad.scope_and_content_abstract
         self.doc['scope_and_content_narrative_search'] = self.isad.scope_and_content_narrative
         self.doc['archival_history_search'] = self.isad.archival_history
+        self.doc['administrative_history_search'] = self.isad.administrative_history
         self.doc["publication_note_search"] = self.isad.publication_note
 
         self.doc['primary_type'] = "Archival Unit"
@@ -129,6 +130,9 @@ class ISADCatalogIndexer:
 
             if self.isad.archival_history_original:
                 self.doc['archival_history_search_%s' % locale] = self.isad.archival_history_original
+
+            if self.isad.administrative_history_original:
+                self.doc['administrative_history_search_%s' % locale] = self.isad.administrative_history_original
 
             if self.isad.publication_note_original:
                 self.doc['publication_note_search_%s' % locale] = self.isad.publication_note_original
