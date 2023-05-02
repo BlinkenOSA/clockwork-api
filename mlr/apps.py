@@ -11,3 +11,4 @@ class MLRConfig(AppConfig):
         super(MLRConfig, self).ready()
         from mlr.signals import downsync_mlr
         from mlr.signals import upsync_mlr
+        from mlr.signals import check_empty_mlr
