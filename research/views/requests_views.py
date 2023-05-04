@@ -31,7 +31,7 @@ class RequestsCreate(CreateAPIView):
 class RequestItemRetrieveUpdate(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     method_serializer_classes = {
         ('GET', ): RequestItemReadSerializer,
-        ('POST', ): RequestItemWriteSerializer
+        ('PUT', ): RequestItemWriteSerializer
     }
     queryset = RequestItem.objects.all()
 
