@@ -102,6 +102,7 @@ class RequestItem(models.Model):
     container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.CASCADE)
     identifier = models.CharField(max_length=20, blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
+    quantity = models.CharField(max_length=200, blank=True, null=True)
     return_date = models.DateTimeField(blank=True, null=True)
     reshelve_date = models.DateTimeField(blank=True, null=True)
 

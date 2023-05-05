@@ -101,23 +101,26 @@ class RequestItemReadSerializer(serializers.ModelSerializer):
     container = serializers.SerializerMethodField()
 
     def get_archival_unit(self, obj):
-        return {
-            'label': obj.container.archival_unit.reference_code,
-            'value': obj.container.archival_unit.id
-        }
+        if obj.container:
+            return {
+                'label': obj.container.archival_unit.reference_code,
+                'value': obj.container.archival_unit.id
+            }
 
     def get_container(self, obj):
-        return {
-            'label': "%s (%s)" % (obj.container.container_no, obj.container.carrier_type.type),
-            'value': obj.container.id
-        }
+        if obj.container:
+            return {
+                'label': "%s (%s)" % (obj.container.container_no, obj.container.carrier_type.type),
+                'value': obj.container.id
+            }
 
     class Meta:
         model = RequestItem
-        fields = ('id', 'researcher', 'request_date', 'item_origin', 'archival_unit', 'container', 'identifier', 'title')
+        fields = ('id', 'researcher', 'request_date', 'item_origin', 'archival_unit', 'container', 'identifier',
+                  'title', 'quantity')
 
 
 class RequestItemWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItem
-        fields = ('id', 'archival_unit', 'item_origin', 'container', 'identifier', 'title')
+        fields = ('id', 'item_origin', 'container', 'identifier', 'title', 'quantity')

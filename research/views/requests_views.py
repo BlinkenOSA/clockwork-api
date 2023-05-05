@@ -1,3 +1,6 @@
+import datetime
+
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -13,13 +16,52 @@ from container.models import Container
 from research.models import RequestItem, Request
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
     RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer
+from django_filters import rest_framework as filters
 
+
+class RequestFilterClass(filters.FilterSet):
+    researcher = filters.CharFilter(label='Researcher', method='filter_researcher')
+    status = filters.CharFilter(label='Status', method='filter_status')
+    item_origin = filters.CharFilter(label='Item Origin', method='filter_item_origin')
+    request_date = filters.CharFilter(label='Request Date', method='filter_request_date')
+
+    def filter_researcher(self, queryset, name, value):
+        return queryset.filter(request__researcher=value)
+
+    def filter_status(self, queryset, name, value):
+        return queryset.filter(status=value)
+
+    def filter_item_origin(self, queryset, name, value):
+        return queryset.filter(item_origin=value)
+
+    def filter_request_date(self, queryset, name, value):
+        if value == 'today':
+            return queryset.filter(request__request_date__date=datetime.date.today())
+        if value == 'all':
+            return queryset
+        if value == 'next_day':
+            today = datetime.date.today()
+            if today.weekday() < 4:
+                next_weekday = today + datetime.timedelta(days=1)
+            else:
+                next_weekday = today + datetime.timedelta(days=7 - today.weekday())
+            return queryset.filter(request__request_date__date=next_weekday)
+        if value == 'next_week':
+            today = datetime.date.today()
+            next_week_start = today + datetime.timedelta(days=7 - today.weekday())
+            next_week_end = today + datetime.timedelta(days=14 - today.weekday())
+            return queryset.filter(
+                request__request_date__date__gte=next_week_start,
+                request__request_date__date__lt=next_week_end,
+            )
+        
 
 class RequestsList(generics.ListAPIView):
     queryset = RequestItem.objects.all().order_by('request__created_date')
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filterset_fields = ['request__researcher', 'status', 'item_origin', 'reshelve_date']
-    ordering_fields = ['request__researcher__last_name', 'status', 'item_origin', 'request__request_date', 'request__created_date', 'reshelve_date']
+    filterset_class = RequestFilterClass
+    ordering_fields = ['request__researcher__last_name', 'status', 'item_origin', 'request__request_date',
+                       'request__created_date', 'reshelve_date']
     serializer_class = RequestListSerializer
 
 
@@ -31,7 +73,7 @@ class RequestsCreate(CreateAPIView):
 class RequestItemRetrieveUpdate(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     method_serializer_classes = {
         ('GET', ): RequestItemReadSerializer,
-        ('POST', ): RequestItemWriteSerializer
+        ('PUT', ): RequestItemWriteSerializer
     }
     queryset = RequestItem.objects.all()
 
