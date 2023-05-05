@@ -54,14 +54,14 @@ class RequestFilterClass(filters.FilterSet):
                 request__request_date__date__gte=next_week_start,
                 request__request_date__date__lt=next_week_end,
             )
-        
+
 
 class RequestsList(generics.ListAPIView):
     queryset = RequestItem.objects.all().order_by('request__created_date')
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = RequestFilterClass
     ordering_fields = ['request__researcher__last_name', 'status', 'item_origin', 'request__request_date',
-                       'request__created_date', 'reshelve_date']
+                       'ordering', 'reshelve_date']
     serializer_class = RequestListSerializer
 
 
