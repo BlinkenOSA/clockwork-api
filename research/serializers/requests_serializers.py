@@ -35,12 +35,15 @@ class RequestListSerializer(serializers.ModelSerializer):
                 return 'Waiting to be reshelved'
 
         if obj.item_origin == 'FA':
-            series = obj.container.archival_unit
-            carrier_type = obj.container.carrier_type
-            try:
-                mlr = MLREntity.objects.get(series=series, carrier_type=carrier_type)
-                return mlr.get_locations()
-            except ObjectDoesNotExist:
+            if obj.container:
+                series = obj.container.archival_unit
+                carrier_type = obj.container.carrier_type
+                try:
+                    mlr = MLREntity.objects.get(series=series, carrier_type=carrier_type)
+                    return mlr.get_locations()
+                except ObjectDoesNotExist:
+                    return ''
+            else:
                 return ''
 
         return 'Library Record'
@@ -60,7 +63,10 @@ class RequestListSerializer(serializers.ModelSerializer):
 
     def get_archival_reference_number(self, obj):
         if obj.item_origin == 'FA':
-            return "%s:%s" % (obj.container.archival_unit.reference_code, obj.container.container_no)
+            if obj.container:
+                return "%s:%s" % (obj.container.archival_unit.reference_code, obj.container.container_no)
+            else:
+                return 'Unknown(?)'
         else:
             return ''
 
