@@ -142,7 +142,10 @@ class RequestItem(models.Model):
 
         # Save ordering
         if self.item_origin == 'FA':
-            self.ordering = self.container.archival_unit.sort
+            if self.container:
+                self.ordering = "%s%04d" % (self.container.archival_unit.sort, self.container.container_no)
+            else:
+                self.ordering = ''
         else:
             self.ordering = self.identifier
 
