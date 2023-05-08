@@ -105,6 +105,7 @@ class RequestItem(models.Model):
     quantity = models.CharField(max_length=200, blank=True, null=True)
     return_date = models.DateTimeField(blank=True, null=True)
     reshelve_date = models.DateTimeField(blank=True, null=True)
+    ordering = models.CharField(max_length=50, blank=True, null=True)
 
     def save(self, **kwargs):
         researcher = self.request.researcher
@@ -138,6 +139,12 @@ class RequestItem(models.Model):
         if self.status == '5':
             if not self.reshelve_date:
                 self.reshelve_date = datetime.datetime.now()
+
+        # Save ordering
+        if self.item_origin == 'FA':
+            self.ordering = self.container.archival_unit.sort
+        else:
+            self.ordering = self.identifier
 
         super(RequestItem, self).save(**kwargs)
 
