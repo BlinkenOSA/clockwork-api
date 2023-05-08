@@ -57,9 +57,11 @@ class RequestFilterClass(filters.FilterSet):
 
 
 class RequestsList(generics.ListAPIView):
-    queryset = RequestItem.objects.all().order_by('request__created_date')
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    queryset = RequestItem.objects.all().order_by('-request__created_date')
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_class = RequestFilterClass
+    search_fields = ['request__researcher__last_name', 'request__researcher__first_name',
+                     'container__archival_unit__reference_code', 'identifier', 'title']
     ordering_fields = ['request__researcher__last_name', 'status', 'item_origin', 'request__request_date',
                        'ordering', 'reshelve_date']
     serializer_class = RequestListSerializer
