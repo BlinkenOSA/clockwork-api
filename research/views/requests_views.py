@@ -61,7 +61,8 @@ class RequestsList(generics.ListAPIView):
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_class = RequestFilterClass
     search_fields = ['request__researcher__last_name', 'request__researcher__first_name',
-                     'container__archival_unit__reference_code', 'identifier', 'title']
+                     'container__archival_unit__reference_code', 'identifier', 'title',
+                     'container__barcode']
     ordering_fields = ['request__researcher__last_name', 'status', 'item_origin', 'request__request_date',
                        'ordering', 'reshelve_date']
     serializer_class = RequestListSerializer
