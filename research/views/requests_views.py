@@ -100,13 +100,18 @@ class RequestItemStatusStep(APIView):
 
         if action == 'next':
             # Handle digital version
-            if request_item.container.has_digital_version:
-                if st == 2:
-                    request_item.status = '9'
-                    request_item.save()
+            if request_item.container:
+                if request_item.container.has_digital_version:
+                    if st == 2:
+                        request_item.status = '9'
+                        request_item.save()
+                else:
+                    if st < 5:
+                        request_item.status = str(st+1)
+                        request_item.save()
             else:
                 if st < 5:
-                    request_item.status = str(st+1)
+                    request_item.status = str(st + 1)
                     request_item.save()
             return Response(status=status.HTTP_200_OK)
         if action == 'previous':
