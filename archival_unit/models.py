@@ -90,9 +90,12 @@ class ArchivalUnit(models.Model, DetectProtectedMixin):
         self.set_sort()
         self.set_reference_code()
         self.set_title_full()
-        if self.isad:
-            self.isad.title = self.title
-            self.isad.save()
+
+        if hasattr(self, 'isad'):
+            isad = self.isad
+            isad.title = self.title
+            isad.save()
+
         super(ArchivalUnit, self).save()
 
     class Meta:
