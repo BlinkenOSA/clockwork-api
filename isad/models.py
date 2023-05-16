@@ -21,7 +21,7 @@ class Isad(models.Model):
     description_level = models.CharField(max_length=10, choices=DESCRIPTION_LEVEL)
     year_from = models.IntegerField()
     year_to = models.IntegerField(blank=True, null=True)
-    isaar = models.ManyToManyField('isaar.Isaar', blank=True)
+    isaar = models.ForeignKey('isaar.Isaar', on_delete=models.PROTECT, blank=True, null=True)
     language = models.ManyToManyField('authority.Language')
     accruals = models.BooleanField(default=False)
 
