@@ -110,7 +110,8 @@ class ISADCatalogIndexer:
         self.doc['language_facet'] = list(map(lambda l: l.language, self.isad.language.all()))
 
         creators = list(c.creator for c in self.isad.isadcreator_set.all())
-        creators.extend(list(i.name for i in self.isad.isaar.all()))
+        if self.isad.isaar:
+            creators.extend(list(self.isad.isaar.name))
         self.doc['creator'] = ", ".join(creators)
         self.doc['creator_facet'] = creators
 
@@ -171,8 +172,8 @@ class ISADCatalogIndexer:
         for c in self.isad.isadcreator_set.all():
             creator.append(c.creator)
 
-        for c in self.isad.isaar.all():
-            creator.append(c.name)
+        if self.isad.isaar:
+            creator.append(self.isad.isaar.name)
         j["creator"] = creator
 
         related_finding_aids = []
