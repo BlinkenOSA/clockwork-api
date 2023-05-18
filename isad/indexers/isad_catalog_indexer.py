@@ -111,7 +111,7 @@ class ISADCatalogIndexer:
 
         creators = list(c.creator for c in self.isad.isadcreator_set.all())
         if self.isad.isaar:
-            creators.extend(list(self.isad.isaar.name))
+            creators.append(self.isad.isaar.name)
         self.doc['creator'] = ", ".join(creators)
         self.doc['creator_facet'] = creators
 
