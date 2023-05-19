@@ -38,6 +38,18 @@ class Researcher(models.Model, DetectProtectedMixin):
     research_will_be_published = models.BooleanField(default=False)
     date_is_tentative = models.BooleanField(default=False)
 
+    HOW_DO_YOU_KNOW_CHOICES = [
+        ('web', 'OSA Web page'),
+        ('event', 'Event at OSA'),
+        ('verzio', 'Verzio'),
+        ('ceu', 'CEU'),
+        ('contacts', 'Personal Contacts'),
+        ('media', 'Media'),
+        ('other', 'Other')
+    ]
+    how_do_you_know_osa = models.CharField(max_length=20, blank=True, null=True, choices=HOW_DO_YOU_KNOW_CHOICES)
+    how_do_you_know_osa_other = models.TextField(blank=True, null=True)
+
     active = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
 
