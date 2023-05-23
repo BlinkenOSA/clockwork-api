@@ -26,7 +26,7 @@ class FindingAidsCatalogIndexer:
     def __init__(self, finding_aids_entity_id):
         self.finding_aids_id = finding_aids_entity_id
         self.finding_aids = FindingAidsEntity.objects.get(id=finding_aids_entity_id)
-        self.hashids = Hashids(salt="osaarchives", min_length=8)
+        self.hashids = Hashids(salt="osacontent", min_length=10)
         self.original_locale = ""
         self.json = {}
         self.doc = {}
@@ -73,8 +73,7 @@ class FindingAidsCatalogIndexer:
         if self.finding_aids.catalog_id:
             return self.finding_aids.catalog_id
         else:
-            hashids = Hashids(salt="osacontent", min_length=10)
-            return hashids.encode(self.finding_aids.id)
+            return self.hashids.encode(self.finding_aids.id)
 
     def _get_original_locale(self):
         if self.finding_aids.original_locale and \

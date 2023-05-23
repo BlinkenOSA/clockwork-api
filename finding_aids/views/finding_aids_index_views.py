@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from finding_aids.indexers.finding_aids_ams_indexer import FindingAidsAMSIndexer
 from finding_aids.indexers.finding_aids_catalog_indexer import FindingAidsCatalogIndexer
+from finding_aids.indexers.finding_aids_new_catalog_indexer import FindingAidsNewCatalogIndexer
 
 
 class FindingAidsEntityIndexTestView(generics.RetrieveAPIView):
@@ -17,7 +18,7 @@ class FindingAidsEntityIndexTestView(generics.RetrieveAPIView):
             if target == 'ams':
                 indexer = FindingAidsAMSIndexer(isad_id=pk, target='ams')
             else:
-                indexer = FindingAidsCatalogIndexer(finding_aids_entity_id=pk)
+                indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id=pk)
             indexer.create_solr_document()
             return Response(indexer.get_solr_document())
         except ObjectDoesNotExist:
