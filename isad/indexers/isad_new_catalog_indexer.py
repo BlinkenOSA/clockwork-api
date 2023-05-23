@@ -31,7 +31,7 @@ class ISADNewCatalogIndexer:
             print('Error with Report No. %s! Error: %s' % (self.doc['id'], e))
 
     def delete(self):
-        self.solr.delete(id=self.isad_id, commit=True)
+        self.solr.delete(id=self._get_solr_id(), commit=True)
 
     def _get_isad(self, isad_id):
         qs = Isad.objects.filter(pk=isad_id)
