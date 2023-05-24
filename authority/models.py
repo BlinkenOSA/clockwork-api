@@ -5,6 +5,7 @@ class Country(models.Model):
     id = models.AutoField(primary_key=True)
     alpha2 = models.CharField(max_length=2, blank=True, null=True)
     alpha3 = models.CharField(max_length=3)
+    wikidata_id = models.CharField(max_length=20, blank=True, null=True)
     wiki_url = models.CharField(max_length=150, blank=True, null=True)
     authority_url = models.CharField(max_length=200, blank=True, null=True)
     country = models.CharField(unique=True, max_length=100)
@@ -28,6 +29,7 @@ class Language(models.Model):
     iso_639_1 = models.CharField(max_length=10, blank=True, null=True)
     iso_639_2 = models.CharField(max_length=10, blank=True, null=True)
     iso_639_3 = models.CharField(max_length=10, blank=True, null=True)
+    wikidata_id = models.CharField(max_length=20, blank=True, null=True)
     wiki_url = models.CharField(max_length=150, blank=True, null=True)
     authority_url = models.CharField(max_length=200, blank=True, null=True)
     language = models.CharField(unique=True, max_length=100)
@@ -49,9 +51,10 @@ class Language(models.Model):
 
 class Place(models.Model):
     id = models.AutoField(primary_key=True)
+    place = models.CharField(unique=True, max_length=100)
+    wikidata_id = models.CharField(max_length=20, blank=True, null=True)
     wiki_url = models.CharField(max_length=150, blank=True, null=True)
     authority_url = models.CharField(max_length=200, blank=True, null=True)
-    place = models.CharField(unique=True, max_length=100)
     other_url = models.CharField(max_length=150, blank=True, null=True)
 
     user_created = models.CharField(max_length=100, blank=True)
@@ -72,6 +75,7 @@ class Person(models.Model):
     id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    wikidata_id = models.CharField(max_length=20, blank=True, null=True)
     wiki_url = models.CharField(max_length=150, blank=True, null=True)
     authority_url = models.CharField(max_length=150, blank=True, null=True)
     other_url = models.CharField(max_length=150, blank=True, null=True)
@@ -107,6 +111,7 @@ class PersonOtherFormat(models.Model):
 class Corporation(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(unique=True, max_length=250)
+    wikidata_id = models.CharField(max_length=20, blank=True, null=True)
     wiki_url = models.CharField(max_length=150, blank=True, null=True)
     authority_url = models.CharField(max_length=150, blank=True, null=True)
     other_url = models.CharField(max_length=150, blank=True, null=True)
@@ -140,6 +145,7 @@ class CorporationOtherFormat(models.Model):
 class Genre(models.Model):
     id = models.AutoField(primary_key=True)
     genre = models.CharField(unique=True, max_length=50)
+    wikidata_id = models.CharField(max_length=20, blank=True, null=True)
     wiki_url = models.CharField(max_length=150, blank=True, null=True)
     authority_url = models.CharField(max_length=150, blank=True, null=True)
     other_url = models.CharField(max_length=150, blank=True, null=True)
@@ -161,6 +167,7 @@ class Genre(models.Model):
 class Subject(models.Model):
     id = models.AutoField(primary_key=True)
     subject = models.CharField(unique=True, max_length=50)
+    wikidata_id = models.CharField(max_length=20, blank=True, null=True)
     wiki_url = models.CharField(max_length=150, blank=True, null=True)
     authority_url = models.CharField(max_length=150, blank=True, null=True)
     other_url = models.CharField(max_length=150, blank=True, null=True)
