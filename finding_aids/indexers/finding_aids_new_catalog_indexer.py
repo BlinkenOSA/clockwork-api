@@ -2,9 +2,9 @@ import pysolr
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
+from langdetect import detect
 
 from finding_aids.models import FindingAidsEntity
-from isad.models import Isad
 
 
 class FindingAidsNewCatalogIndexer:
@@ -19,6 +19,7 @@ class FindingAidsNewCatalogIndexer:
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG_NEW", "catalog")
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
         self.solr = pysolr.Solr(self.solr_url, always_commit=True)
+        self.locales = ['en', 'hu', 'ru', 'pl']
         self.doc = {}
 
     def get_solr_document(self):
@@ -96,6 +97,13 @@ class FindingAidsNewCatalogIndexer:
         self.doc['language_facet'] = list(
             map(lambda l: str(l.language), self.finding_aids_entity.findingaidsentitylanguage_set.all())
         )
+        self.doc['availability_facet'] = self._get_availability()
+
+        # Search fields
+        self.doc['identifier_search'] = self._get_identifiers()
+        self._get_search_field('title', 'title_search')
+        self._get_search_field('contents_summary', 'contents_summary_search')
+
 
     def _get_solr_id(self):
         if self.finding_aids_entity.catalog_id:
@@ -212,6 +220,33 @@ class FindingAidsNewCatalogIndexer:
                     date.append(str(year_from))
 
             return date
+
+    def _get_availability(self):
+        digital_version = self._get_digital_version_info()
+        if digital_version['digital_version_exists'] and not digital_version['digital_version_online']:
+            return 'Digitally Anywhere / With Registration'
+
+        if digital_version['digital_version_exists'] and digital_version['digital_version_online']:
+            return 'Digitally Anywhere / Without Registration'
+
+        return 'In the Research Room'
+
+    def _get_identifiers(self):
+        digital_version = self._get_digital_version_info()
+        if digital_version['digital_version_exists']:
+            return digital_version['digital_version_barcode']
+
+    def _get_search_field(self, ams_field, solr_field):
+        if self.finding_aids_entity.original_locale:
+            locale = self.finding_aids_entity.original_locale.locale.lower()
+            self.doc['%s_en' % solr_field] = getattr(self.finding_aids_entity, ams_field)
+            self.doc['%s_%s' % (solr_field, locale)] = getattr(self.finding_aids_entity, "%s_original" % ams_field)
+        else:
+            locale = detect(self.finding_aids_entity.title)
+            if locale in self.locales:
+                self.doc['%s_%s' % (solr_field, locale)] = getattr(self.finding_aids_entity, ams_field)
+            else:
+                self.doc['%s_general' % solr_field] = getattr(self.finding_aids_entity, ams_field)
 
     def _remove_duplicates(self):
         for k, v in self.doc.items():
