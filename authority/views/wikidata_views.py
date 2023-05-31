@@ -14,7 +14,14 @@ class WikidataMixin(object):
             session.trust_env = False
 
             r = session.get(
-                'https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&search=%s&language=en' % query
+                'https://www.wikidata.org/w/api.php',
+                params={
+                    'action': 'query',
+                    'list': 'search',
+                    'srprop': 'snippet|titlesnippet',
+                    'srsearch': query,
+                    'format': 'json'
+                }
             )
             if r.status_code == 200:
                 session.close()
@@ -27,14 +34,17 @@ class WikidataMixin(object):
     def assemble_data_stream(json_data):
         data = []
 
-        if 'search' in json_data:
-            for record in json_data['search']:
-                id = record['id']
+        if json_data['query']['searchinfo']['totalhits'] > 0:
+            for record in json_data['query']['search']:
+                id = record['title']
                 rec = {
                     'wikidata_id': id,
-                    'wikidata_url': record['concepturi'],
-                    'name': "%s (%s)" % (record['label'], record['description'])
+                    'wikidata_url': 'https://www.wikidata.org/wiki/%s' % id
                 }
+                if 'snippet' in record:
+                    rec['name'] = "%s (%s)" % (record['titlesnippet'], record['snippet'])
+                else:
+                    rec['name'] = record['titlesnippet']
                 data.append(rec)
         return data
 
