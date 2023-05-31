@@ -31,7 +31,7 @@ class ResearcherFilterClass(filters.FilterSet):
 
 class ResearcherList(MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = Researcher.objects.all().order_by('-date_created', 'last_name', 'first_name')
-    filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_fields = ['country', 'citizenship', 'active', 'approved']
     filterset_class = ResearcherFilterClass
     ordering_fields = ['last_name', 'first_name', 'card_number', 'country__country', 'citizenship__nationality', 'date_created']
@@ -52,8 +52,8 @@ class ResearcherDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIV
 class ResearcherSelectList(generics.ListAPIView):
     serializer_class = ResearcherSelectSerializer
     pagination_class = None
-    filter_backends = (SearchFilter,)
-    search_fields = ['first_name', 'last_name']
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = ResearcherFilterClass
     queryset = Researcher.objects.filter(active=True, approved=True).order_by('last_name', 'first_name')
 
 

@@ -9,6 +9,7 @@ from authority.views.place_views import PlaceList, PlaceDetail, PlaceSelectList
 from authority.views.lcsh_views import LCSHList
 from authority.views.subject_views import SubjectList, SubjectDetail, SubjectSelectList
 from authority.views.viaf_views import VIAFList
+from authority.views.wikidata_views import WikidataList
 from authority.views.wikipedia_views import WikipediaList
 
 app_name = 'authority'
@@ -51,6 +52,7 @@ urlpatterns = [
 
     # Authority services URLs
     path('wikipedia/', WikipediaList.as_view(), name='wikipedia-list'),
+    path('wikidata/', WikidataList.as_view(), name='wikidata-list'),
     path('viaf/', VIAFList.as_view(), name='viaf-list'),
     path('lcsh/', LCSHList.as_view(), name='lcsh-list')
 ]
