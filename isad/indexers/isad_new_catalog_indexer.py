@@ -81,10 +81,10 @@ class ISADNewCatalogIndexer:
         self.doc["title_search_ru"] = self._get_title("ru")
         self.doc["title_search_pl"] = self._get_title("pl")
 
-        self.doc["description_search_en"] = self._get_description_search_values('en')
-        self.doc["description_search_hu"] = self._get_description_search_values('hu')
-        self.doc["description_search_ru"] = self._get_description_search_values('ru')
-        self.doc["description_search_pl"] = self._get_description_search_values('pl')
+        self.doc["contents_summary_search_en"] = self._get_contents_summary_search_values('en')
+        self.doc["contents_summary_search_hu"] = self._get_contents_summary_search_values('hu')
+        self.doc["contents_summary_search_ru"] = self._get_contents_summary_search_values('ru')
+        self.doc["contents_summary_search_pl"] = self._get_contents_summary_search_values('pl')
 
     def _get_solr_id(self):
         hashids = Hashids(salt="osaarchives", min_length=8)
@@ -152,7 +152,7 @@ class ISADNewCatalogIndexer:
             else:
                 return None
 
-    def _get_description_search_values(self, locale):
+    def _get_contents_summary_search_values(self, locale):
         values = []
         if locale == 'en':
             values.append(self.isad.scope_and_content_abstract)
