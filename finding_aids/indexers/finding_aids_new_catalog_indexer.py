@@ -103,7 +103,9 @@ class FindingAidsNewCatalogIndexer:
         self.doc['identifier_search'] = self._get_identifiers()
         self._get_search_field('title', 'title_search')
         self._get_search_field('contents_summary', 'contents_summary_search')
-
+        self.doc['subject_search'] = self._get_subjects()
+        self.doc['contributor_search'] = self._get_contributors()
+        self.doc['geo_search'] = self._get_geo()
 
     def _get_solr_id(self):
         if self.finding_aids_entity.catalog_id:
@@ -238,7 +240,7 @@ class FindingAidsNewCatalogIndexer:
 
     def _get_search_field(self, ams_field, solr_field):
         if self.finding_aids_entity.original_locale:
-            locale = self.finding_aids_entity.original_locale.locale.lower()
+            locale = self.finding_aids_entity.original_locale.id.lower()
             self.doc['%s_en' % solr_field] = getattr(self.finding_aids_entity, ams_field)
             self.doc['%s_%s' % (solr_field, locale)] = getattr(self.finding_aids_entity, "%s_original" % ams_field)
         else:
