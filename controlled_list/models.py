@@ -128,7 +128,7 @@ class Keyword(models.Model, DetectProtectedMixin):
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
     def __str__(self):
-        return self.keyword
+        return self.keyword.strip()
 
     class Meta:
         db_table = 'controlled_keywords'
