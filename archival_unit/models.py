@@ -7,8 +7,7 @@ from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 class ArchivalUnit(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children',
-                               db_index=True, on_delete=models.PROTECT)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
     theme = models.ManyToManyField('controlled_list.ArchivalUnitTheme', blank=True)
 
     fonds = models.IntegerField()
@@ -102,3 +101,12 @@ class ArchivalUnit(models.Model, DetectProtectedMixin):
         db_table = 'archival_units'
         ordering = ['fonds', 'subfonds', 'series']
         unique_together = ("fonds", "subfonds", "series", "level")
+        indexes = [
+            models.Index(fields=['parent']),
+            models.Index(fields=['fonds']),
+            models.Index(fields=['subfonds']),
+            models.Index(fields=['series']),
+            models.Index(fields=['fonds', 'subfonds', 'series'], name='fsfs_idx'),
+            models.Index(fields=['title']),
+            models.Index(fields=['reference_code']),
+        ]
