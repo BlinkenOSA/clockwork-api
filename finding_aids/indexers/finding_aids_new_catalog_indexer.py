@@ -89,11 +89,11 @@ class FindingAidsNewCatalogIndexer:
         self.doc['primary_type_facet'] = self.finding_aids_entity.primary_type.type
         self.doc['description_level_facet'] = self._get_description_level()
         self.doc['subject_facet'] = self._get_subjects()
-        self.doc['subject_facet_wikidata'] = self._get_subjects(wikidata=True)
+        self.doc['subject_wikidata_facet'] = self._get_subjects(wikidata=True)
         self.doc['contributor_facet'] = self._get_contributors()
-        self.doc['contributor_facet_wikidata'] = self._get_contributors(wikidata=True)
+        self.doc['contributor_wikidata_facet'] = self._get_contributors(wikidata=True)
         self.doc['geo_facet'] = self._get_geo()
-        self.doc['geo_facet_wikidata'] = self._get_geo(wikidata=True)
+        self.doc['geo_wikidata_facet'] = self._get_geo(wikidata=True)
         self.doc['keyword_facet'] = self._get_keywords()
         self.doc['year_created_facet'] = self._get_date_created_facet()
         self.doc['language_facet'] = list(
