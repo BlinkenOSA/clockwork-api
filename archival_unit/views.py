@@ -10,7 +10,6 @@ from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnit
     ArchivalUnitPreCreateSerializer
 from clockwork_api.mixins.allowed_archival_unit_mixin import ListAllowedArchivalUnitMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
-from clockwork_api.mixins.read_write_serializer_mixin import ReadWriteSerializerMixin
 
 
 class ArchivalUnitFilterClass(filters.FilterSet):
