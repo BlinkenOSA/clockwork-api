@@ -2,7 +2,7 @@ import pysolr
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
-from langdetect import detect
+from langdetect import detect, LangDetectException
 
 from finding_aids.models import FindingAidsEntity
 
@@ -49,10 +49,8 @@ class FindingAidsNewCatalogIndexer:
         qs = qs.prefetch_related('subject_corporation')
         qs = qs.prefetch_related('subject_heading')
         qs = qs.prefetch_related('subject_keyword')
-        try:
-            return qs.get()
-        except ObjectDoesNotExist:
-            return None
+        return qs.get()
+
 
     def create_solr_document(self):
         self._index_record()
@@ -91,8 +89,12 @@ class FindingAidsNewCatalogIndexer:
         self.doc['primary_type_facet'] = self.finding_aids_entity.primary_type.type
         self.doc['description_level_facet'] = self._get_description_level()
         self.doc['subject_facet'] = self._get_subjects()
+        self.doc['subject_wikidata_facet'] = self._get_subjects(wikidata=True)
         self.doc['contributor_facet'] = self._get_contributors()
+        self.doc['contributor_wikidata_facet'] = self._get_contributors(wikidata=True)
         self.doc['geo_facet'] = self._get_geo()
+        self.doc['geo_wikidata_facet'] = self._get_geo(wikidata=True)
+        self.doc['keyword_facet'] = self._get_keywords()
         self.doc['year_created_facet'] = self._get_date_created_facet()
         self.doc['language_facet'] = list(
             map(lambda l: str(l.language), self.finding_aids_entity.findingaidsentitylanguage_set.all())
@@ -106,6 +108,7 @@ class FindingAidsNewCatalogIndexer:
         self.doc['subject_search'] = self._get_subjects()
         self.doc['contributor_search'] = self._get_contributors()
         self.doc['geo_search'] = self._get_geo()
+        self.doc['keyword_search'] = self._get_keywords()
 
     def _get_solr_id(self):
         if self.finding_aids_entity.catalog_id:
@@ -145,61 +148,80 @@ class FindingAidsNewCatalogIndexer:
 
         return val
 
+    def _get_value_with_wikidata_id(self, obj):
+        wikipedia_id = getattr(obj, "wikidata_id")
+        if wikipedia_id:
+            return "%s#%s" % (str(obj), wikipedia_id)
+        else:
+            return str(obj)
+
     def _get_subjects(self, wikidata=False):
         subjects = []
         # Subjects
         for fa_subject in self.finding_aids_entity.findingaidsentitysubject_set.all():
-            subjects.append(fa_subject.subject)
+            if wikidata:
+                subjects.append(self._get_value_with_wikidata_id(fa_subject.subject))
+            else:
+                subjects.append(fa_subject.subject)
 
         # Subject people
         for person in self.finding_aids_entity.subject_person.all():
-            subjects.append(str(person))
+            if wikidata:
+                subjects.append(self._get_value_with_wikidata_id(person))
+            else:
+                subjects.append(str(person))
 
         # Subject corporation
         for corporation in self.finding_aids_entity.subject_corporation.all():
-            subjects.append(str(corporation))
-
-        # Subject headings
-        for heading in self.finding_aids_entity.subject_heading.all():
-            subjects.append(heading.subject)
-
-        # Subject keywords
-        for keyword in self.finding_aids_entity.subject_keyword.all():
-            subjects.append(keyword.keyword)
+            if wikidata:
+                subjects.append(self._get_value_with_wikidata_id(corporation))
+            else:
+                subjects.append(str(corporation))
 
         return subjects
 
-    def _get_contributors(self):
+    def _get_keywords(self):
+        keywords = []
+        # Subject keywords
+        for keyword in self.finding_aids_entity.subject_keyword.all():
+            keywords.append(str(keyword))
+        return keywords
+
+    def _get_contributors(self, wikidata=False):
         contributors = []
 
         # Associated person
         for ap in self.finding_aids_entity.findingaidsentityassociatedperson_set.all():
-            contributors.append(str(ap.associated_person))
+            if wikidata:
+                contributors.append(self._get_value_with_wikidata_id(ap.associated_person))
+            else:
+                contributors.append(str(ap.associated_person))
 
         # Associated corporation
         for ac in self.finding_aids_entity.findingaidsentityassociatedcorporation_set.all():
-            contributors.append(str(ac.associated_corporation))
+            if wikidata:
+                contributors.append(self._get_value_with_wikidata_id(ac.associated_corporation))
+            else:
+                contributors.append(str(ac.associated_corporation))
 
         return contributors
 
-    def _get_geo(self):
+    def _get_geo(self, wikidata=False):
         geo = []
 
         # Spatial coverage country
         for country in self.finding_aids_entity.spatial_coverage_country.all():
-            geo.append(str(country))
+            if wikidata:
+                geo.append(self._get_value_with_wikidata_id(country))
+            else:
+                geo.append(str(country))
 
         # Spatial coverage place
         for place in self.finding_aids_entity.spatial_coverage_place.all():
-            geo.append(str(place))
-
-        # Associated country
-        for ac in self.finding_aids_entity.findingaidsentityassociatedcountry_set.all():
-            geo.append(str(ac.associated_country))
-
-        # Associated place
-        for ap in self.finding_aids_entity.findingaidsentityassociatedplace_set.all():
-            geo.append(str(ap.associated_place))
+            if wikidata:
+                geo.append(self._get_value_with_wikidata_id(place))
+            else:
+                geo.append(str(place))
 
         return geo
 
@@ -244,10 +266,13 @@ class FindingAidsNewCatalogIndexer:
             self.doc['%s_en' % solr_field] = getattr(self.finding_aids_entity, ams_field)
             self.doc['%s_%s' % (solr_field, locale)] = getattr(self.finding_aids_entity, "%s_original" % ams_field)
         else:
-            locale = detect(self.finding_aids_entity.title)
-            if locale in self.locales:
-                self.doc['%s_%s' % (solr_field, locale)] = getattr(self.finding_aids_entity, ams_field)
-            else:
+            try:
+                locale = detect(self.finding_aids_entity.title)
+                if locale in self.locales:
+                    self.doc['%s_%s' % (solr_field, locale)] = getattr(self.finding_aids_entity, ams_field)
+                else:
+                    self.doc['%s_general' % solr_field] = getattr(self.finding_aids_entity, ams_field)
+            except LangDetectException:
                 self.doc['%s_general' % solr_field] = getattr(self.finding_aids_entity, ams_field)
 
     def _remove_duplicates(self):

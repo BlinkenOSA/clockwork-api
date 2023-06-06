@@ -17,7 +17,7 @@ class Country(models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
     def __str__(self):
-        return self.country
+        return self.country.strip()
 
     class Meta:
         db_table = 'authority_countries'
@@ -41,7 +41,7 @@ class Language(models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
     def __str__(self):
-        return self.language
+        return self.language.strip()
 
     class Meta:
         db_table = 'authority_languages'
@@ -64,7 +64,7 @@ class Place(models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
     def __str__(self):
-        return self.place
+        return self.place.strip()
 
     class Meta:
         db_table = 'authority_places'
@@ -87,7 +87,7 @@ class Person(models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
     def __str__(self):
-        return ', '.join((self.last_name, self.first_name))
+        return ', '.join((self.last_name.strip(), self.first_name.strip()))
 
     class Meta:
         db_table = 'authority_people'
@@ -123,7 +123,7 @@ class Corporation(models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.name.strip()
 
     class Meta:
         db_table = 'authority_corporations'
@@ -157,7 +157,7 @@ class Genre(models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
     def __str__(self):
-        return self.genre
+        return self.genre.strip()
 
     class Meta:
         db_table = 'authority_genres'
@@ -179,7 +179,7 @@ class Subject(models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
     def __str__(self):
-        return self.subject
+        return self.subject.strip()
 
     class Meta:
         db_table = 'authority_subjects'

@@ -89,6 +89,10 @@ class Isad(models.Model):
 
     class Meta:
         db_table = 'isad_recrods'
+        indexes = [
+            models.Index(fields=['published']),
+            models.Index(fields=['archival_unit'])
+        ]
 
     def _get_catalog_id(self):
         hashids = Hashids(salt="osaarchives", min_length=8)
