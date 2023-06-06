@@ -108,7 +108,7 @@ class RequestItem(models.Model):
     request = models.ForeignKey('Request', on_delete=models.PROTECT)
     STATUS_VALUES = [('1', 'In Queue'), ('2', 'Pending'), ('3', 'Processed and prepared'),
                      ('4', 'Returned'), ('5', 'Reshelved'), ('9', 'Uploaded')]
-    status = models.CharField(max_length=1, choices=STATUS_VALUES, default='1')
+    status = models.CharField(max_length=1, choices=STATUS_VALUES, default='3')
     ORIGIN = [('FA', 'Finding Aids'), ('L', 'Library'), ('FL', 'Film Library')]
     item_origin = models.CharField(max_length=3, choices=ORIGIN)
     container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.CASCADE)
