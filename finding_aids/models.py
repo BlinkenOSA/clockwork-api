@@ -101,6 +101,12 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     digital_version_research_cloud_path = models.TextField(blank=True, null=True)
     digital_version_online = models.BooleanField(default=False, db_index=True)
 
+    # Access Rights
+    access_rights = models.ForeignKey('controlled_list.AccessRight', on_delete=models.PROTECT,
+                                      blank=True, null=True, default=1)
+    access_rights_restriction_date = models.DateField(blank=True, null=True)
+    access_rights_restriction_explanation = models.TextField(blank=True, null=True)
+
     confidential_display_text = models.CharField(max_length=300, blank=True, null=True)
     confidential = models.BooleanField(default=False)
 
