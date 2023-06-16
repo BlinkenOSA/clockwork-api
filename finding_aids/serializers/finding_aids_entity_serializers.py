@@ -9,7 +9,7 @@ from container.models import Container
 from finding_aids.models import FindingAidsEntity, FindingAidsEntityAlternativeTitle, FindingAidsEntityDate, \
     FindingAidsEntityCreator, FindingAidsEntityPlaceOfCreation, FindingAidsEntitySubject, \
     FindingAidsEntityAssociatedPerson, FindingAidsEntityAssociatedCorporation, FindingAidsEntityAssociatedCountry, \
-    FindingAidsEntityAssociatedPlace, FindingAidsEntityLanguage, FindingAidsEntityExtent
+    FindingAidsEntityAssociatedPlace, FindingAidsEntityLanguage, FindingAidsEntityExtent, FindingAidsEntityIdentifier
 
 
 class FindingAidsEntityExtentSerializer(serializers.ModelSerializer):
@@ -75,6 +75,12 @@ class FindingAidsEntityDateSerializer(serializers.ModelSerializer):
         exclude = ('fa_entity',)
 
 
+class FindingAidsEntityIdentifierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FindingAidsEntityIdentifier
+        exclude = ('fa_entity',)
+
+
 class FindingAidsEntityAlternativeTitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = FindingAidsEntityAlternativeTitle
@@ -95,6 +101,7 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
     date_from = ApproximateDateSerializerField()
     date_to = ApproximateDateSerializerField()
     dates = FindingAidsEntityDateSerializer(many=True, source='findingaidsentitydate_set')
+    identifiers = FindingAidsEntityIdentifierSerializer(many=True, source='findingaidsentityidentifier_set')
     alternative_titles = FindingAidsEntityAlternativeTitleSerializer(
         many=True, source='findingaidsentityalternativetitle_set')
     subjects = FindingAidsEntitySubjectSerializer(many=True, source='findingaidsentitysubject_set')
@@ -148,6 +155,8 @@ class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedMo
     date_from = ApproximateDateSerializerField()
     date_to = ApproximateDateSerializerField(required=False)
     dates = FindingAidsEntityDateSerializer(many=True, source='findingaidsentitydate_set', required=False)
+    identifiers = FindingAidsEntityIdentifierSerializer(
+        many=True, source='findingaidsentityidentifier_set', required=False)
     alternative_titles = FindingAidsEntityAlternativeTitleSerializer(
         many=True, source='findingaidsentityalternativetitle_set', required=False)
     subjects = FindingAidsEntitySubjectSerializer(many=True, source='findingaidsentitysubject_set', required=False)

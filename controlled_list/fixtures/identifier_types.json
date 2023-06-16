@@ -1,0 +1,24 @@
+[
+{
+  "model": "controlled_list.identifiertype",
+  "pk": 1,
+  "fields": {
+    "type": "ISBN",
+    "user_created": "finding.aids",
+    "date_created": "2023-06-16T14:38:03",
+    "user_updated": "finding.aids",
+    "date_updated": "2023-06-16T14:38:03"
+  }
+},
+{
+  "model": "controlled_list.identifiertype",
+  "pk": 2,
+  "fields": {
+    "type": "ISSN",
+    "user_created": "finding.aids",
+    "date_created": "2023-06-16T14:38:03",
+    "user_updated": "finding.aids",
+    "date_updated": "2023-06-16T14:38:03"
+  }
+}
+]

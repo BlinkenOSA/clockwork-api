@@ -10,6 +10,8 @@ from controlled_list.views.corporation_role_views import CorporationRoleList, Co
 from controlled_list.views.date_type_views import DateTypeList, DateTypeDetail, DateTypeSelectList
 from controlled_list.views.extent_unit_views import ExtentUnitList, ExtentUnitDetail, ExtentUnitSelectList
 from controlled_list.views.geo_role_views import GeoRoleList, GeoRoleDetail, GeoRoleSelectList
+from controlled_list.views.identifier_type_views import IdentifierTypeList, IdentifierTypeSelectList, \
+    IdentifierTypeDetail
 from controlled_list.views.keyword_views import KeywordList, KeywordDetail, KeywordSelectList
 from controlled_list.views.language_usage_views import LanguageUsageList, LanguageUsageDetail, LanguageUsageSelectList
 from controlled_list.views.locale_views import LocaleList, LocaleDetail, LocaleSelectList
@@ -63,6 +65,11 @@ urlpatterns = [
     path('geo_roles/', GeoRoleList.as_view(), name='geo_role-list'),
     path('geo_roles/<int:pk>/', GeoRoleDetail.as_view(), name='geo_role-detail'),
     path('select/geo_roles/', GeoRoleSelectList.as_view(), name='geo_role-select-list'),
+
+    # Date Type URLs
+    path('identifier_types/', IdentifierTypeList.as_view(), name='identifier_type-list'),
+    path('identifier_types/<int:pk>/', IdentifierTypeDetail.as_view(), name='identifier_type-detail'),
+    path('select/identifier_types/', IdentifierTypeSelectList.as_view(), name='identifier_type-select-list'),
 
     # Keyword URLs
     path('keywords/', KeywordList.as_view(), name='keyword-list'),

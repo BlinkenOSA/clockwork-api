@@ -214,6 +214,16 @@ class FindingAidsEntityCreator(models.Model):
         db_table = 'finding_aids_creators'
 
 
+class FindingAidsEntityIdentifier(models.Model):
+    id = models.AutoField(primary_key=True)
+    fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
+    identifier = models.CharField(max_length=50, blank=True, null=True)
+    identifier_type = models.ForeignKey('controlled_list.IdentifierType', on_delete=models.PROTECT)
+
+    class Meta:
+        db_table = 'finding_aids_identifiers'
+
+
 class FindingAidsEntityPlaceOfCreation(models.Model):
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
