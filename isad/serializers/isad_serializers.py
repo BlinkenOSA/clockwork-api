@@ -12,59 +12,43 @@ from isad.models import Isad, IsadCreator, IsadCarrier, IsadExtent, IsadLocation
 class IsadCreatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = IsadCreator
-        fields = '__all__'
+        exclude = ('isad',)
 
 
-class IsadCarrierReadSerializer(serializers.ModelSerializer):
-    carrier_type = CarrierTypeSelectSerializer()
-
+class IsadCarrierSerializer(serializers.ModelSerializer):
     class Meta:
         model = IsadCarrier
-        fields = '__all__'
+        exclude = ('isad',)
 
 
-class IsadCarrierWriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IsadCarrier
-        fields = '__all__'
-
-
-class IsadExtentReadSerializer(serializers.ModelSerializer):
-    extent_unit = ExtentUnitSelectSerializer()
-
+class IsadExtentSerializer(serializers.ModelSerializer):
     class Meta:
         model = IsadExtent
-        fields = '__all__'
-
-
-class IsadExtentWriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IsadExtent
-        fields = '__all__'
+        exclude = ('isad',)
 
 
 class IsadLocationOfOriginalsSerializer(serializers.ModelSerializer):
     class Meta:
         model = IsadLocationOfOriginals
-        fields = '__all__'
+        exclude = ('isad',)
 
 
 class IsadLocationOfCopiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = IsadLocationOfCopies
-        fields = '__all__'
+        exclude = ('isad',)
 
 
 class IsadRelatedFindingAidsSerializer(serializers.ModelSerializer):
     class Meta:
         model = IsadRelatedFindingAids
-        fields = '__all__'
+        exclude = ('isad',)
 
 
 class IsadReadSerializer(serializers.ModelSerializer):
     creators = IsadCreatorSerializer(many=True, source='isadcreator_set')
-    carriers = IsadCarrierReadSerializer(many=True, source='isadcarrier_set')
-    extents = IsadExtentReadSerializer(many=True, source='isadextent_set')
+    carriers = IsadCarrierSerializer(many=True, source='isadcarrier_set')
+    extents = IsadExtentSerializer(many=True, source='isadextent_set')
     related_finding_aids = IsadRelatedFindingAidsSerializer(many=True, source='isadrelatedfindingaids_set')
     location_of_originals = IsadLocationOfOriginalsSerializer(many=True, source='isadlocationoforiginals_set')
     location_of_copies = IsadLocationOfCopiesSerializer(many=True, source='isadlocationofcopies_set')
@@ -80,8 +64,8 @@ class IsadReadSerializer(serializers.ModelSerializer):
 
 class IsadWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     creators = IsadCreatorSerializer(many=True, source='isadcreator_set', required=False)
-    carriers = IsadCarrierWriteSerializer(many=True, source='isadcarrier_set', required=False)
-    extents = IsadExtentWriteSerializer(many=True, source='isadextent_set', required=False)
+    carriers = IsadCarrierSerializer(many=True, source='isadcarrier_set', required=False)
+    extents = IsadExtentSerializer(many=True, source='isadextent_set', required=False)
     related_finding_aids = IsadRelatedFindingAidsSerializer(many=True, source='isadrelatedfindingaids_set', required=False)
     location_of_originals = IsadLocationOfOriginalsSerializer(many=True, source='isadlocationoforiginals_set', required=False)
     location_of_copies = IsadLocationOfCopiesSerializer(many=True, source='isadlocationofcopies_set', required=False)
