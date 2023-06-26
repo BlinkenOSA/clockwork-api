@@ -3,7 +3,7 @@ from rest_framework import serializers
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from controlled_list.models import AccessRight, ArchivalUnitTheme, Building, CarrierType, CorporationRole, DateType, \
     ExtentUnit, GeoRole, Keyword, LanguageUsage, Locale, PersonRole, PrimaryType, ReproductionRight, \
-    RightsRestrictionReason, Nationality
+    RightsRestrictionReason, Nationality, IdentifierType
 
 
 # AccessRight serializers
@@ -109,6 +109,19 @@ class GeoRoleSelectSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeoRole
         fields = ('id', 'role')
+
+
+# IdentifierType serializers
+class IdentifierTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IdentifierType
+        fields = ('id', 'type', 'is_removable')
+
+
+class IdentifierTypeSelectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IdentifierType
+        fields = ('id', 'type')
 
 
 # Keyword serializers

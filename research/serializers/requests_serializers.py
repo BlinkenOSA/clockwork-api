@@ -17,6 +17,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     has_digital_version = serializers.SerializerMethodField()
     digital_version_barcode = serializers.SerializerMethodField()
 
+
     def get_mlr(self, obj):
         if obj.item_origin == 'FA':
             same_archival_request = RequestItem.objects.filter(

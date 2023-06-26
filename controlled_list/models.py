@@ -117,6 +117,24 @@ class GeoRole(models.Model, DetectProtectedMixin):
         ordering = ['role']
 
 
+class IdentifierType(models.Model, DetectProtectedMixin):
+    id = models.AutoField(primary_key=True)
+    type = models.CharField(unique=True, max_length=100)
+
+    user_created = models.CharField(max_length=100, blank=True)
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+
+    user_updated = models.CharField(max_length=100, blank=True)
+    date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
+
+    def __str__(self):
+        return self.type.strip()
+
+    class Meta:
+        db_table = 'controlled_identifier_types'
+        ordering = ['type']
+
+
 class Keyword(models.Model, DetectProtectedMixin):
     id = models.AutoField(primary_key=True)
     keyword = models.CharField(unique=True, max_length=250)

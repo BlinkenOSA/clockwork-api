@@ -10,14 +10,6 @@ from controlled_list.models import Locale
 from finding_aids.models import FindingAidsEntity
 from requests.auth import HTTPBasicAuth
 
-PRIMARY_TYPES = {
-    'Audio': 'Audio',
-    'Electronic Record': 'Electronic Record',
-    'Video': 'Moving Image',
-    'Still Image': 'Still Image',
-    'Textual': 'Textual'
-}
-
 
 class FindingAidsCatalogIndexer:
     """
@@ -129,8 +121,8 @@ class FindingAidsCatalogIndexer:
 
         self.doc["contents_summary_search"] = self.finding_aids.contents_summary
 
-        self.doc["primary_type"] = PRIMARY_TYPES[self.finding_aids.primary_type.type]
-        self.doc["primary_type_facet"] = PRIMARY_TYPES[self.finding_aids.primary_type.type]
+        self.doc["primary_type"] = self.finding_aids.primary_type.type
+        self.doc["primary_type_facet"] = self.finding_aids.primary_type.type
 
         date_created_display = self._make_date_created_display()
         if date_created_display != "":
@@ -214,7 +206,7 @@ class FindingAidsCatalogIndexer:
             j['title'] = self.finding_aids.title
             j['titleOriginal'] = self.finding_aids.title_original
             j['level'] = "Folder" if self.finding_aids.level == 'F' else 'Item'
-            j['primaryType'] = PRIMARY_TYPES[self.finding_aids.primary_type.type]
+            j['primaryType'] = self.finding_aids.primary_type.type
             j["containerNumber"] = self.finding_aids.container.container_no
             j["containerType"] = self.finding_aids.container.carrier_type.type
 
@@ -388,7 +380,7 @@ class FindingAidsCatalogIndexer:
 
         j['id'] = self.get_solr_id()
         j['level'] = "Folder" if self.finding_aids.level == 'F' else 'Item'
-        j['primaryType'] = PRIMARY_TYPES[self.finding_aids.primary_type.type]
+        j['primaryType'] = self.finding_aids.primary_type.type
         j["containerNumber"] = self.finding_aids.container.container_no
         j["containerType"] = self.finding_aids.container.carrier_type.type
 
