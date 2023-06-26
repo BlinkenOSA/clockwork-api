@@ -23,7 +23,7 @@ urlpatterns = [
 
     path('visits', ResearcherVisitsList.as_view(), name='researcher-visits-list'),
     path('visits/check-in/<int:researcher_id>', ResearcherVisitsCheckIn.as_view(), name='researcher-visits-check-in'),
-    path('visits/check-out/<int:researcher_id>', ResearcherVisitsCheckOut.as_view(), name='researcher-visits-check-out'),
+    path('visits/check-out/<int:pk>', ResearcherVisitsCheckOut.as_view(), name='researcher-visits-check-out'),
 
     path('requests', RequestsList.as_view(), name='requests-list'),
     path('requests/create/', RequestsCreate.as_view(), name='requests-create'),
