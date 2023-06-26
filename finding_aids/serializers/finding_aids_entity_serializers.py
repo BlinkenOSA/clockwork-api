@@ -143,7 +143,7 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
 
     class Meta:
         model = FindingAidsEntity
-        fields = '__all__'
+        exclude = ('duration',)
 
 
 class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
