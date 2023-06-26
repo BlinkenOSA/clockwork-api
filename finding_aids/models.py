@@ -171,12 +171,17 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
                 self.catalog_id = hashids.encode(self.id)
                 super(FindingAidsEntity, self).save()
 
+    def set_duration(self):
+        if getattr(self, 'time_start') and getattr(self, 'time_end'):
+            self.duration = self.time_end - self.time_start
+
     def save(self, **kwargs):
         if not self.date_created:
             self.date_created = datetime.datetime.now()
         self.set_reference_code()
         if self.digital_version_exists and not self.digital_version_creation_date:
             self.digital_version_creation_date = datetime.datetime.now()
+        self.set_duration()
         super(FindingAidsEntity, self).save()
         self.set_catalog_id()
 
