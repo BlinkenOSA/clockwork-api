@@ -2,3 +2,4 @@
 omit =
     manage.py
     clockwork_api/wsgi.py
+    */management/commands/*
