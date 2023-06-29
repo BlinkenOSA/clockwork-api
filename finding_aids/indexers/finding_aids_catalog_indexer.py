@@ -1,5 +1,6 @@
 # encoding: utf-8
 import json
+import re
 from base64 import b64encode
 
 import pysolr
@@ -244,7 +245,7 @@ class FindingAidsCatalogIndexer:
             j["sequenceNumber"] = self.finding_aids.sequence_no
 
             j["formGenre"] = list(map(lambda g: str(g), self.finding_aids.genre.all()))
-            j["note"] = self.finding_aids.note
+            j["note"] = re.sub('<[^<]+?>', '', self.finding_aids.note )
 
             j["contentsSummary"] = self.finding_aids.contents_summary.replace('\n', '<br />') \
                 if self.finding_aids.contents_summary else None
