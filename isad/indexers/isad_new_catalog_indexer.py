@@ -52,7 +52,7 @@ class ISADNewCatalogIndexer:
 
     def _index_record(self):
         self.doc['id'] = self._get_solr_id()
-        self.doc['ams_id'] = self.isad.id
+        self.doc['ams_id'] = self.isad.archival_unit.id
 
         # Display field
         self.doc['record_origin'] = "Archives"
@@ -85,6 +85,16 @@ class ISADNewCatalogIndexer:
         self.doc["contents_summary_search_hu"] = self._get_contents_summary_search_values('hu')
         self.doc["contents_summary_search_ru"] = self._get_contents_summary_search_values('ru')
         self.doc["contents_summary_search_pl"] = self._get_contents_summary_search_values('pl')
+
+        # Sort fields
+        self.doc["fonds_sort"] = self.isad.archival_unit.fonds
+        self.doc["subfonds_sort"] = self.isad.archival_unit.subfonds
+        self.doc["series_sort"] = self.isad.archival_unit.series
+        self.doc["container_number_sort"] = 0
+        self.doc["folder_number_sort"] = 0
+        self.doc["sequence_number_sort"] = 0
+        self.doc["title_sort"] = self._get_title("en")
+
 
     def _get_solr_id(self):
         hashids = Hashids(salt="osaarchives", min_length=8)
@@ -139,7 +149,10 @@ class ISADNewCatalogIndexer:
     def _get_subfonds_name(self):
         if self.isad.description_level == 'SF' or self.isad.description_level == 'S':
             sf = self.isad.archival_unit.get_subfonds()
-            return "%s %s" % (sf.reference_code, sf.title)
+            if sf.subfonds != 0:
+                return "%s %s" % (sf.reference_code, sf.title)
+            else:
+                return None
         else:
             return None
 

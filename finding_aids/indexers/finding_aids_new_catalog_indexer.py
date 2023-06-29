@@ -60,11 +60,13 @@ class FindingAidsNewCatalogIndexer:
     def _index_record(self):
         self.doc['id'] = self._get_solr_id()
         self.doc['ams_id'] = self.finding_aids_entity.id
+        self.doc['call_number'] = self.finding_aids_entity.archival_reference_code
 
         # Display field
         self.doc['record_origin'] = "Archives"
         self.doc['primary_type'] = self.finding_aids_entity.primary_type.type
         self.doc['description_level'] = self._get_description_level()
+        self.doc['container_type'] = self.finding_aids_entity.container.carrier_type.type
         self.doc['title'] = self.finding_aids_entity.title
         self.doc['reference_code'] = self.finding_aids_entity.archival_reference_code
         self.doc['date_created'] = self._get_date_created_display()
@@ -76,9 +78,7 @@ class FindingAidsNewCatalogIndexer:
 
         # Archival Unit Specific fields
         self.doc['fonds_name'] = self.finding_aids_entity.archival_unit.get_fonds().title_full
-        self.doc['subfonds_name'] = "%s %s" % (
-            self.finding_aids_entity.archival_unit.get_subfonds().reference_code,
-            self.finding_aids_entity.archival_unit.get_subfonds().title)
+        self.doc['subfonds_name'] = self._get_subfonds_name()
         self.doc['series_name'] = "%s %s" % (
             self.finding_aids_entity.archival_unit.reference_code,
             self.finding_aids_entity.archival_unit.title)
@@ -110,6 +110,15 @@ class FindingAidsNewCatalogIndexer:
         self.doc['geo_search'] = self._get_geo()
         self.doc['keyword_search'] = self._get_keywords()
 
+        # Sort fields
+        self.doc["fonds_sort"] = self.finding_aids_entity.archival_unit.fonds
+        self.doc["subfonds_sort"] = self.finding_aids_entity.archival_unit.subfonds
+        self.doc["series_sort"] = self.finding_aids_entity.archival_unit.series
+        self.doc["container_number_sort"] = self.finding_aids_entity.container.container_no
+        self.doc["folder_number_sort"] = self.finding_aids_entity.folder_no
+        self.doc["sequence_number_sort"] = self.finding_aids_entity.sequence_no
+        self.doc["title_sort"] = self.finding_aids_entity.title
+
     def _get_solr_id(self):
         if self.finding_aids_entity.catalog_id:
             return self.finding_aids_entity.catalog_id
@@ -127,6 +136,13 @@ class FindingAidsNewCatalogIndexer:
             if self.finding_aids_entity.date_from != self.finding_aids_entity.date_to:
                 return "%s - %s" % (self.finding_aids_entity.date_from, self.finding_aids_entity.date_to)
         return str(self.finding_aids_entity.date_from)
+
+    def _get_subfonds_name(self):
+        sf = self.finding_aids_entity.archival_unit.get_subfonds()
+        if sf.subfonds != 0:
+            return "%s %s" % (sf.reference_code, sf.title)
+        else:
+            return None
 
     def _get_digital_version_info(self):
         val = {
