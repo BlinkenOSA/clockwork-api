@@ -16,7 +16,7 @@ class ContainerReadSerializer(serializers.ModelSerializer):
 class ContainerWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Container
-        exclude = ('container_no', )
+        exclude = ('container_no', 'digital_version_creation_date')
 
 
 class ContainerListSerializer(serializers.ModelSerializer):
