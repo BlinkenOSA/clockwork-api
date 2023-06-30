@@ -30,7 +30,7 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
     reproduction_rights = serializers.SlugRelatedField(slug_field='statement', queryset=ReproductionRight.objects.all())
     language = LanguageSerializer(many=True)
     creator = serializers.SlugRelatedField(slug_field='creator', many=True, read_only=True, source='isadcreator_set')
-    isaar = IsaarSerializer(many=True)
+    isaar = IsaarSerializer()
     description_level = serializers.SerializerMethodField()
     extent_processed = serializers.SerializerMethodField()
     extent_processed_original = serializers.SerializerMethodField()
