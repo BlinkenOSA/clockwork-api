@@ -26,12 +26,15 @@ class FindingAidsNewCatalogIndexer:
         return self.doc
 
     def index(self):
-        self.create_solr_document()
-        try:
-            self.solr.add([self.doc])
-            print("Indexing Report No. %s!" % (self.doc['id']))
-        except pysolr.SolrError as e:
-            print('Error with Report No. %s! Error: %s' % (self.doc['id'], e))
+        if self.finding_aids_entity.archival_unit.isad:
+            if self.finding_aids_entity.archival_unit.isad.published:
+                self.create_solr_document()
+                try:
+                    self.solr.add([self.doc])
+                except pysolr.SolrError as e:
+                    print('Error with Report No. %s! Error: %s' % (self.doc['id'], e))
+        else:
+            print("ISAD(G) record doesn't exists. %s!" % self.finding_aids_entity.archival_reference_code)
 
     def delete(self):
         self.solr.delete(id=self._get_solr_id(), commit=True)
@@ -51,7 +54,6 @@ class FindingAidsNewCatalogIndexer:
         qs = qs.prefetch_related('subject_keyword')
         return qs.get()
 
-
     def create_solr_document(self):
         self._index_record()
         self._store_json()
@@ -67,9 +69,14 @@ class FindingAidsNewCatalogIndexer:
         self.doc['primary_type'] = self.finding_aids_entity.primary_type.type
         self.doc['description_level'] = self._get_description_level()
         self.doc['container_type'] = self.finding_aids_entity.container.carrier_type.type
+        self.doc['original_locale'] = self.finding_aids_entity.original_locale.id
         self.doc['title'] = self.finding_aids_entity.title
+        self.doc['title_original'] = self.finding_aids_entity.title_original
+        self.doc['contents_summary'] = self.finding_aids_entity.contents_summary
+        self.doc['contents_summary_original'] = self.finding_aids_entity.contents_summary_original
         self.doc['reference_code'] = self.finding_aids_entity.archival_reference_code
         self.doc['date_created'] = self._get_date_created_display()
+        self.doc['info'] = self._get_info()
 
         # Digital Version related fields
         self.doc['digital_version_exists'] = self._get_digital_version_info()['digital_version_exists']
@@ -77,12 +84,11 @@ class FindingAidsNewCatalogIndexer:
         self.doc['digital_version_barcode'] = self._get_digital_version_info()['digital_version_barcode']
 
         # Archival Unit Specific fields
-        self.doc['fonds_name'] = self.finding_aids_entity.archival_unit.get_fonds().title_full
-        self.doc['subfonds_name'] = self._get_subfonds_name()
-        self.doc['series_name'] = "%s %s" % (
-            self.finding_aids_entity.archival_unit.reference_code,
-            self.finding_aids_entity.archival_unit.title)
+        self.doc['parent_unit'] = self._get_parent_unit()
         self.doc['archival_unit_theme'] = list(map(lambda t: t.theme, self.finding_aids_entity.archival_unit.theme.all()))
+
+        # Finding Aids filter id
+        self.doc['series_id'] = self._get_series_id()
 
         # Facet fields
         self.doc['record_origin_facet'] = "Archives"
@@ -137,12 +143,48 @@ class FindingAidsNewCatalogIndexer:
                 return "%s - %s" % (self.finding_aids_entity.date_from, self.finding_aids_entity.date_to)
         return str(self.finding_aids_entity.date_from)
 
-    def _get_subfonds_name(self):
-        sf = self.finding_aids_entity.archival_unit.get_subfonds()
-        if sf.subfonds != 0:
-            return "%s %s" % (sf.reference_code, sf.title)
-        else:
-            return None
+    def _get_parent_unit(self):
+        return self.finding_aids_entity.archival_unit.title_full
+
+    def _get_info(self):
+        values = []
+
+        # Genre
+        for genre in self.finding_aids_entity.genre.all():
+            values.append(genre.genre)
+
+        # Languages
+        for language in self.finding_aids_entity.findingaidsentitylanguage_set.all():
+            if language.language_usage:
+                values.append("%s (%s)" % (str(language.language), language.language_usage))
+            else:
+                values.append(str(language.language))
+
+        # Date
+        for date in self.finding_aids_entity.findingaidsentitydate_set.all():
+            if date.date_type.type:
+                values.append("%s: %s" % (str(date.date_type), str(date.date_from)))
+            else:
+                values.append(str(date.date))
+
+        # Date
+        if self.finding_aids_entity.findingaidsentitydate_set.count() == 0:
+            if self.finding_aids_entity.date_to:
+                values.append("%s - %s" % (str(self.finding_aids_entity.date_from), str(self.finding_aids_entity.date_to)))
+            else:
+                values.append(str(self.finding_aids_entity.date_from))
+
+        # Duration
+        if self.finding_aids_entity.duration:
+            values.append(self._get_duration())
+
+        return ', '.join(values)
+
+    def _get_series_id(self):
+        hashids = Hashids(salt="osaarchives", min_length=8)
+        return hashids.encode(self.finding_aids_entity.archival_unit.fonds * 1000000 +
+                              self.finding_aids_entity.archival_unit.subfonds * 1000 +
+                              self.finding_aids_entity.archival_unit.series)
 
     def _get_digital_version_info(self):
         val = {
@@ -202,6 +244,23 @@ class FindingAidsNewCatalogIndexer:
         for keyword in self.finding_aids_entity.subject_keyword.all():
             keywords.append(str(keyword))
         return keywords
+
+    def _get_duration(self):
+        duration_string = []
+        if self.finding_aids_entity.duration:
+            hours, remainder = divmod(self.finding_aids_entity.duration.seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            if hours == 1:
+                duration_string.append("%s hour" % hours)
+
+            if hours > 1:
+                duration_string.append("%s hours" % hours)
+
+            if minutes > 0:
+                duration_string.append("%s min." % minutes)
+            if seconds > 0:
+                duration_string.append("%s sec." % seconds)
+        return ' '.join(duration_string)
 
     def _get_contributors(self, wikidata=False):
         contributors = []

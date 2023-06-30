@@ -23,12 +23,13 @@ class ISADNewCatalogIndexer:
         return self.doc
 
     def index(self):
-        self.create_solr_document()
-        try:
-            self.solr.add([self.doc])
-            print("Indexing Report No. %s!" % (self.doc['id']))
-        except pysolr.SolrError as e:
-            print('Error with Report No. %s! Error: %s' % (self.doc['id'], e))
+        if self.isad.published:
+            self.create_solr_document()
+            try:
+                self.solr.add([self.doc])
+                print("Indexing ISAD(G) %s!" % self.isad.reference_code)
+            except pysolr.SolrError as e:
+                print('Error with Report No. %s! Error: %s' % (self.isad.reference_code, e))
 
     def delete(self):
         self.solr.delete(id=self._get_solr_id(), commit=True)
@@ -64,8 +65,7 @@ class ISADNewCatalogIndexer:
         self.doc['creator'] = self._get_creator()
 
         # Archival Unit specific display fields
-        self.doc['fonds_name'] = self._get_fonds_name()
-        self.doc['subfonds_name'] = self._get_subfonds_name()
+        self.doc['parent_unit'] = self._get_parent_unit()
         self.doc['archival_unit_theme'] = list(map(lambda t: t.theme, self.isad.archival_unit.theme.all()))
 
         # Facet fields
@@ -95,7 +95,6 @@ class ISADNewCatalogIndexer:
         self.doc["sequence_number_sort"] = 0
         self.doc["title_sort"] = self._get_title("en")
 
-
     def _get_solr_id(self):
         hashids = Hashids(salt="osaarchives", min_length=8)
         return hashids.encode(
@@ -111,6 +110,13 @@ class ISADNewCatalogIndexer:
             'S': 'Series'
         }
         return levels[self.isad.description_level]
+
+    def _get_parent_unit(self):
+        if self.isad.description_level == 'SF':
+            return self.isad.archival_unit.get_fonds().title_full
+        if self.isad.description_level == 'S':
+            return self.isad.archival_unit.get_subfonds().title_full
+        return None
 
     def _get_date_created_display(self):
         if self.isad.year_from > 0:
