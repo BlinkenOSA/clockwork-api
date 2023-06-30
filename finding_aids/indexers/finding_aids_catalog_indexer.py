@@ -246,9 +246,10 @@ class FindingAidsCatalogIndexer:
 
             j["formGenre"] = list(map(lambda g: str(g), self.finding_aids.genre.all()))
 
-            note = re.sub('<[^<]+?>', '', self.finding_aids.note).strip()
-            if note != '':
-                j["note"] = note
+            if self.finding_aids.note:
+                note = re.sub('<[^<]+?>', '', self.finding_aids.note).strip()
+                if note != '':
+                    j["note"] = note
 
             j["contentsSummary"] = self.finding_aids.contents_summary.replace('\n', '<br />') \
                 if self.finding_aids.contents_summary else None
