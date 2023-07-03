@@ -69,6 +69,7 @@ class FindingAidsEntityCreatorSerializer(serializers.ModelSerializer):
 class FindingAidsEntityDateSerializer(serializers.ModelSerializer):
     date_from = ApproximateDateSerializerField()
     date_to = ApproximateDateSerializerField(required=False, default='')
+    date_span = serializers.IntegerField(required=False, default=0)
 
     class Meta:
         model = FindingAidsEntityDate
@@ -143,7 +144,7 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
 
     class Meta:
         model = FindingAidsEntity
-        exclude = ('duration',)
+        fields = '__all__'
 
 
 class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
@@ -183,7 +184,7 @@ class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedMo
 
     class Meta:
         model = FindingAidsEntity
-        fields = '__all__'
+        exclude = ('duration',)
 
 
 class FindingAidsSelectSerializer(serializers.ModelSerializer):
