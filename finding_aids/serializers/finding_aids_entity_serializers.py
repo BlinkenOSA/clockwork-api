@@ -154,7 +154,7 @@ class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedMo
     creators = FindingAidsEntityCreatorSerializer(many=True, source='findingaidsentitycreator_set', required=False)
     date_from = ApproximateDateSerializerField()
     date_to = ApproximateDateSerializerField(required=False)
-    date_span = serializers.IntegerField(required=False, default=0)
+    date_ca_span = serializers.IntegerField(required=False, default=0)
     dates = FindingAidsEntityDateSerializer(many=True, source='findingaidsentitydate_set', required=False)
     identifiers = FindingAidsEntityIdentifierSerializer(
         many=True, source='findingaidsentityidentifier_set', required=False)
