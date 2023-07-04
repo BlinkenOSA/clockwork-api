@@ -69,7 +69,10 @@ class FindingAidsNewCatalogIndexer:
         self.doc['primary_type'] = self.finding_aids_entity.primary_type.type
         self.doc['description_level'] = self._get_description_level()
         self.doc['container_type'] = self.finding_aids_entity.container.carrier_type.type
-        self.doc['original_locale'] = self.finding_aids_entity.original_locale.id
+
+        if self.finding_aids_entity.original_locale:
+            self.doc['original_locale'] = self.finding_aids_entity.original_locale.id
+
         self.doc['title'] = self.finding_aids_entity.title
         self.doc['title_original'] = self.finding_aids_entity.title_original
         self.doc['contents_summary'] = self.finding_aids_entity.contents_summary
