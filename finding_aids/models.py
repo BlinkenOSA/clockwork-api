@@ -111,13 +111,13 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     confidential = models.BooleanField(default=False)
 
     user_published = models.CharField(max_length=100, blank=True)
-    date_published = models.DateTimeField(blank=True, null=True)
+    date_published = models.DateTimeField(blank=True, null=True, db_index=True)
 
     user_created = models.CharField(max_length=100, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    date_created = models.DateTimeField(blank=True, auto_now_add=True, db_index=True)
 
     user_updated = models.CharField(max_length=100, blank=True)
-    date_updated = models.DateTimeField(blank=True, null=True)
+    date_updated = models.DateTimeField(blank=True, null=True, db_index=True)
 
     # Clone fields
     _clone_excluded_model_fields = ['id', 'uuid', 'legacy_id', 'archival_reference_code', 'old_id', 'catalog_id']
