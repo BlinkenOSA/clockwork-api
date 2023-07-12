@@ -91,7 +91,9 @@ class FindingAidsNewCatalogIndexer:
         self.doc['archival_unit_theme'] = list(map(lambda t: t.theme, self.finding_aids_entity.archival_unit.theme.all()))
 
         # Finding Aids filter id
-        self.doc['series_id'] = self._get_series_id()
+        self.doc['fonds_id'] = self.finding_aids_entity.archival_unit.get_fonds().id
+        self.doc['subfonds_id'] = self.finding_aids_entity.archival_unit.get_subfonds().id
+        self.doc['series_id'] = self.finding_aids_entity.archival_unit.id
 
         # Facet fields
         self.doc['record_origin_facet'] = "Archives"
@@ -184,10 +186,7 @@ class FindingAidsNewCatalogIndexer:
         return ', '.join(values)
 
     def _get_series_id(self):
-        hashids = Hashids(salt="osaarchives", min_length=8)
-        return hashids.encode(self.finding_aids_entity.archival_unit.fonds * 1000000 +
-                              self.finding_aids_entity.archival_unit.subfonds * 1000 +
-                              self.finding_aids_entity.archival_unit.series)
+        return self.finding_aids_entity.archival_unit.id
 
     def _get_digital_version_info(self):
         val = {
