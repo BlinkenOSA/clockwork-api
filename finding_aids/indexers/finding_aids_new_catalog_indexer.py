@@ -1,4 +1,5 @@
 import pysolr
+import requests
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
@@ -18,7 +19,7 @@ class FindingAidsNewCatalogIndexer:
         self.hashids = Hashids(salt="osacontent", min_length=10)
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG_NEW", "catalog")
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url, always_commit=True)
+        self.solr = pysolr.Solr(self.solr_url)
         self.locales = ['en', 'hu', 'ru', 'pl']
         self.doc = {}
 
@@ -26,7 +27,7 @@ class FindingAidsNewCatalogIndexer:
         return self.doc
 
     def index(self):
-        if self.finding_aids_entity.archival_unit.isad:
+        if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
             if self.finding_aids_entity.archival_unit.isad.published:
                 self.create_solr_document()
                 try:
@@ -34,10 +35,23 @@ class FindingAidsNewCatalogIndexer:
                 except pysolr.SolrError as e:
                     print('Error with Report No. %s! Error: %s' % (self.doc['id'], e))
         else:
-            print("ISAD(G) record doesn't exists. %s!" % self.finding_aids_entity.archival_reference_code)
+            print("Finding Aids record doesn't exists. %s!" % self.finding_aids_entity.archival_reference_code)
+
+    def index_with_requests(self):
+        if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
+            if self.finding_aids_entity.archival_unit.isad.published:
+                self.create_solr_document()
+                r = requests.post("%s/update/json/docs" % self.solr_url, json=self.doc)
+                if r.status_code == 200:
+                    print('Record successfully indexed: %s' % self.finding_aids_entity.archival_reference_code)
+                else:
+                    print('Error with indexing %s: %s' % (self.finding_aids_entity.archival_reference_code, r.text))
+
+    def commit(self):
+        requests.post("%s/update" % self.solr_url, params={'commit': True})
 
     def delete(self):
-        self.solr.delete(id=self._get_solr_id(), commit=True)
+        self.solr.delete(id=self._get_solr_id())
 
     def _get_finding_aids_record(self, finding_aids_entity_id):
         qs = FindingAidsEntity.objects.filter(pk=finding_aids_entity_id)

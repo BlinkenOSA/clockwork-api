@@ -19,7 +19,7 @@ class Command(BaseCommand):
                 for fa in FindingAidsEntity.objects.filter(archival_unit=archival_unit).iterator():
                     indexer = FindingAidsNewCatalogIndexer(fa.id)
                     if fa.published:
-                        indexer.index()
+                        indexer.index_with_requests()
                     else:
                         indexer.delete()
         else:
@@ -30,6 +30,9 @@ class Command(BaseCommand):
             for fa in finding_aids_entities.iterator():
                 indexer = FindingAidsNewCatalogIndexer(fa.id)
                 if fa.published:
-                    indexer.index()
+                    indexer.index_with_requests()
                 else:
                     indexer.delete()
+
+        indexer = FindingAidsNewCatalogIndexer(1)
+        indexer.commit()
