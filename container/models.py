@@ -27,6 +27,8 @@ class Container(models.Model, DetectProtectedMixin):
     digital_version_research_cloud_path = models.TextField(blank=True, null=True)
     digital_version_online = models.BooleanField(default=False, db_index=True)
 
+    internal_note = models.TextField(blank=True, null=True)
+
     user_created = models.CharField(max_length=100, blank=True)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
