@@ -41,7 +41,7 @@ urlpatterns = [
     path('archival-units-image-manifest/<str:archival_unit_id>/manifest.json',
          ArchivalUnitsManifestView.as_view(),
          name='archival-units-manifest-view'),
-    path('finding-aids-image-manifest/(<str:fa_entity_catalog_id>/manifest.json',
+    path('finding-aids-image-manifest/<str:fa_entity_catalog_id>/manifest.json',
          FindingAidsImageManifestView.as_view(),
          name='finding-aids-manifest-view'),
 
