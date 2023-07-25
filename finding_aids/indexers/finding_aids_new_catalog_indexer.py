@@ -48,7 +48,8 @@ class FindingAidsNewCatalogIndexer:
                     print('Error with indexing %s: %s' % (self.finding_aids_entity.archival_reference_code, r.text))
 
     def commit(self):
-        requests.post("%s/update" % self.solr_url, params={'commit': True})
+        r = requests.post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={})
+        print(r.text)
 
     def delete(self):
         self.solr.delete(id=self._get_solr_id())
@@ -115,6 +116,7 @@ class FindingAidsNewCatalogIndexer:
         self.doc['description_level_facet'] = self._get_description_level()
         self.doc['subject_facet'] = self._get_subjects()
         self.doc['subject_wikidata_facet'] = self._get_subjects(wikidata=True)
+        self.doc['subject_term_facet'] = self._get_subject_terms()
         self.doc['contributor_facet'] = self._get_contributors()
         self.doc['contributor_wikidata_facet'] = self._get_contributors(wikidata=True)
         self.doc['geo_facet'] = self._get_geo()
@@ -211,7 +213,20 @@ class FindingAidsNewCatalogIndexer:
         if self.finding_aids_entity.digital_version_exists:
             val['digital_version_exists'] = True
             val['digital_version_online'] = self.finding_aids_entity.digital_version_online
-            barcode = self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_")
+
+            if self.finding_aids_entity.level == 'L1':
+                barcode = "%s_%04d-%03d" % (
+                    self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_"),
+                    self.finding_aids_entity.container.container_no,
+                    self.finding_aids_entity.folder_no
+                )
+            else:
+                barcode = "%s-%04d-%03d-%03d" % (
+                    self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_"),
+                    self.finding_aids_entity.container.container_no,
+                    self.finding_aids_entity.folder_no,
+                    self.finding_aids_entity.sequence_no
+                )
             val['digital_version_barcode'] = barcode
         else:
             if self.finding_aids_entity.container.digital_version_exists:
@@ -231,13 +246,6 @@ class FindingAidsNewCatalogIndexer:
 
     def _get_subjects(self, wikidata=False):
         subjects = []
-        # Subjects
-        for fa_subject in self.finding_aids_entity.findingaidsentitysubject_set.all():
-            if wikidata:
-                subjects.append(self._get_value_with_wikidata_id(fa_subject.subject))
-            else:
-                subjects.append(fa_subject.subject)
-
         # Subject people
         for person in self.finding_aids_entity.subject_person.all():
             if wikidata:
@@ -251,6 +259,14 @@ class FindingAidsNewCatalogIndexer:
                 subjects.append(self._get_value_with_wikidata_id(corporation))
             else:
                 subjects.append(str(corporation))
+
+        return subjects
+
+    def _get_subject_terms(self):
+        subjects = []
+        # Subjects
+        for fa_subject in self.finding_aids_entity.findingaidsentitysubject_set.all():
+            subjects.append(fa_subject.subject)
 
         return subjects
 
