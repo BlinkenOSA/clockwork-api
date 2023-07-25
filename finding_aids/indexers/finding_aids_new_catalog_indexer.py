@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
 from langdetect import detect, LangDetectException
 
+from finding_aids.generators.digital_version_identifier_generator import DigitalVersionIdentifierGenerator
 from finding_aids.models import FindingAidsEntity
 
 
@@ -97,9 +98,10 @@ class FindingAidsNewCatalogIndexer:
         self.doc['info'] = self._get_info()
 
         # Digital Version related fields
-        self.doc['digital_version_exists'] = self._get_digital_version_info()['digital_version_exists']
-        self.doc['digital_version_online'] = self._get_digital_version_info()['digital_version_online']
-        self.doc['digital_version_barcode'] = self._get_digital_version_info()['digital_version_barcode']
+        digital_version_info = self._get_digital_version_info()
+        self.doc['digital_version_exists'] = digital_version_info['digital_version_exists']
+        self.doc['digital_version_online'] = digital_version_info['digital_version_online']
+        self.doc['digital_version_barcode'] = digital_version_info['digital_version_barcode']
 
         # Archival Unit Specific fields
         self.doc['parent_unit'] = self._get_parent_unit()
@@ -116,7 +118,6 @@ class FindingAidsNewCatalogIndexer:
         self.doc['description_level_facet'] = self._get_description_level()
         self.doc['subject_facet'] = self._get_subjects()
         self.doc['subject_wikidata_facet'] = self._get_subjects(wikidata=True)
-        self.doc['subject_term_facet'] = self._get_subject_terms()
         self.doc['contributor_facet'] = self._get_contributors()
         self.doc['contributor_wikidata_facet'] = self._get_contributors(wikidata=True)
         self.doc['geo_facet'] = self._get_geo()
@@ -205,36 +206,12 @@ class FindingAidsNewCatalogIndexer:
         return self.finding_aids_entity.archival_unit.id
 
     def _get_digital_version_info(self):
+        did_generator = DigitalVersionIdentifierGenerator(self.finding_aids_entity)
         val = {
-            'digital_version_exists': False,
-            'digital_version_online': False,
-            'digital_version_barcode': ''
+            'digital_version_exists': did_generator.detect(),
+            'digital_version_online': did_generator.detect_available_online(),
+            'digital_version_barcode': did_generator.generate_identifier()
         }
-        if self.finding_aids_entity.digital_version_exists:
-            val['digital_version_exists'] = True
-            val['digital_version_online'] = self.finding_aids_entity.digital_version_online
-
-            if self.finding_aids_entity.level == 'L1':
-                barcode = "%s_%04d-%03d" % (
-                    self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_"),
-                    self.finding_aids_entity.container.container_no,
-                    self.finding_aids_entity.folder_no
-                )
-            else:
-                barcode = "%s-%04d-%03d-%03d" % (
-                    self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_"),
-                    self.finding_aids_entity.container.container_no,
-                    self.finding_aids_entity.folder_no,
-                    self.finding_aids_entity.sequence_no
-                )
-            val['digital_version_barcode'] = barcode
-        else:
-            if self.finding_aids_entity.container.digital_version_exists:
-                val['digital_version_exists'] = True
-                val['digital_version_online'] = self.finding_aids_entity.container.digital_version_online
-                if self.finding_aids_entity.container.barcode:
-                    val['digital_version_barcode'] = self.finding_aids_entity.container.barcode
-
         return val
 
     def _get_value_with_wikidata_id(self, obj):
@@ -262,16 +239,12 @@ class FindingAidsNewCatalogIndexer:
 
         return subjects
 
-    def _get_subject_terms(self):
-        subjects = []
-        # Subjects
-        for fa_subject in self.finding_aids_entity.findingaidsentitysubject_set.all():
-            subjects.append(fa_subject.subject)
-
-        return subjects
-
     def _get_keywords(self):
         keywords = []
+        # Subjects
+        for fa_subject in self.finding_aids_entity.findingaidsentitysubject_set.all():
+            keywords.append(fa_subject.subject)
+
         # Subject keywords
         for keyword in self.finding_aids_entity.subject_keyword.all():
             keywords.append(str(keyword))
