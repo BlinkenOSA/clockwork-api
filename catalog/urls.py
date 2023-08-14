@@ -51,6 +51,8 @@ urlpatterns = [
     path('research/country/select/', ResearcherCountrySelectList.as_view(), name='researcher-country-select-list'),
     path('research/nationality/select/', ResearcherNationalitySelectList.as_view(), name='researcher-country-select-list'),
 
+    # New Request
+
 
     # Statistics
     re_path(r'newly-added-content/(?P<content_type>["isad"|"folder"]+)/$', NewlyAddedContent.as_view(),

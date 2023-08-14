@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 
 from authority.models import Country
 from authority.serializers import CountrySelectSerializer
+from clockwork_api.mailer.email_with_template import EmailWithTemplate
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.pagination import DropDownResultSetPagination
 from controlled_list.models import Nationality
@@ -123,6 +124,13 @@ class ResearcherApprove(APIView):
         if action == 'approve':
             researcher.approved = True
             researcher.save()
+
+            mail = EmailWithTemplate(
+                researcher=researcher,
+                context={'researcher': researcher}
+            )
+            mail.send_new_user_approved_user()
+
             return Response(status=status.HTTP_200_OK)
         else:
             researcher.approved = False
