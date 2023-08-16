@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br>
+
+        <h2>Your request is being sent!</h2>
+
+        <p>Dear {{ researcher.first_name }},</p>
+        <p>
+            Blinken OSA Archivum received your request!<br/>
+            Our colleagues will start processing your request. You will get a notification email once the items are
+            prepared in our Research Room.
+        </p>
+        <p>
+            Here are the details of your request<br/><br/>
+            <strong>Request Date:</strong> {{ request.request_date }}
+        </p>
+
+        <h3>The following items were requested:</h3>
+        <p>
+            <ul>
+                {% for item in items %}
+                    <li>
+                        <strong>Title:</strong> {{ item.title }}<br/>
+                        <strong>Call Number:</strong> {{ item.call_number }}<br/>
+                        <strong>Origin:</strong> {{ item.origin }}<br/>
+                    </li>
+                    <br/>
+                {% endfor %}
+            </ul>
+        </p>
+
+        <p>
+            Regards,<br/>
+            Blinken OSA Archivum - AMS
+        </p>
+    </body>
+</html>

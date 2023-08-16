@@ -23,6 +23,18 @@ class EmailWithTemplate:
         self.template = "researcher_approved_user"
         self._send_mail('user')
 
+    def send_new_request_admin(self):
+        self.template = "new_request_admin"
+        self._send_mail('admin')
+
+    def send_new_request_user(self):
+        self.template = "new_request_user"
+        self._send_mail('user')
+
+    def send_request_delivered_user(self):
+        self.template = "request_delivered_user"
+        self._send_mail('user')
+
     def _send_mail(self, to='user'):
         message = get_template("research/emails/%s.html" % self.template).render(self.context)
         if to == 'user':
@@ -55,12 +67,12 @@ class EmailWithTemplate:
             return "Your Research Card number"
 
         # New Request
-        if self.template == 'researcher_new_request_admin':
+        if self.template == 'new_request_admin':
             return "New request arrived!"
 
-        if self.template == 'researcher_new_request_user':
+        if self.template == 'new_request_user':
             return "Request confirmation"
 
         # Request Item status change
-        if self.template == 'researcher_request_status_change_user':
-            return "Request status change"
+        if self.template == 'request_delivered_user':
+            return "Requested items are prepared"

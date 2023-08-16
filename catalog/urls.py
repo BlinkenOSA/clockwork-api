@@ -6,6 +6,7 @@ from catalog.views.finding_aids_views.finding_aids_entity_detail_view import Fin
 from catalog.views.finding_aids_views.finding_aids_entity_location_view import FindingAidsEntityLocationView
 from catalog.views.iiif_views.archival_units_image_manifest_view import ArchivalUnitsManifestView
 from catalog.views.iiif_views.finding_aids_image_manifest_view import FindingAidsImageManifestView
+from catalog.views.research_request_views.request_views import ResearcherRequestView
 from catalog.views.research_request_views.researcher_registration import ResearcherRegistration
 from catalog.views.statistics_views.archival_unit_sizes import ArchivalUnitSizes
 from catalog.views.statistics_views.collection_specific_tags import CollectionSpecificTags
@@ -52,7 +53,7 @@ urlpatterns = [
     path('research/nationality/select/', ResearcherNationalitySelectList.as_view(), name='researcher-country-select-list'),
 
     # New Request
-
+    path('request/', ResearcherRequestView.as_view(), name='new-request'),
 
     # Statistics
     re_path(r'newly-added-content/(?P<content_type>["isad"|"folder"]+)/$', NewlyAddedContent.as_view(),

@@ -7,6 +7,11 @@ from isad.models import Isad
 class Command(BaseCommand):
     def handle(self, *args, **options):
         for isad in Isad.objects.all():
+            indexer = ISADNewCatalogIndexer(isad.id)
             if isad.published:
-                indexer = ISADNewCatalogIndexer(isad.id)
-                indexer.index()
+                indexer.index_with_requests()
+            else:
+                indexer.delete()
+
+        indexer = ISADNewCatalogIndexer(1)
+        indexer.commit()

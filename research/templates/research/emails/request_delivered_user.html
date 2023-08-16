@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br>
+
+        <h2>Your request is prepared in the research room!</h2>
+
+        <p>Dear {{ researcher.first_name }},</p>
+        <p>
+            Your request with the following items are prepared!
+            <ul>
+                <li>
+                    If the requested materials are physical copies (archival boxes, non-digitized video cassettes, etc.)
+                    they are now prepared and can be accessed in our research room.
+                </li>
+                <li>
+                    In case the requested items are available digitally, those will be shared with you with a direct link,
+                    through our Research Cloud service.
+                </li>
+            </ul>
+        </p>
+
+        <p>
+            Here are the details of your requested item<br/><br/>
+        </p>
+        {% if item.item_origin == 'FA' %}
+            <p>
+                <strong>Item:</strong> {{ item.container.carrier_type.type }} #{{ item.container.container_no }} in {{ item.container.archival_unit.reference_code }}<br/>
+                <strong>Call Number:</strong> {{ item.container.archival_unit.reference_code }}:{{ item.container.container_no }}<br/>
+                <strong>Origin:</strong> Archives
+            </p>
+        {% else %}
+            <p>
+                <strong>Title:</strong> {{ item.title }}<br/>
+                <strong>Call Number:</strong> {{ item.identifier }}<br/>
+                <strong>Origin:</strong>
+                {% if item.item_origin == 'L' %}
+                    Library
+                {% else %}
+                    Film Library
+                {% endif %}
+            </p>
+        {% endif %}
+
+        <p>
+            Regards,<br/>
+            Blinken OSA Archivum - AMS
+        </p>
+    </body>
+</html>
