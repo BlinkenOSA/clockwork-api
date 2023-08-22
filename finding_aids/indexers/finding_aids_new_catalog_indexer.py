@@ -21,7 +21,9 @@ class FindingAidsNewCatalogIndexer:
         self.hashids = Hashids(salt="osacontent", min_length=10)
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG_NEW", "catalog")
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url)
+        self.solr = pysolr.Solr(self.solr_url, auth=HTTPBasicAuth(
+                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+            ))
         self.locales = ['en', 'hu', 'ru', 'pl']
         self.doc = {}
 
@@ -58,7 +60,7 @@ class FindingAidsNewCatalogIndexer:
         print(r.text)
 
     def delete(self):
-        self.solr.delete(id=self._get_solr_id())
+        self.solr.delete(id=self._get_solr_id(), commit=True)
 
     def _get_finding_aids_record(self, finding_aids_entity_id):
         qs = FindingAidsEntity.objects.filter(pk=finding_aids_entity_id)
