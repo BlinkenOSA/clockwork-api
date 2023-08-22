@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br>
+        <h2>Registration approved!</h2>
+
+        <p>Dear {{ researcher.first_name }},</p>
+        <p>
+            Blinken OSA Archivum approved your registration!<br/>
+            Your virtual research card number is:
+        </p>
+        <h2>{{ researcher.card_number }}</h2>
+        <p>
+            Please keep this email and/or the card number permanently, because it is required for
+            requesting materials!
+        </p>
+
+        <p>
+            Regards,<br/>
+            Blinken OSA Archivum - AMS
+        </p>
+    </body>
+</html>

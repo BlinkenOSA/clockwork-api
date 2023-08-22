@@ -1,9 +1,11 @@
 from rest_framework import serializers
+
+from catalog.serializer_fields.hcaptcha_field import HCaptchaField
 from research.models import Researcher
 
 
 class ResearcherSerializer(serializers.ModelSerializer):
-    captcha = serializers.CharField(read_only=True)
+    captcha = HCaptchaField(read_only=True, required=False)
 
     class Meta:
         model = Researcher

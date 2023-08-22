@@ -1,7 +1,9 @@
 import pysolr
+import requests
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
+from requests.auth import HTTPBasicAuth
 
 from isad.models import Isad
 
@@ -30,6 +32,23 @@ class ISADNewCatalogIndexer:
                 print("Indexing ISAD(G) %s!" % self.isad.reference_code)
             except pysolr.SolrError as e:
                 print('Error with Report No. %s! Error: %s' % (self.isad.reference_code, e))
+
+    def index_with_requests(self):
+        if self.isad.published:
+            self.create_solr_document()
+            r = requests.post("%s/update/json/docs" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
+                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+            ))
+            if r.status_code == 200:
+                print('Record successfully indexed: %s' % self.isad.reference_code)
+            else:
+                print('Error with Report No. %s! Error: %s' % (self.isad.reference_code, r.text))
+
+    def commit(self):
+        r = requests.post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
+                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+            ))
+        print(r.text)
 
     def delete(self):
         self.solr.delete(id=self._get_solr_id(), commit=True)

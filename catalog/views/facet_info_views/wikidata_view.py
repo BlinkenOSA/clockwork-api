@@ -118,10 +118,16 @@ class WikidataView(APIView):
             return Response(
                 {
                     'title': entity.label['en'],
-                    'description': entity.description['en'],
+                    'description': self._get_description(entity.description),
                     'wikipedia': wikipedia,
                     'properties': keys_dict
                 }
             )
         else:
             return Response(status=HTTP_404_NOT_FOUND)
+
+    def _get_description(self, description):
+        if 'en' in description.keys():
+            return description['en']
+        else:
+            return description[list(description.keys())[0]]

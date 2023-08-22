@@ -6,6 +6,7 @@ from catalog.views.finding_aids_views.finding_aids_entity_detail_view import Fin
 from catalog.views.finding_aids_views.finding_aids_entity_location_view import FindingAidsEntityLocationView
 from catalog.views.iiif_views.archival_units_image_manifest_view import ArchivalUnitsManifestView
 from catalog.views.iiif_views.finding_aids_image_manifest_view import FindingAidsImageManifestView
+from catalog.views.research_request_views.request_views import ResearcherRequestView
 from catalog.views.research_request_views.researcher_registration import ResearcherRegistration
 from catalog.views.statistics_views.archival_unit_sizes import ArchivalUnitSizes
 from catalog.views.statistics_views.collection_specific_tags import CollectionSpecificTags
@@ -41,7 +42,7 @@ urlpatterns = [
     path('archival-units-image-manifest/<str:archival_unit_id>/manifest.json',
          ArchivalUnitsManifestView.as_view(),
          name='archival-units-manifest-view'),
-    path('finding-aids-image-manifest/(<str:fa_entity_catalog_id>/manifest.json',
+    path('finding-aids-image-manifest/<str:fa_entity_catalog_id>/manifest.json',
          FindingAidsImageManifestView.as_view(),
          name='finding-aids-manifest-view'),
 
@@ -51,6 +52,8 @@ urlpatterns = [
     path('research/country/select/', ResearcherCountrySelectList.as_view(), name='researcher-country-select-list'),
     path('research/nationality/select/', ResearcherNationalitySelectList.as_view(), name='researcher-country-select-list'),
 
+    # New Request
+    path('request/', ResearcherRequestView.as_view(), name='new-request'),
 
     # Statistics
     re_path(r'newly-added-content/(?P<content_type>["isad"|"folder"]+)/$', NewlyAddedContent.as_view(),

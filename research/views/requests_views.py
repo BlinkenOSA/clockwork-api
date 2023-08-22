@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
 from archival_unit.serializers import ArchivalUnitSeriesSerializer
+from clockwork_api.mailer.email_with_template import EmailWithTemplate
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.pagination import DropDownResultSetPagination
 from container.models import Container
@@ -113,6 +114,20 @@ class RequestItemStatusStep(APIView):
                 if st < 5:
                     request_item.status = str(st + 1)
                     request_item.save()
+
+            # Check if all the items were delivered, if yes send out the e-mail to the user
+            if request_item.status == '3' or request_item.status == '9':
+                request = request_item.request
+                mail = EmailWithTemplate(
+                    researcher=request.researcher,
+                    context={
+                        'researcher': request.researcher,
+                        'request': request,
+                        'item': request_item
+                    }
+                )
+                mail.send_request_delivered_user()
+
             return Response(status=status.HTTP_200_OK)
         if action == 'previous':
             if 1 < st < 5:

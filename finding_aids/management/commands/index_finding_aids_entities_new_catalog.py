@@ -1,3 +1,5 @@
+import time
+
 from django.core.management import BaseCommand
 
 from archival_unit.models import ArchivalUnit
@@ -15,13 +17,23 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['all']:
             archival_units = ArchivalUnit.objects.filter()
+            counter = 0
             for archival_unit in archival_units.iterator():
                 for fa in FindingAidsEntity.objects.filter(archival_unit=archival_unit).iterator():
                     indexer = FindingAidsNewCatalogIndexer(fa.id)
                     if fa.published:
                         indexer.index_with_requests()
+
+                        if counter % 500 == 0:
+                            print("Commit changes")
+                            indexer = FindingAidsNewCatalogIndexer(1)
+                            indexer.commit()
+                            time.sleep(3)
+
+                        counter += 1
                     else:
                         indexer.delete()
+
         else:
             archival_unit = ArchivalUnit.objects.get(fonds=options['fonds'],
                                                      subfonds=options['subfonds'],

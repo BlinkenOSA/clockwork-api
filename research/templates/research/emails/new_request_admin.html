@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br>
+
+        <h2>A new request has been made!</h2>
+
+        <h3>Request Data</h3>
+        <p>
+            <strong>Researcher:</strong> {{ researcher.last_name }}, {{ researcher.first_name }}<br/>
+            <strong>Request Date:</strong> {{ request.request_date }}
+        </p>
+
+        <h3>The following items were requested:</h3>
+        <p>
+            <ul>
+                {% for item in items %}
+                    <li>
+                        <strong>Title:</strong> {{ item.title }}<br/>
+                        <strong>Call Number:</strong> {{ item.call_number }}<br/>
+                        <strong>Origin:</strong> {{ item.origin }}<br/>
+                    </li>
+                    <br/>
+                {% endfor %}
+            </ul>
+        </p>
+
+        <p>
+            Regards,<br/>
+            Blinken OSA Archivum - AMS
+        </p>
+    </body>
+</html>

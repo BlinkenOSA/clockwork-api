@@ -4,7 +4,9 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
 from langdetect import detect, LangDetectException
+from requests.auth import HTTPBasicAuth
 
+from finding_aids.generators.digital_version_identifier_generator import DigitalVersionIdentifierGenerator
 from finding_aids.models import FindingAidsEntity
 
 
@@ -41,14 +43,19 @@ class FindingAidsNewCatalogIndexer:
         if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
             if self.finding_aids_entity.archival_unit.isad.published:
                 self.create_solr_document()
-                r = requests.post("%s/update/json/docs" % self.solr_url, json=self.doc)
+                r = requests.post("%s/update/json/docs" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
+                    getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+                ))
                 if r.status_code == 200:
                     print('Record successfully indexed: %s' % self.finding_aids_entity.archival_reference_code)
                 else:
                     print('Error with indexing %s: %s' % (self.finding_aids_entity.archival_reference_code, r.text))
 
     def commit(self):
-        requests.post("%s/update" % self.solr_url, params={'commit': True})
+        r = requests.post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
+                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+            ))
+        print(r.text)
 
     def delete(self):
         self.solr.delete(id=self._get_solr_id())
@@ -96,9 +103,10 @@ class FindingAidsNewCatalogIndexer:
         self.doc['info'] = self._get_info()
 
         # Digital Version related fields
-        self.doc['digital_version_exists'] = self._get_digital_version_info()['digital_version_exists']
-        self.doc['digital_version_online'] = self._get_digital_version_info()['digital_version_online']
-        self.doc['digital_version_barcode'] = self._get_digital_version_info()['digital_version_barcode']
+        digital_version_info = self._get_digital_version_info()
+        self.doc['digital_version_exists'] = digital_version_info['digital_version_exists']
+        self.doc['digital_version_online'] = digital_version_info['digital_version_online']
+        self.doc['digital_version_barcode'] = digital_version_info['digital_version_barcode']
 
         # Archival Unit Specific fields
         self.doc['parent_unit'] = self._get_parent_unit()
@@ -203,23 +211,12 @@ class FindingAidsNewCatalogIndexer:
         return self.finding_aids_entity.archival_unit.id
 
     def _get_digital_version_info(self):
+        did_generator = DigitalVersionIdentifierGenerator(self.finding_aids_entity)
         val = {
-            'digital_version_exists': False,
-            'digital_version_online': False,
-            'digital_version_barcode': ''
+            'digital_version_exists': did_generator.detect(),
+            'digital_version_online': did_generator.detect_available_online(),
+            'digital_version_barcode': did_generator.generate_identifier()
         }
-        if self.finding_aids_entity.digital_version_exists:
-            val['digital_version_exists'] = True
-            val['digital_version_online'] = self.finding_aids_entity.digital_version_online
-            barcode = self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_")
-            val['digital_version_barcode'] = barcode
-        else:
-            if self.finding_aids_entity.container.digital_version_exists:
-                val['digital_version_exists'] = True
-                val['digital_version_online'] = self.finding_aids_entity.container.digital_version_online
-                if self.finding_aids_entity.container.barcode:
-                    val['digital_version_barcode'] = self.finding_aids_entity.container.barcode
-
         return val
 
     def _get_value_with_wikidata_id(self, obj):
@@ -231,13 +228,6 @@ class FindingAidsNewCatalogIndexer:
 
     def _get_subjects(self, wikidata=False):
         subjects = []
-        # Subjects
-        for fa_subject in self.finding_aids_entity.findingaidsentitysubject_set.all():
-            if wikidata:
-                subjects.append(self._get_value_with_wikidata_id(fa_subject.subject))
-            else:
-                subjects.append(fa_subject.subject)
-
         # Subject people
         for person in self.finding_aids_entity.subject_person.all():
             if wikidata:
@@ -256,6 +246,10 @@ class FindingAidsNewCatalogIndexer:
 
     def _get_keywords(self):
         keywords = []
+        # Subjects
+        for fa_subject in self.finding_aids_entity.findingaidsentitysubject_set.all():
+            keywords.append(fa_subject.subject)
+
         # Subject keywords
         for keyword in self.finding_aids_entity.subject_keyword.all():
             keywords.append(str(keyword))
