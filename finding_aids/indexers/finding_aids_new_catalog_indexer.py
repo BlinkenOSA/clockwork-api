@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
 from langdetect import detect, LangDetectException
+from requests.auth import HTTPBasicAuth
 
 from finding_aids.generators.digital_version_identifier_generator import DigitalVersionIdentifierGenerator
 from finding_aids.models import FindingAidsEntity
@@ -42,14 +43,18 @@ class FindingAidsNewCatalogIndexer:
         if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
             if self.finding_aids_entity.archival_unit.isad.published:
                 self.create_solr_document()
-                r = requests.post("%s/update/json/docs" % self.solr_url, json=self.doc)
+                r = requests.post("%s/update/json/docs" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
+                    getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+                ))
                 if r.status_code == 200:
                     print('Record successfully indexed: %s' % self.finding_aids_entity.archival_reference_code)
                 else:
                     print('Error with indexing %s: %s' % (self.finding_aids_entity.archival_reference_code, r.text))
 
     def commit(self):
-        r = requests.post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={})
+        r = requests.post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
+                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+            ))
         print(r.text)
 
     def delete(self):
