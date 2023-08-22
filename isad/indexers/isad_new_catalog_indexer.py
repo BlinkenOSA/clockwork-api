@@ -18,7 +18,9 @@ class ISADNewCatalogIndexer:
         self.isad = self._get_isad(isad_id)
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG_NEW", "catalog")
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url, always_commit=True)
+        self.solr = pysolr.Solr(self.solr_url, auth=HTTPBasicAuth(
+                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
+            ))
         self.doc = {}
 
     def get_solr_document(self):
