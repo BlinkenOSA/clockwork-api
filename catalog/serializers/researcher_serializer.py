@@ -5,7 +5,7 @@ from research.models import Researcher
 
 
 class ResearcherSerializer(serializers.ModelSerializer):
-    captcha = HCaptchaField(required=True)
+    captcha = HCaptchaField(read_only=True)
 
     class Meta:
         model = Researcher
