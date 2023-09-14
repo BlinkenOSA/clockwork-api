@@ -2,6 +2,7 @@ import json
 import datetime
 from rest_framework import serializers
 
+from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from container.models import Container
 from controlled_list.models import CarrierType
 from finding_aids.models import FindingAidsEntity
@@ -13,7 +14,7 @@ class ContainerReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ContainerWriteSerializer(serializers.ModelSerializer):
+class ContainerWriteSerializer(UserDataSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Container
         exclude = ('container_no', 'digital_version_creation_date')
