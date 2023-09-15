@@ -20,7 +20,7 @@ class DigitalVersionIdentifierGenerator:
 
     def generate_identifier(self):
         if self.finding_aids_entity.description_level == 'L1':
-            barcode = "%s_%04d-%03d" % (
+            barcode = "%s-%04d-%03d" % (
                 self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_"),
                 self.finding_aids_entity.container.container_no,
                 self.finding_aids_entity.folder_no
