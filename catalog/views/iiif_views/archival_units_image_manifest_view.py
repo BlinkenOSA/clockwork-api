@@ -35,7 +35,7 @@ class ArchivalUnitsManifestView(APIView):
             if fa_entity.primary_type.type == 'Still Image':
 
                 archival_unit_ref_code = fa_entity.archival_unit.reference_code.replace(" ", "_")
-                item_reference_code = "%s_%03d-%03d" % (
+                item_reference_code = "%s-%04d-%03d" % (
                     archival_unit_ref_code,
                     fa_entity.container.container_no,
                     fa_entity.folder_no
