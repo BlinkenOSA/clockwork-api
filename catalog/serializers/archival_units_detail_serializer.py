@@ -26,7 +26,7 @@ class IsaarSerializer(serializers.ModelSerializer):
 class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
     archival_unit = ArchivalUnitSerializer()
     title_original = serializers.SerializerMethodField()
-    access_rights = serializers.SlugRelatedField(slug_field='statement', read_only=True)
+    access_rights = serializers.SerializerMethodField()
     reproduction_rights = serializers.SlugRelatedField(slug_field='statement', queryset=ReproductionRight.objects.all())
     language = LanguageSerializer(many=True)
     creator = serializers.SlugRelatedField(slug_field='creator', many=True, read_only=True, source='isadcreator_set')
@@ -51,6 +51,38 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
 
     def get_digital_content_online(self, obj):
         return FindingAidsEntity.objects.filter(archival_unit=obj.archival_unit, digital_version_online=True).count()
+
+    def get_access_rights(self, obj):
+        fa_entity_count = 0
+        restricted_count = 0
+
+        if obj.description_level == 'F':
+            fa_entity_count = FindingAidsEntity.objects.filter(
+                archival_unit__parent__parent=obj.archival_unit, is_template=False).count()
+            restricted_count = FindingAidsEntity.objects.filter(
+                archival_unit__parent__parent=obj.archival_unit, access_rights__id=3).count()
+
+        if obj.description_level == 'SF':
+            fa_entity_count = FindingAidsEntity.objects.filter(
+                archival_unit__parent=obj.archival_unit, is_template=False).count()
+            restricted_count = FindingAidsEntity.objects.filter(
+                archival_unit__parent=obj.archival_unit, access_rights__id=3).count()
+
+        if obj.description_level == 'S':
+            fa_entity_count = FindingAidsEntity.objects.filter(
+                archival_unit=obj.archival_unit, is_template=False).count()
+            restricted_count = FindingAidsEntity.objects.filter(
+                archival_unit=obj.archival_unit, access_rights__id=3).count()
+
+        if fa_entity_count == restricted_count:
+            return 'Restricted'
+
+        if restricted_count == 0:
+            return 'Not restricted'
+
+        return 'Partially restricted (%s Folder/Item Restricted - %s Folder/Item Not restricted)' % (
+            restricted_count, (fa_entity_count - restricted_count)
+        )
 
     def get_extent(self, archival_unit, lang='EN'):
         extent = []
