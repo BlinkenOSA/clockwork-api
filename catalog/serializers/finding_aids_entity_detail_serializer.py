@@ -158,7 +158,7 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
 
         # Folder level indicator
         if obj.digital_version_exists:
-            return "%s_%03d-%03d" % (archival_unit_ref_code, obj.container.container_no, obj.folder_no)
+            return "%s-%03d-%03d" % (archival_unit_ref_code, obj.container.container_no, obj.folder_no)
 
         # Container level indicator
         if obj.container.digital_version_exists:
@@ -168,7 +168,7 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
                 if obj.container.container_label:
                     return obj.container.container_label
                 else:
-                    return "%s_%03d" % (archival_unit_ref_code, obj.container.container_no)
+                    return "%s-%03d" % (archival_unit_ref_code, obj.container.container_no)
 
     def get_citation(self, obj):
         citation = []
