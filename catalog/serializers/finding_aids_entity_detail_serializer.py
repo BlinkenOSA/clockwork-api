@@ -126,6 +126,7 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     level = serializers.SerializerMethodField()
     description_level = serializers.SerializerMethodField()
+    access_rights = serializers.SlugRelatedField(slug_field='statement', read_only=True)
     spatial_coverage_country = CountrySerializer(many=True)
     spatial_coverage_place = PlaceSerializer(many=True)
     subject_person = PersonSerializer(many=True)
