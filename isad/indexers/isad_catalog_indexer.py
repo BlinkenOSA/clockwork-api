@@ -40,6 +40,7 @@ class ISADCatalogIndexer:
             print('Error with ISAD(G) %s! Error: %s' % (self.isad.reference_code, e))
 
     def delete(self):
+        self._get_isad_record()
         self.solr.delete(id=self.get_solr_id(), commit=True)
 
     def create_solr_document(self):
