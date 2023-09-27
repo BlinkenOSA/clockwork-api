@@ -42,4 +42,4 @@ class MLREntitySerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = MLREntity
-        fields = ['id', 'series', 'series_name', 'carrier_type', 'locations']
+        fields = ['id', 'series', 'series_name', 'carrier_type', 'locations', 'notes']
