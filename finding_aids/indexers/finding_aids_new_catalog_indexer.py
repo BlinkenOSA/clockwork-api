@@ -137,9 +137,8 @@ class FindingAidsNewCatalogIndexer:
         self.doc['geo_wikidata_facet'] = self._get_geo(wikidata=True)
         self.doc['keyword_facet'] = self._get_keywords()
         self.doc['year_created_facet'] = self._get_date_created_facet()
-        self.doc['language_facet'] = list(
-            map(lambda l: str(l.language), self.finding_aids_entity.findingaidsentitylanguage_set.all())
-        )
+        self.doc['language_facet'] = self._get_languages()
+        self.doc['language_wikidata_facet'] = self._get_languages(wikidata=True)
         self.doc['availability_facet'] = self._get_availability()
 
         # Search fields
@@ -296,7 +295,6 @@ class FindingAidsNewCatalogIndexer:
                 contributors.append(self._get_value_with_wikidata_id(ac.associated_corporation))
             else:
                 contributors.append(str(ac.associated_corporation))
-
         return contributors
 
     def _get_geo(self, wikidata=False):
@@ -315,8 +313,17 @@ class FindingAidsNewCatalogIndexer:
                 geo.append(self._get_value_with_wikidata_id(place))
             else:
                 geo.append(str(place))
-
         return geo
+
+    def _get_languages(self, wikidata=False):
+        languages = []
+        for fa_language in self.finding_aids_entity.findingaidsentitylanguage_set.all():
+            if wikidata:
+                languages.append(self._get_value_with_wikidata_id(fa_language.language))
+            else:
+                languages.append(str(fa_language.language))
+        return languages
+
 
     def _get_date_created_facet(self):
         date = []
