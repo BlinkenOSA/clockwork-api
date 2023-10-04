@@ -16,6 +16,7 @@ class ArchivalUnitsTreeView(APIView):
             'title_original': archival_unit.title_original,
             'reference_code': archival_unit.reference_code,
             'level': archival_unit.level,
+            'themes': [theme.theme for theme in archival_unit.theme.all()],
             'children': []
         }
         return data
