@@ -30,8 +30,10 @@ urlpatterns = [
          name='finding-aids-location-view'),
 
     # Tree Views
-    path('archival-units-tree/<str:archival_unit_id>/', ArchivalUnitsTreeView.as_view(),
+    path('archival-units-tree/<str:archival_unit_id>/', ArchivalUnitsTreeView.as_view(), kwargs={'theme': None},
          name='archival-units-tree'),
+    path('archival-units-tree/<str:archival_unit_id>/<str:theme>/', ArchivalUnitsTreeView.as_view(),
+         name='archival-units-tree-with-theme'),
     path('archival-units-tree-quick-view/<str:archival_unit_id>/', ArchivalUnitsTreeQuickView.as_view(),
          name='archival-units-tree-quick-view'),
 

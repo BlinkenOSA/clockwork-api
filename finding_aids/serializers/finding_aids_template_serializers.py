@@ -41,7 +41,7 @@ class FindingAidsTemplateWriteSerializer(UserDataSerializerMixin, WritableNested
     associated_countries = FindingAidsEntityAssociatedCountrySerializer(
         many=True, source='findingaidsentityassociatedcountry_set', required=False
     )
-    languges = FindingAidsEntityLanguageSerializer(many=True, source='findingaidsentitylanguage_set', required=False)
+    languages = FindingAidsEntityLanguageSerializer(many=True, source='findingaidsentitylanguage_set', required=False)
     extents = FindingAidsEntityExtentSerializer(many=True, source='findingaidsentityextent_set', required=False)
 
     def validate(self, data):
