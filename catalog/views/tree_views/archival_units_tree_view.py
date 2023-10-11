@@ -21,7 +21,7 @@ class ArchivalUnitsTreeView(APIView):
         }
         return data
 
-    def get(self, request, archival_unit_id):
+    def get(self, request, archival_unit_id, theme):
         tree = []
 
         fonds = {}
@@ -30,7 +30,13 @@ class ArchivalUnitsTreeView(APIView):
         actual_subfonds = 0
 
         if archival_unit_id == 'all':
-            qs = ArchivalUnit.objects.filter(isad__published=True).select_related('isad').order_by('fonds', 'subfonds', 'series')
+            if theme and theme != 'all':
+                qs = ArchivalUnit.objects.filter(
+                    isad__published=True,
+                    theme__id=theme
+                ).select_related('isad').order_by('fonds', 'subfonds', 'series')
+            else:
+                qs = ArchivalUnit.objects.filter(isad__published=True).select_related('isad').order_by('fonds', 'subfonds', 'series')
         else:
             archival_unit = get_object_or_404(ArchivalUnit, id=archival_unit_id)
             qs = ArchivalUnit.objects.filter(isad__published=True, fonds=archival_unit.fonds).order_by('fonds', 'subfonds', 'series')
