@@ -140,6 +140,10 @@ class FindingAidsNewCatalogIndexer:
         self.doc['language_facet'] = self._get_languages()
         self.doc['language_wikidata_facet'] = self._get_languages(wikidata=True)
         self.doc['availability_facet'] = self._get_availability()
+        self.doc['series_facet'] = "%s - %s" % (
+            self.finding_aids_entity.archival_unit.reference_code,
+            self.finding_aids_entity.archival_unit.title
+        )
 
         # Search fields
         self.doc['identifier_search'] = self._get_identifiers()
