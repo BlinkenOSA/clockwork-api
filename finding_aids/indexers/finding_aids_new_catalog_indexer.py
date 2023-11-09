@@ -47,7 +47,7 @@ class FindingAidsNewCatalogIndexer:
         if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
             if self.finding_aids_entity.archival_unit.isad.published:
                 self.create_solr_document()
-                r = requests.post("%s/update/json/docs" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
+                r = requests.post("%s/update/json/docs/" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
                     getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
                 ))
                 if r.status_code == 200:
@@ -140,9 +140,10 @@ class FindingAidsNewCatalogIndexer:
         self.doc['language_facet'] = self._get_languages()
         self.doc['language_wikidata_facet'] = self._get_languages(wikidata=True)
         self.doc['availability_facet'] = self._get_availability()
-        self.doc['series_facet'] = "%s - %s" % (
+        self.doc['series_facet'] = "%s - %s#%s" % (
             self.finding_aids_entity.archival_unit.reference_code,
-            self.finding_aids_entity.archival_unit.title
+            self.finding_aids_entity.archival_unit.title,
+            self.finding_aids_entity.archival_unit.id
         )
 
         # Search fields
