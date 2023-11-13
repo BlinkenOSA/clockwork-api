@@ -1,4 +1,6 @@
 # coding=utf-8
+import re
+
 from django.db.models import Sum, Count
 from rest_framework import serializers
 
@@ -118,3 +120,26 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
         model = Isad
         fields = '__all__'
 
+
+class ArchivalUnitsFacetQuerySerializer(serializers.ModelSerializer):
+    scope_and_content_narrative = serializers.SerializerMethodField()
+    scope_and_content_abstract = serializers.SerializerMethodField()
+    archival_history = serializers.SerializerMethodField()
+
+    def get_scope_and_content_narrative(self, obj):
+        return self._clean_field(obj.scope_and_content_narrative)
+
+    def get_scope_and_content_abstract(self, obj):
+        return self._clean_field(obj.scope_and_content_abstract)
+
+    def get_archival_history(self, obj):
+        return self._clean_field(obj.archival_history)
+
+    def _clean_field(self, data):
+        CLEANR = re.compile('<.*?>')
+        cleantext = re.sub(CLEANR, '', data)
+        return cleantext
+
+    class Meta:
+        model = Isad
+        fields = ('title', 'scope_and_content_narrative', 'scope_and_content_abstract', 'archival_history')
