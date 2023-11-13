@@ -1,6 +1,7 @@
 from rest_framework.generics import RetrieveAPIView, get_object_or_404
 
-from catalog.serializers.archival_units_detail_serializer import ArchivalUnitsDetailSerializer
+from catalog.serializers.archival_units_detail_serializer import ArchivalUnitsDetailSerializer, \
+    ArchivalUnitsFacetQuerySerializer
 from isad.models import Isad
 
 
@@ -16,7 +17,7 @@ class ArchivalUnitsDetailView(RetrieveAPIView):
 
 class ArchivalUnitsFacetQuickView(RetrieveAPIView):
     permission_classes = []
-    serializer_class = ArchivalUnitsDetailSerializer
+    serializer_class = ArchivalUnitsFacetQuerySerializer
 
     def get_object(self):
         archival_unit_full_title = self.request.query_params.get('full_title', None)
