@@ -72,4 +72,3 @@ class FindingAidsTemplateDetail(MethodSerializerMixin, generics.RetrieveUpdateDe
         ('GET', ): FindingAidsEntityReadSerializer,
         ('PUT', 'PATCH', 'DELETE'): FindingAidsTemplateWriteSerializer
     }
-

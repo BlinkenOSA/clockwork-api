@@ -18,7 +18,7 @@ class FindingAidsImageManifestView(APIView):
         if fa_entity.primary_type.type == 'Still Image' and fa_entity.digital_version_online:
 
             factory = ManifestFactory()
-            factory.set_base_prezi_uri("%s%s" % (settings.BASE_URL, request.get_full_path()))
+            factory.set_base_prezi_uri("%s%s" % (settings.BASE_URL, request.get_full_path().replace('manifest.json', '')))
 
             # Default Image API information
             factory.set_base_image_uri(getattr(settings, 'BASE_IMAGE_URI', 'http://127.0.0.1:8182/iiif/2/'))
