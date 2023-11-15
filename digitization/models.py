@@ -8,7 +8,13 @@ class DigitalVersion(models.Model):
     id = models.AutoField(primary_key=True)
     finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', blank=True, null=True, on_delete=models.CASCADE)
     container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.CASCADE)
-    identifier = models.CharField(max_length=100, blank=True, null=True)
+
+    identifier = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    level = models.CharField(max_length=1, choices=(('M', 'Master'), ('A', 'Access Copy')), db_index=True, default='A')
+
+    filename = models.CharField(max_length=200, blank=True, null=True, db_index=True)
+
+    label = models.CharField(max_length=50, blank=True, null=True)
 
     available_research_cloud = models.BooleanField(default=False, db_index=True)
     available_online = models.BooleanField(default=False, db_index=True)
