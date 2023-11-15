@@ -4,6 +4,7 @@ from archival_unit.models import ArchivalUnit
 from authority.serializers import PersonSerializer, CorporationSerializer, CountrySerializer, PlaceSerializer, \
     LanguageSerializer, GenreSerializer, SubjectSerializer
 from container.models import Container
+from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity, FindingAidsEntityAlternativeTitle, FindingAidsEntityDate, \
     FindingAidsEntityCreator, FindingAidsEntityPlaceOfCreation, FindingAidsEntitySubject, \
     FindingAidsEntityAssociatedPerson, FindingAidsEntityAssociatedCorporation, FindingAidsEntityAssociatedPlace, \
@@ -119,6 +120,12 @@ class FAExtentSerializer(serializers.ModelSerializer):
         fields = ['extent_number', 'extent_unit']
 
 
+class DigitalVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DigitalVersion
+        exclude = ['id',]
+
+
 class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
     archival_unit = ArchivalUnitSerializer()
     container = ContainerSerializer()
@@ -145,6 +152,8 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
     digital_version_identifier = serializers.SerializerMethodField()
     languages = FALanguageSerializer(many=True, source='findingaidsentitylanguage_set')
     citation = serializers.SerializerMethodField()
+    digital_version_online = serializers.SerializerMethodField()
+    access_copies = serializers.SerializerMethodField()
 
     def get_description_level(self, obj):
         dl = {'L1': 'Level 1', 'L2': 'Level 2'}
@@ -212,6 +221,14 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
         citation.append("Vera and Donald Blinken Open Society Archives at Central European University, Budapest")
 
         return "".join(citation)
+
+    def get_digital_version_online(self, obj):
+        return obj.digitalversion_set.filter(available_online=True).count() > 0
+
+    def get_access_copies(self, obj):
+        digital_versions = obj.digitalversion_set.filter(level='A')
+        serializer = DigitalVersionSerializer(instance=digital_versions, many=True)
+        return serializer.data
 
     class Meta:
         model = FindingAidsEntity
