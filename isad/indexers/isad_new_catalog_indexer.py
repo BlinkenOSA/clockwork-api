@@ -91,7 +91,7 @@ class ISADNewCatalogIndexer:
 
         # Facet fields
         self.doc['record_origin_facet'] = "Archives"
-        self.doc['primary_type_facet'] = "Archival Unit"
+        # self.doc['primary_type_facet'] = "Archival Unit"
         self.doc['description_level_facet'] = self._get_description_level()
         self.doc['year_created_facet'] = self._get_date_created_facet()
         self.doc['archival_unit_theme_facet'] = list(map(lambda t: t.theme, self.isad.archival_unit.theme.all()))
