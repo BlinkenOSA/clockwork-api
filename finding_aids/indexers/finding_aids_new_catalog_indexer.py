@@ -381,21 +381,24 @@ class FindingAidsNewCatalogIndexer:
                 self.doc['%s_general' % solr_field] = getattr(self.finding_aids_entity, ams_field)
 
     def _get_digital_version_technical_metadata(self):
-        iiif_url = (getattr(settings, 'BASE_IMAGE_URI', 'http://127.0.0.1:8182/iiif/2/'))
-        archival_unit_ref_code = self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_").replace("-", "_")
-        item_reference_code = "%s_%04d_%03d" % (
-            archival_unit_ref_code,
-            self.finding_aids_entity.container.container_no,
-            self.finding_aids_entity.folder_no
-        )
-        image_id = 'catalog/%s/%s.jpg' % (archival_unit_ref_code, item_reference_code)
-        image_id = urllib.parse.quote_plus(image_id)
-        r = requests.get("%s%s/info.json" % (iiif_url, image_id))
+        if self.finding_aids_entity.primary_type.type == 'Still Image':
+            iiif_url = (getattr(settings, 'BASE_IMAGE_URI', 'http://127.0.0.1:8182/iiif/2/'))
+            archival_unit_ref_code = self.finding_aids_entity.archival_unit.reference_code\
+                .replace(" ", "_")\
+                .replace("-", "_")
+            item_reference_code = "%s_%04d_%03d" % (
+                archival_unit_ref_code,
+                self.finding_aids_entity.container.container_no,
+                self.finding_aids_entity.folder_no
+            )
+            image_id = 'catalog/%s/%s.jpg' % (archival_unit_ref_code, item_reference_code)
+            image_id = urllib.parse.quote_plus(image_id)
+            r = requests.get("%s%s/info.json" % (iiif_url, image_id))
 
-        if r.status_code == 200:
-            return r.text
-        else:
-            return None
+            if r.status_code == 200:
+                return r.text
+            else:
+                return None
 
     def _remove_duplicates(self):
         for k, v in self.doc.items():
