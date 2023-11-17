@@ -10,7 +10,8 @@ def index_catalog_isad_record(isad_id):
     indexer = ISADCatalogIndexer(isad_id)
     indexer.index()
     indexer = ISADNewCatalogIndexer(isad_id)
-    indexer.index()
+    indexer.index_with_requests()
+    indexer.commit()
 
 
 @shared_task
