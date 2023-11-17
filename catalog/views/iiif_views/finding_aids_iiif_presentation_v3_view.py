@@ -26,7 +26,7 @@ class FindingAidsIIFPresentationV3View(APIView):
                       '%s<br/>' % fa_entity.archival_unit.title_full + 'Blinken OSA Archivum'
             )
 
-            for digital_version in fa_entity.digitalversion_set.all().order_by('identifier'):
+            for digital_version in fa_entity.digitalversion_set.all().order_by('filename'):
                 main_directory = "_".join(digital_version.identifier.split("_", 5)[:5])
 
                 image_id = "catalog/%s/%s" % (main_directory, digital_version.filename)
@@ -36,9 +36,13 @@ class FindingAidsIIFPresentationV3View(APIView):
                 label = digital_version.label if digital_version.label else "Image"
 
                 try:
-                    manifest.make_canvas_from_iiif(
+                    canvas = manifest.make_canvas_from_iiif(
                         url=url,
                         label=label
+                    )
+
+                    canvas.add_thumbnail(
+                        image_url="%s/full/,300/0/default.jpg" % url
                     )
                 except requests.exceptions.HTTPError:
                     pass
