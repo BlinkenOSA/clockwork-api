@@ -9,7 +9,7 @@ def index_catalog_finding_aids_entity(finding_aids_entity_id):
     indexer = FindingAidsCatalogIndexer(finding_aids_entity_id)
     indexer.index()
     indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
-    indexer.index_with_requests()
+    indexer.index()
 
 
 @shared_task
