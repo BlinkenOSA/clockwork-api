@@ -10,6 +10,7 @@ def index_catalog_finding_aids_entity(finding_aids_entity_id):
     indexer.index()
     indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
     indexer.index()
+    indexer.commit()
 
 
 @shared_task
@@ -18,3 +19,4 @@ def index_catalog_finding_aids_entity_remove(finding_aids_entity_id):
     indexer.delete()
     indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
     indexer.delete()
+
