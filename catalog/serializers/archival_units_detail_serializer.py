@@ -80,9 +80,9 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
             return 'Restricted'
 
         if restricted_count == 0:
-            return 'Not restricted'
+            return 'Not Restricted'
 
-        return 'Partially restricted (%s Folder/Item Restricted - %s Folder/Item Not restricted)' % (
+        return 'Partially Restricted (%s Folder/Item Restricted - %s Folder/Item Not Restricted)' % (
             restricted_count, (fa_entity_count - restricted_count)
         )
 
