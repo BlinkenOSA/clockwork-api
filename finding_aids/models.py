@@ -128,6 +128,9 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     class Meta:
         db_table = 'finding_aids_entities'
 
+    @property
+    def available_online(self):
+        return self.digitalversion_set.filter(available_online=True).count() > 0
 
     def publish(self, user):
         self.published = True

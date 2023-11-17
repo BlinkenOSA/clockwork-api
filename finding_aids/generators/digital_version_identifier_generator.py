@@ -11,7 +11,7 @@ class DigitalVersionIdentifierGenerator:
         return False
 
     def detect_available_online(self):
-        if self.finding_aids_entity.digitalversion_set.filter(available_online=True).count() > 0:
+        if self.finding_aids_entity.available_online:
             return True
         else:
             if self.finding_aids_entity.container.digital_version_online:

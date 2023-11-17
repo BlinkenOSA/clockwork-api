@@ -6,6 +6,7 @@ from catalog.views.facet_info_views.wikidata_view import WikidataView
 from catalog.views.finding_aids_views.finding_aids_entity_detail_view import FindingAidsEntityDetailView
 from catalog.views.finding_aids_views.finding_aids_entity_location_view import FindingAidsEntityLocationView
 from catalog.views.iiif_views.archival_units_image_manifest_view import ArchivalUnitsManifestView
+from catalog.views.iiif_views.finding_aids_iiif_presentation_v3_view import FindingAidsIIFPresentationV3View
 from catalog.views.iiif_views.finding_aids_image_manifest_view import FindingAidsImageManifestView
 from catalog.views.research_request_views.request_views import ResearcherRequestView
 from catalog.views.research_request_views.researcher_registration import ResearcherRegistration
@@ -48,8 +49,11 @@ urlpatterns = [
          ArchivalUnitsManifestView.as_view(),
          name='archival-units-manifest-view'),
     path('finding-aids-image-manifest/<str:fa_entity_catalog_id>/manifest.json',
-         FindingAidsImageManifestView.as_view(),
+         FindingAidsIIFPresentationV3View.as_view(),
          name='finding-aids-manifest-view'),
+    #path('finding-aids-image-manifest/<str:fa_entity_catalog_id>/manifest.json',
+    #     FindingAidsImageManifestView.as_view(),
+    #     name='finding-aids-manifest-view'),
     path('finding-aids-image-manifest/mobile/<str:fa_entity_catalog_id>/manifest.json',
          FindingAidsImageManifestView.as_view(),
          name='finding-aids-manifest-mobile-view'),
