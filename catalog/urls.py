@@ -51,7 +51,7 @@ urlpatterns = [
     path('finding-aids-image-manifest/<str:fa_entity_catalog_id>/manifest.json',
          FindingAidsIIFPresentationV3View.as_view(),
          name='finding-aids-manifest-view'),
-    # path('finding-aids-image-manifest/<str:fa_entity_catalog_id>/manifest.json',
+    #path('finding-aids-image-manifest/<str:fa_entity_catalog_id>/manifest.json',
     #     FindingAidsImageManifestView.as_view(),
     #     name='finding-aids-manifest-view'),
     path('finding-aids-image-manifest/mobile/<str:fa_entity_catalog_id>/manifest.json',

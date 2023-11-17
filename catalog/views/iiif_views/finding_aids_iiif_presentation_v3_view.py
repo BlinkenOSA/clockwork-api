@@ -36,9 +36,13 @@ class FindingAidsIIFPresentationV3View(APIView):
                 label = digital_version.label if digital_version.label else "Image"
 
                 try:
-                    manifest.make_canvas_from_iiif(
+                    canvas = manifest.make_canvas_from_iiif(
                         url=url,
                         label=label
+                    )
+
+                    canvas.add_thumbnail(
+                        image_url="%s/full/,300/0/default.jpg" % url
                     )
                 except requests.exceptions.HTTPError:
                     pass

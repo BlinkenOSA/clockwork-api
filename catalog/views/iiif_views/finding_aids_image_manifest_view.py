@@ -15,7 +15,7 @@ class FindingAidsImageManifestView(APIView):
     def get(self, request, fa_entity_catalog_id, *args, **kwargs):
         fa_entity = get_object_or_404(FindingAidsEntity, catalog_id=fa_entity_catalog_id)
 
-        if fa_entity.primary_type.type == 'Still Image' and fa_entity.digital_version_online:
+        if fa_entity.primary_type.type == 'Still Image' and fa_entity.available_online:
 
             factory = ManifestFactory()
             factory.set_base_prezi_uri("%s%s" % (settings.BASE_URL, request.get_full_path().replace('manifest.json', '')))
