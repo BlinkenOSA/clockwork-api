@@ -8,13 +8,13 @@ from finding_aids.indexers.finding_aids_new_catalog_indexer import FindingAidsNe
 def index_catalog_finding_aids_entity(finding_aids_entity_id):
     indexer = FindingAidsCatalogIndexer(finding_aids_entity_id)
     indexer.index()
-    indexer_new = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
-    indexer_new.index_with_requests()
+    indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
+    indexer.index()
 
 
 @shared_task
 def index_catalog_finding_aids_entity_remove(finding_aids_entity_id):
     indexer = FindingAidsCatalogIndexer(finding_aids_entity_id)
     indexer.delete()
-    indexer_new = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
-    indexer_new.delete()
+    indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
+    indexer.delete()
