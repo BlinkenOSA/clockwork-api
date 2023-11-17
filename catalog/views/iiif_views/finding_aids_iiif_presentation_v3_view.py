@@ -26,7 +26,7 @@ class FindingAidsIIFPresentationV3View(APIView):
                       '%s<br/>' % fa_entity.archival_unit.title_full + 'Blinken OSA Archivum'
             )
 
-            for digital_version in fa_entity.digitalversion_set.all().order_by('identifier'):
+            for digital_version in fa_entity.digitalversion_set.all().order_by('filename'):
                 main_directory = "_".join(digital_version.identifier.split("_", 5)[:5])
 
                 image_id = "catalog/%s/%s" % (main_directory, digital_version.filename)
