@@ -382,8 +382,8 @@ class FindingAidsNewCatalogIndexer:
 
     def _get_digital_version_technical_metadata(self):
         iiif_url = (getattr(settings, 'BASE_IMAGE_URI', 'http://127.0.0.1:8182/iiif/2/'))
-        archival_unit_ref_code = self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_")
-        item_reference_code = "%s-%04d-%03d" % (
+        archival_unit_ref_code = self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_").replace("-", "_")
+        item_reference_code = "%s_%04d_%03d" % (
             archival_unit_ref_code,
             self.finding_aids_entity.container.container_no,
             self.finding_aids_entity.folder_no
