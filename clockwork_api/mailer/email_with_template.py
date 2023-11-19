@@ -6,7 +6,7 @@ from django.conf import settings
 
 class EmailWithTemplate:
     def __init__(self, researcher, context):
-        self.staff_email = getattr(settings, 'RESEARCH_ROOM_STAFF_EMAIL')
+        self.staff_emails = getattr(settings, 'RESEARCH_ROOM_STAFF_EMAIL')
         self.researcher = researcher
         self.template = ""
         self.context = context
@@ -40,7 +40,7 @@ class EmailWithTemplate:
         if to == 'user':
             to_address = [self.researcher.email]
         else:
-            to_address = [self.staff_email]
+            to_address = self.staff_emails
         mail = EmailMessage(
             subject=self._get_subject(),
             body=message,
