@@ -1,7 +1,7 @@
 from django.urls import path, re_path
 
 from catalog.views.archival_unit_views.archival_units_detail_view import ArchivalUnitsDetailView, \
-    ArchivalUnitsFacetQuickView
+    ArchivalUnitsFacetQuickView, ArchivalUnitsHelperView
 from catalog.views.facet_info_views.wikidata_view import WikidataView
 from catalog.views.finding_aids_views.finding_aids_entity_detail_view import FindingAidsEntityDetailView
 from catalog.views.finding_aids_views.finding_aids_entity_location_view import FindingAidsEntityLocationView
@@ -26,6 +26,7 @@ urlpatterns = [
          name='archival-units-full-view'),
     path('image-gallery/archival-unit/', ArchivalUnitsFacetQuickView.as_view(),
          name='archival-units-facet-quick-view'),
+    path('archival-units/by-reference-code/<str:reference_code>/', ArchivalUnitsHelperView.as_view()),
 
     # Finding Aids Views
     path('finding-aids/<str:fa_entity_catalog_id>/', FindingAidsEntityDetailView.as_view(),
