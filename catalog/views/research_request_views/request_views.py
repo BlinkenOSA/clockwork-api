@@ -34,7 +34,8 @@ class ResearcherRequestView(APIView):
                         request=request,
                         item_origin=item['origin'],
                         title=item['title'],
-                        identifier=item['call_number']
+                        identifier=item['call_number'],
+                        quantity=item['volume'] if 'volume' in item.keys() else ''
                     )
 
             # Email template

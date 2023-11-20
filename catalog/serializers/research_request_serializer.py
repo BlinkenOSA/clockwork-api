@@ -14,6 +14,7 @@ class RequestItemSerializer(serializers.Serializer):
     title = serializers.CharField(required=True)
     container = serializers.IntegerField(required=False, allow_null=True)
     call_number = serializers.CharField(required=False, allow_blank=True)
+    volume = serializers.CharField(required=False, allow_blank=True)
     digital_version = serializers.CharField(required=False, allow_blank=True)
 
     def validate(self, data):
@@ -52,7 +53,7 @@ class ResearchRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     request_date = serializers.DateField(required=True)
     items = RequestItemSerializer(many=True)
-    captcha = HCaptchaField(read_only=True, required=False)
+    captcha = HCaptchaField(required=True)
 
     def validate_card_number(self, value):
         try:
