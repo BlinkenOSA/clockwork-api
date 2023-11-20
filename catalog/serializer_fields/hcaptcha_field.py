@@ -27,3 +27,6 @@ class HCaptchaField(serializers.Field):
                 raise ValidationError('Error communicating with HCaptcha server!')
         else:
             raise ValidationError('Captcha is required!')
+
+    def to_representation(self, value):
+        return value
