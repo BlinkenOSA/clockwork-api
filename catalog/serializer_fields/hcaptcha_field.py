@@ -22,11 +22,11 @@ class HCaptchaField(serializers.Field):
                 if not response['success']:
                     raise ValidationError('Captcha is invalid, please refresh the page!')
                 else:
-                    return data
+                    return ''
             else:
                 raise ValidationError('Error communicating with HCaptcha server!')
         else:
             raise ValidationError('Captcha is required!')
 
     def to_representation(self, value):
-        return value
+        return ''

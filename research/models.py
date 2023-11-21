@@ -38,6 +38,8 @@ class Researcher(models.Model, DetectProtectedMixin):
     research_will_be_published = models.BooleanField(default=False)
     date_is_tentative = models.BooleanField(default=False)
 
+    captcha = models.CharField(max_length=1, blank=True, null=True)
+
     HOW_DO_YOU_KNOW_CHOICES = [
         ('web', 'OSA Web page'),
         ('event', 'Event at OSA'),
