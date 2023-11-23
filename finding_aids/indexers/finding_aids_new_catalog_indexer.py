@@ -3,7 +3,6 @@ import urllib
 import pysolr
 import requests
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
 from langdetect import detect, LangDetectException
 from requests.auth import HTTPBasicAuth
