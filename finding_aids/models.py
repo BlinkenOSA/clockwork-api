@@ -15,7 +15,7 @@ from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     id = models.AutoField(primary_key=True)
-    uuid = models.UUIDField(default=uuid.uuid4)
+    uuid = models.UUIDField(default=uuid.uuid4, db_index=True)
     archival_unit = models.ForeignKey('archival_unit.ArchivalUnit', on_delete=models.PROTECT, db_index=True)
     container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.PROTECT, db_index=True)
     original_locale = models.ForeignKey('controlled_list.Locale', blank=True, null=True, on_delete=models.PROTECT)
