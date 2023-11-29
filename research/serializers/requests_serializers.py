@@ -9,6 +9,7 @@ from research.models import RequestItem, Request
 
 class RequestListSerializer(serializers.ModelSerializer):
     researcher = serializers.SlugRelatedField(slug_field='name', read_only=True, source='request.researcher')
+    researcher_email = serializers.SlugRelatedField(slug_field='email', read_only=True, source='request.researcher')
     created_date = serializers.SlugRelatedField(slug_field='created_date', read_only=True, source='request')
     request_date = serializers.SlugRelatedField(slug_field='request_date', read_only=True, source='request')
     carrier_type = serializers.SlugRelatedField(slug_field='type', read_only=True, source='container.carrier_type')
