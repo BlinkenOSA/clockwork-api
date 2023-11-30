@@ -213,17 +213,22 @@ class Command(BaseCommand):
             number = extent.xpath('./osa:subExtentNumber', namespaces=NSP)[0].text
             unit = extent.xpath('./osa:subExtentUnit', namespaces=NSP)[0].text
 
-            if unit == 'page':
-                unit = ExtentUnit.objects.get(unit='pages')
+            if unit == 'hh:mm:ss':
+                fa_entity.time_start = '00:00:00'
+                fa_entity.time_end = number
             else:
-                unit, created = ExtentUnit.objects.get_or_create(
-                    unit=unit
+                if unit == 'page':
+                    unit = ExtentUnit.objects.get(unit='pages')
+                else:
+                    unit, created = ExtentUnit.objects.get_or_create(
+                        unit=unit
+                    )
+
+                FindingAidsEntityExtent.objects.get_or_create(
+                    fa_entity=fa_entity,
+                    extent_number=number,
+                    extent_unit=unit
                 )
-            FindingAidsEntityExtent.objects.get_or_create(
-                fa_entity=fa_entity,
-                extent_number=number,
-                extent_unit=unit
-            )
 
         # Associated Person
         for associated_person in xml.xpath('//osa:associatedPersonal', namespaces=NSP):
