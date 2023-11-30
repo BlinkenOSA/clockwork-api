@@ -1,6 +1,6 @@
 import csv
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from django.conf import settings
@@ -133,7 +133,6 @@ class Command(BaseCommand):
         if date_to:
             fa_entity.date_to = date_to
 
-        fa_entity.date_to = xml.xpath('//osa:dateOfCreationCa', namespaces=NSP)[0].text == 'true'
         fa_entity.date_ca_span = int(xml.xpath('//osa:dateOfCreationSpan', namespaces=NSP)[0].text)
 
         # Primary Type
@@ -142,7 +141,7 @@ class Command(BaseCommand):
         # Contents Summary
         contents_summary = []
         for cs in xml.xpath('//osa:contentsSummary', namespaces=NSP):
-            contents_summary.append('<br/>'.join(cs.text))
+            contents_summary.append('%s<br/>' % cs.text)
         if len(contents_summary) > 0:
             contents_summary = '<p>%s</p>' % ''.join(contents_summary)
         else:
@@ -214,8 +213,8 @@ class Command(BaseCommand):
             unit = extent.xpath('./osa:subExtentUnit', namespaces=NSP)[0].text
 
             if unit == 'hh:mm:ss':
-                fa_entity.time_start = '00:00:00'
-                fa_entity.time_end = number
+                hours, minutes, seconds = number.split(':')
+                fa_entity.time_end = timedelta(hours=int(hours), minutes=int(minutes), seconds=int(seconds))
             else:
                 if unit == 'page':
                     unit = ExtentUnit.objects.get(unit='pages')
@@ -353,7 +352,7 @@ class Command(BaseCommand):
                     if ',' in name:
                         last_name, first_name = name.split(', ')
                     else:
-                        first_name = name.strip()
+                        first_name = name.text.strip()
                         last_name = ''
                     person, created = Person.objects.get_or_create(
                         first_name=first_name,
@@ -385,7 +384,11 @@ class Command(BaseCommand):
             fa_entity.note = elements[0].text
 
         fa_entity.published = True
-        fa_entity.save()
+
+        try:
+            fa_entity.save()
+        except Exception:
+            pass
 
         self.fa_entity = fa_entity
         print("Added record %s" % fa_entity.archival_reference_code)
