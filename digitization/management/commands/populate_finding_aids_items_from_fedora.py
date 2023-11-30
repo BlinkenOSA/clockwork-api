@@ -46,7 +46,7 @@ class Command(BaseCommand):
         parser.add_argument('--level', dest='level', help='Collection identifier', action='store')
         parser.add_argument('--container', dest='container_type', help='Collection identifier', action='store')
         parser.add_argument('--title_field', dest='title_field', help='Title field', action='store')
-        parser.add_argument('--locale', dest='locale', help='Locale field', action='locale')
+        parser.add_argument('--locale', dest='locale', help='Locale field', action='store')
 
     def handle(self, *args, **options):
         collection = options.get('collection', None)
