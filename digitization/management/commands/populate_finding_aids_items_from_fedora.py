@@ -150,7 +150,7 @@ class Command(BaseCommand):
         # locale
         if self.locale:
             try:
-                fa_entity.original_locale = Locale.objects.get(locale=self.locale)
+                fa_entity.original_locale = Locale.objects.get(pk=self.locale)
             except ObjectDoesNotExist:
                 pass
 
