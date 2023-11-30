@@ -41,15 +41,15 @@ class Command(BaseCommand):
         self.fa_entity = None
 
     def add_arguments(self, parser):
-        parser.add_argument('--collection', dest='collection', help='Collection identifier')
-        parser.add_argument('--level', dest='level', help='Collection identifier')
-        parser.add_argument('--container', dest='container_type', help='Collection identifier')
-        parser.add_argument('--title_field', dest='title_field', help='Title field')
+        parser.add_argument('--collection', dest='collection', help='Collection identifier', action='store')
+        parser.add_argument('--level', dest='level', help='Collection identifier', action='store')
+        parser.add_argument('--container', dest='container_type', help='Collection identifier', action='store')
+        parser.add_argument('--title_field', dest='title_field', help='Title field', action='store')
 
     def handle(self, *args, **options):
-        collection = options.get('collection', default=None)
-        self.level = options.get('level', default='L1')
-        self.title_field = options.get('title_field', default='title')
+        collection = options.get('collection', None)
+        self.level = options.get('level', 'L1')
+        self.title_field = options.get('title_field', 'title')
 
         carrier_type = options.get('container_type')
         try:
