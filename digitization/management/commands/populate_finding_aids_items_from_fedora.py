@@ -70,6 +70,7 @@ class Command(BaseCommand):
 
     def get_document(self):
         r = requests.get("%s/objects/%s/datastreams/ITEM-ARC-EN/content" % (FEDORA_URL, self.pid))
+        r.encoding = 'UTF-8'
         if r.ok:
             self.xml = r.text
 
@@ -187,6 +188,7 @@ class Command(BaseCommand):
                 pass
 
         # Genre
+        fa_entity.genre.clear()
         for genre in xml.xpath('//osa:genre', namespaces=NSP):
             genre, created = Genre.objects.get_or_create(genre=genre.text)
             fa_entity.genre.add(genre)
@@ -325,9 +327,10 @@ class Command(BaseCommand):
                 )
 
         # Spatial Coverage Place
+        fa_entity.spatial_coverage_place.clear()
         for scp in xml.xpath('//osa:spatialCoverage/osa:coverage', namespaces=NSP):
             if scp.text.strip():
-                if scp.text.strip().find('('):
+                if scp.text.strip().find('(') > -1:
                     pl = scp.text.strip()[:scp.text.strip().find('(')-1]
                 else:
                     pl = scp.text.strip()
@@ -337,6 +340,7 @@ class Command(BaseCommand):
                 fa_entity.spatial_coverage_place.add(place)
 
         # Spatial Coverage Country
+        fa_entity.spatial_coverage_country.clear()
         for sc in xml.xpath('//osa:spatialCoverageCountry/osa:country', namespaces=NSP):
             if sc.text.strip():
                 country, created = Country.objects.get_or_create(
@@ -345,6 +349,7 @@ class Command(BaseCommand):
                 fa_entity.spatial_coverage_country.add(country)
 
         # Subject People
+        fa_entity.subject_person.clear()
         fields = ['//osa:subjectPersonal/osa:name', '//osa:subjectPersonalFree']
         for field in fields:
             for name in xml.xpath(field, namespaces=NSP):
@@ -362,6 +367,7 @@ class Command(BaseCommand):
 
         # Subject People
         fields = ['//osa:subjectCorporate/osa:name', '//osa:subjectCorporateFree']
+        fa_entity.subject_corporation.clear()
         for field in fields:
             for name in xml.xpath(field, namespaces=NSP):
                 if name.text.strip():
@@ -371,6 +377,7 @@ class Command(BaseCommand):
                     fa_entity.subject_corporation.add(corporation)
 
         # Subject Keyword
+        fa_entity.subject_keyword.clear()
         for keyword in xml.xpath('//osa:subjectFree', namespaces=NSP):
             if keyword.text.strip():
                 keyword, created = Keyword.objects.get_or_create(
