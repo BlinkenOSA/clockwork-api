@@ -34,19 +34,22 @@ class Command(BaseCommand):
         self.pid = None
         self.xml = None
         self.level = 'L1'
+        self.title_field = 'title'
         self.carrier_type = None
         self.archival_unit = None
         self.current_container = None
         self.fa_entity = None
 
     def add_arguments(self, parser):
-        parser.add_argument('collection', help='Collection identifier')
-        parser.add_argument('level', help='Collection identifier')
-        parser.add_argument('container_type', help='Collection identifier')
+        parser.add_argument('--collection', dest='collection', help='Collection identifier')
+        parser.add_argument('--level', dest='level', help='Collection identifier')
+        parser.add_argument('--container', dest='container_type', help='Collection identifier')
+        parser.add_argument('--title_field', dest='title_field', help='Title field')
 
     def handle(self, *args, **options):
-        collection = options.get('collection')
-        self.level = options.get('level')
+        collection = options.get('collection', default=None)
+        self.level = options.get('level', default='L1')
+        self.title_field = options.get('title_field', default='title')
 
         carrier_type = options.get('container_type')
         try:
@@ -96,7 +99,14 @@ class Command(BaseCommand):
         )
 
         xml = etree.fromstring(self.xml)
-        title = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
+
+        if self.title_field == 'title':
+            title = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
+            title_original = xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
+        else:
+            title = xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
+            title_original = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
+
         title_given = xml.xpath('//osa:primaryTitle/osa:titleGiven', namespaces=NSP)[0].text == 'true'
 
         date_from = datetime.strptime(xml.xpath('//osa:dateOfCreationNormalizedStart', namespaces=NSP)[0].text,
@@ -126,6 +136,7 @@ class Command(BaseCommand):
         fa_entity.uuid = self.pid.replace('osa:', '').replace('-', '')
         fa_entity.level = 'I'
         fa_entity.title = title
+        fa_entity.title_original = title_original
         fa_entity.title_given = title_given
 
         # Dates
