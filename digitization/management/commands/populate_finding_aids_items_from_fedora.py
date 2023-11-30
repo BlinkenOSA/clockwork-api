@@ -70,6 +70,7 @@ class Command(BaseCommand):
 
     def get_document(self):
         r = requests.get("%s/objects/%s/datastreams/ITEM-ARC-EN/content" % (FEDORA_URL, self.pid))
+        r.encoding = 'UTF-8'
         if r.ok:
             self.xml = r.text
 
@@ -327,7 +328,7 @@ class Command(BaseCommand):
         # Spatial Coverage Place
         for scp in xml.xpath('//osa:spatialCoverage/osa:coverage', namespaces=NSP):
             if scp.text.strip():
-                if scp.text.strip().find('('):
+                if scp.text.strip().find('(') > -1:
                     pl = scp.text.strip()[:scp.text.strip().find('(')-1]
                 else:
                     pl = scp.text.strip()
