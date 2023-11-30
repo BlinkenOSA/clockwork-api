@@ -12,7 +12,7 @@ from archival_unit.models import ArchivalUnit
 from authority.models import Language, Genre, Person, PersonOtherFormat, Corporation, Place, Country
 from container.models import Container
 from controlled_list.models import CarrierType, PrimaryType, AccessRight, ExtentUnit, PersonRole, CorporationRole, \
-    Keyword
+    Keyword, Locale
 from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity, FindingAidsEntityLanguage, FindingAidsEntityCreator, \
     FindingAidsEntityExtent, FindingAidsEntityAssociatedPerson, FindingAidsEntityAssociatedCorporation, \
@@ -39,17 +39,20 @@ class Command(BaseCommand):
         self.archival_unit = None
         self.current_container = None
         self.fa_entity = None
+        self.locale = None
 
     def add_arguments(self, parser):
         parser.add_argument('--collection', dest='collection', help='Collection identifier', action='store')
         parser.add_argument('--level', dest='level', help='Collection identifier', action='store')
         parser.add_argument('--container', dest='container_type', help='Collection identifier', action='store')
         parser.add_argument('--title_field', dest='title_field', help='Title field', action='store')
+        parser.add_argument('--locale', dest='locale', help='Locale field', action='locale')
 
     def handle(self, *args, **options):
         collection = options.get('collection', None)
         self.level = options.get('level', 'L1')
         self.title_field = options.get('title_field', 'title')
+        self.locale = options.get('locale', None)
 
         carrier_type = options.get('container_type')
         try:
@@ -109,8 +112,13 @@ class Command(BaseCommand):
 
         title_given = xml.xpath('//osa:primaryTitle/osa:titleGiven', namespaces=NSP)[0].text == 'true'
 
-        date_from = datetime.strptime(xml.xpath('//osa:dateOfCreationNormalizedStart', namespaces=NSP)[0].text,
-                               '%Y-%m-%dT%H:%M:%SZ')
+        date_to = None
+        date_of_creation = xml.xpath('//osa:dateOfCreation', namespaces=NSP)[0].text.split(' - ')
+        if len(date_of_creation) > 1:
+            date_from = date_of_creation[0]
+            date_to = date_of_creation[1]
+        else:
+            date_from = date_of_creation[0]
 
         try:
             fa_entity = FindingAidsEntity.objects.get(
@@ -139,12 +147,16 @@ class Command(BaseCommand):
         fa_entity.title_original = title_original
         fa_entity.title_given = title_given
 
-        # Dates
-        date_to = datetime.strptime(
-            xml.xpath('//osa:dateOfCreationNormalizedEnd', namespaces=NSP)[0].text, '%Y-%m-%dT%H:%M:%SZ')
-        if date_to:
-            fa_entity.date_to = date_to
+        # locale
+        if self.locale:
+            try:
+                fa_entity.original_locale = Locale.objects.get(locale=self.locale)
+            except ObjectDoesNotExist:
+                pass
 
+        # Dates
+        fa_entity.date_from = date_from
+        fa_entity.date_to = date_to
         fa_entity.date_ca_span = int(xml.xpath('//osa:dateOfCreationSpan', namespaces=NSP)[0].text)
 
         # Primary Type
