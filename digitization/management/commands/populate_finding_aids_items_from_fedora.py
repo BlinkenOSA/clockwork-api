@@ -1,6 +1,6 @@
 import csv
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from django.conf import settings
@@ -133,7 +133,6 @@ class Command(BaseCommand):
         if date_to:
             fa_entity.date_to = date_to
 
-        fa_entity.date_to = xml.xpath('//osa:dateOfCreationCa', namespaces=NSP)[0].text == 'true'
         fa_entity.date_ca_span = int(xml.xpath('//osa:dateOfCreationSpan', namespaces=NSP)[0].text)
 
         # Primary Type
@@ -142,7 +141,7 @@ class Command(BaseCommand):
         # Contents Summary
         contents_summary = []
         for cs in xml.xpath('//osa:contentsSummary', namespaces=NSP):
-            contents_summary.append('<br/>'.join(cs.text))
+            contents_summary.append('%s<br/>' % cs.text)
         if len(contents_summary) > 0:
             contents_summary = '<p>%s</p>' % ''.join(contents_summary)
         else:
@@ -213,17 +212,22 @@ class Command(BaseCommand):
             number = extent.xpath('./osa:subExtentNumber', namespaces=NSP)[0].text
             unit = extent.xpath('./osa:subExtentUnit', namespaces=NSP)[0].text
 
-            if unit == 'page':
-                unit = ExtentUnit.objects.get(unit='pages')
+            if unit == 'hh:mm:ss':
+                hours, minutes, seconds = number.split(':')
+                fa_entity.time_end = timedelta(hours=int(hours), minutes=int(minutes), seconds=int(seconds))
             else:
-                unit, created = ExtentUnit.objects.get_or_create(
-                    unit=unit
+                if unit == 'page':
+                    unit = ExtentUnit.objects.get(unit='pages')
+                else:
+                    unit, created = ExtentUnit.objects.get_or_create(
+                        unit=unit
+                    )
+
+                FindingAidsEntityExtent.objects.get_or_create(
+                    fa_entity=fa_entity,
+                    extent_number=number,
+                    extent_unit=unit
                 )
-            FindingAidsEntityExtent.objects.get_or_create(
-                fa_entity=fa_entity,
-                extent_number=number,
-                extent_unit=unit
-            )
 
         # Associated Person
         for associated_person in xml.xpath('//osa:associatedPersonal', namespaces=NSP):
@@ -348,7 +352,7 @@ class Command(BaseCommand):
                     if ',' in name:
                         last_name, first_name = name.split(', ')
                     else:
-                        first_name = name.strip()
+                        first_name = name.text.strip()
                         last_name = ''
                     person, created = Person.objects.get_or_create(
                         first_name=first_name,
@@ -380,7 +384,11 @@ class Command(BaseCommand):
             fa_entity.note = elements[0].text
 
         fa_entity.published = True
-        fa_entity.save()
+
+        try:
+            fa_entity.save()
+        except Exception:
+            pass
 
         self.fa_entity = fa_entity
         print("Added record %s" % fa_entity.archival_reference_code)
