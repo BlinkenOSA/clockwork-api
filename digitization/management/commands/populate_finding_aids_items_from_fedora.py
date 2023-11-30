@@ -216,6 +216,7 @@ class Command(BaseCommand):
 
             if unit == 'hh:mm:ss':
                 hours, minutes, seconds = number.split(':')
+                fa_entity.time_start = timedelta(hours=0, minutes=0, seconds=0)
                 fa_entity.time_end = timedelta(hours=int(hours), minutes=int(minutes), seconds=int(seconds))
             else:
                 if unit == 'page':
