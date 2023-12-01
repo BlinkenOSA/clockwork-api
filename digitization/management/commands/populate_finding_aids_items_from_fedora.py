@@ -115,10 +115,10 @@ class Command(BaseCommand):
         date_to = None
         date_of_creation = xml.xpath('//osa:dateOfCreation', namespaces=NSP)[0].text.split(' - ')
         if len(date_of_creation) > 1:
-            date_from = date_of_creation[0]
-            date_to = date_of_creation[1]
+            date_from = self.make_date(date_of_creation[0])
+            date_to = self.make_date(date_of_creation[1])
         else:
-            date_from = date_of_creation[0]
+            date_from = self.make_date(date_of_creation[0])
 
         try:
             fa_entity = FindingAidsEntity.objects.get(
@@ -435,6 +435,15 @@ class Command(BaseCommand):
         if ptype == "sound":
             return PrimaryType.objects.get(type="Audio")
         return None
+
+    def make_date(self, date):
+        if date:
+            hyphen = date.count('-')
+            if hyphen == 0:
+                return "%s-00-00" % date
+            if hyphen == 1:
+                return "%s-00" % date
+            return date
 
     def create_digital_version(self, did):
         access_copy, created = DigitalVersion.objects.get_or_create(
