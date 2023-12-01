@@ -175,7 +175,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
                 super(FindingAidsEntity, self).save()
 
     def set_duration(self):
-        if getattr(self, 'time_start') and getattr(self, 'time_end'):
+        if getattr(self, 'time_end'):
             self.duration = self.time_end - self.time_start
 
     def save(self, **kwargs):
