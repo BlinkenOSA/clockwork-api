@@ -11,11 +11,9 @@ from finding_aids.models import FindingAidsEntity
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('collection', help='Collection identifier')
-        parser.add_argument('filetype', help='FileType')
 
     def handle(self, *args, **options):
         collection = options.get('collection')
-        filetype = options.get('filetype')
 
         csv_file = os.path.join(
             os.getcwd(), 'digitization', 'management', 'commands', 'csv', '%s_datasheet.csv' % collection)
@@ -26,6 +24,14 @@ class Command(BaseCommand):
                 uuid = row['fedora_id'].replace("osa:", "").replace("-", "")
                 reference_code = row['reference_code']
                 access_copy_id = row['access_copy']
+
+                primary_type = row['primary_type']
+                if primary_type == 'Audio':
+                    filetype = 'mp3'
+                if primary_type == 'Moving Image':
+                    filetype = 'mp4'
+                if primary_type == 'Textual':
+                    filetype = 'pdf'
 
                 try:
                     fa_entity = FindingAidsEntity.objects.get(archival_reference_code=reference_code)
