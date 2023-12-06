@@ -87,7 +87,7 @@ class FindingAidsNewCatalogIndexer:
         self.doc['id'] = self._get_solr_id()
         self.doc['ams_id'] = self.finding_aids_entity.id
         self.doc['call_number'] = self.finding_aids_entity.archival_reference_code
-        self.doc['guid'] = self.finding_aids_entity.uuid
+        self.doc['guid'] = "osa:%s" % self.finding_aids_entity.uuid
 
         # Display field
         self.doc['record_origin'] = "Archives"
