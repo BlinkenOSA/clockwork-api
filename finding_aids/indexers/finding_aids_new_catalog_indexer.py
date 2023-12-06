@@ -87,6 +87,7 @@ class FindingAidsNewCatalogIndexer:
         self.doc['id'] = self._get_solr_id()
         self.doc['ams_id'] = self.finding_aids_entity.id
         self.doc['call_number'] = self.finding_aids_entity.archival_reference_code
+        self.doc['guid'] = "osa:%s" % self.finding_aids_entity.uuid
 
         # Display field
         self.doc['record_origin'] = "Archives"
@@ -114,6 +115,9 @@ class FindingAidsNewCatalogIndexer:
         self.doc['digital_version_online'] = digital_version_info['digital_version_online']
         self.doc['digital_version_barcode'] = digital_version_info['digital_version_barcode']
         self.doc['digital_version_technical_metadata'] = self._get_digital_version_technical_metadata()
+
+        if digital_version_info['digital_version_exists']:
+            self.doc['digital_collection_facet'] = self.finding_aids_entity.archival_unit.get_fonds().title_full
 
         # Archival Unit Specific fields
         self.doc['parent_unit'] = self._get_parent_unit()
