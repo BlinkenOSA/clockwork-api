@@ -165,6 +165,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
 
     def set_catalog_id(self):
         if not self.is_template:
+            super(FindingAidsEntity, self).save()
             # Add hashids
             hashids = Hashids(salt="blinkenosa", min_length=10)
             self.catalog_id = hashids.encode(self.id)
