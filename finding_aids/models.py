@@ -118,10 +118,9 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, db_index=True)
 
     # Clone fields
-    _clone_excluded_model_fields = ['id', 'uuid', 'legacy_id', 'archival_reference_code', 'old_id', 'catalog_id']
-    _clone_many_to_many_fields = ['genre', 'spatial_coverage_country', 'spatial_coverage_place',
-                                  'subject_person', 'subject_corporation', 'subject_keyword']
-    _clone_many_to_one_or_one_to_many_fields = ['archival_unit', 'container', 'original_locale', 'primary_type']
+    _clone_excluded_fields = ['id', 'uuid', 'legacy_id', 'archival_reference_code', 'old_id', 'catalog_id', 'published']
+    _clone_linked_m2m_fields = ['genre', 'spatial_coverage_country', 'spatial_coverage_place',
+                                'subject_person', 'subject_corporation', 'subject_keyword']
 
     class Meta:
         db_table = 'finding_aids_entities'
@@ -168,9 +167,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         if not self.is_template:
             # Add hashids
             hashids = Hashids(salt="blinkenosa", min_length=10)
-            if not self.catalog_id:
-                self.catalog_id = hashids.encode(self.id)
-                super(FindingAidsEntity, self).save()
+            self.catalog_id = hashids.encode(self.id)
 
     def set_duration(self):
         if getattr(self, 'time_end'):
@@ -183,8 +180,8 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         if self.digital_version_exists and not self.digital_version_creation_date:
             self.digital_version_creation_date = datetime.datetime.now()
         self.set_duration()
-        super(FindingAidsEntity, self).save()
         self.set_catalog_id()
+        super(FindingAidsEntity, self).save()
 
 
 class FindingAidsEntityAlternativeTitle(models.Model):
