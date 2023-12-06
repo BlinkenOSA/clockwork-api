@@ -180,7 +180,8 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         if self.digital_version_exists and not self.digital_version_creation_date:
             self.digital_version_creation_date = datetime.datetime.now()
         self.set_duration()
-        self.set_catalog_id()
+        if not self.catalog_id:
+            self.set_catalog_id()
         super(FindingAidsEntity, self).save()
 
 
