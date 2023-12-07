@@ -37,6 +37,8 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
     extent_processed = serializers.SerializerMethodField()
     extent_processed_original = serializers.SerializerMethodField()
     digital_content_online = serializers.SerializerMethodField()
+    container_count = serializers.SerializerMethodField()
+    folder_item_count = serializers.SerializerMethodField()
 
     def get_title_original(self, obj):
         return obj.archival_unit.title_original
@@ -115,6 +117,12 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
                 extent.append(str(c['number']) + ' ' + c['carrier_type__type'] + ', ' +
                               str(round(c['width'] / 1000.00, 2)) + ' linear meters')
         return extent
+
+    def get_folder_item_count(self, obj):
+        return FindingAidsEntity.objects.filter(archival_unit=obj.archival_unit, published=True).count()
+
+    def get_container_count(self, obj):
+        return Container.objects.filter(archival_unit=obj.archival_unit).count()
 
     class Meta:
         model = Isad
