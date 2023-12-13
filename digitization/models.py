@@ -12,6 +12,7 @@ class DigitalVersion(models.Model):
     identifier = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     level = models.CharField(max_length=1, choices=(('M', 'Master'), ('A', 'Access Copy')), db_index=True, default='A')
 
+    digital_collection = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     filename = models.CharField(max_length=200, blank=True, null=True, db_index=True)
 
     label = models.CharField(max_length=50, blank=True, null=True)
