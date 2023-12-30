@@ -11,9 +11,11 @@ from finding_aids.models import FindingAidsEntity
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('collection', help='Collection identifier')
+        parser.add_argument('digital_collection', help='Digital collection name')
 
     def handle(self, *args, **options):
         collection = options.get('collection')
+        digital_collection = options.get('digital_collection')
 
         csv_file = os.path.join(
             os.getcwd(), 'digitization', 'management', 'commands', 'csv', '%s_datasheet.csv' % collection)
@@ -41,6 +43,7 @@ class Command(BaseCommand):
                     DigitalVersion.objects.get_or_create(
                         finding_aids_entity=fa_entity,
                         identifier=access_copy_id,
+                        digital_collection=digital_collection,
                         level='A',
                         filename='%s.%s' % (access_copy_id, filetype),
                         available_online=True,
