@@ -42,16 +42,16 @@ class Command(BaseCommand):
         self.locale = None
 
     def add_arguments(self, parser):
-        parser.add_argument('--collection', dest='collection', help='Collection identifier', action='store')
-        parser.add_argument('--level', dest='level', help='Collection identifier', action='store')
-        parser.add_argument('--container', dest='container_type', help='Collection identifier', action='store')
-        parser.add_argument('--title_field', dest='title_field', help='Title field', action='store')
-        parser.add_argument('--locale', dest='locale', help='Locale field', action='store')
+        parser.add_argument('--collection', dest='collection', help='Collection identifier')
+        parser.add_argument('--level', nargs='?', dest='level', help='Collection identifier', default='L1')
+        parser.add_argument('--container', dest='container_type', help='Collection identifier')
+        parser.add_argument('--title_field', nargs='?', dest='title_field', help='Title field', default='title')
+        parser.add_argument('--locale', dest='locale', help='Locale field')
 
     def handle(self, *args, **options):
         collection = options.get('collection', None)
         self.level = options.get('level', 'L1')
-        self.title_field = options.get('title_field', 'title')
+        self.title_field = options.get('title_field')
         self.locale = options.get('locale', None)
 
         carrier_type = options.get('container_type')
@@ -61,13 +61,13 @@ class Command(BaseCommand):
             raise CommandError("Wrong carrier type: %s" % carrier_type)
 
         csv_file = os.path.join(
-            os.getcwd(), 'digitization', 'management', 'commands', 'csv', '%s_reference_numbers.csv' % collection)
+            os.getcwd(), 'digitization', 'management', 'commands', 'csv', '%s_datasheet.csv' % collection)
 
         with open(csv_file, newline='', mode='r', encoding='utf-8-sig') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 self.pid = row['fedora_id']
-                did = row['did']
+                did = row['access_copy']
 
                 self.get_document()
                 self.create_finding_aids_entity(did)
@@ -105,20 +105,20 @@ class Command(BaseCommand):
 
         if self.title_field == 'title':
             title = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
-            title_original = xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
+            if len(xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)) > 0:
+                title_original = xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
+            else:
+                title_original = None
         else:
             title = xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
             title_original = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
 
         title_given = xml.xpath('//osa:primaryTitle/osa:titleGiven', namespaces=NSP)[0].text == 'true'
 
-        date_to = None
-        date_of_creation = xml.xpath('//osa:dateOfCreation', namespaces=NSP)[0].text.split(' - ')
-        if len(date_of_creation) > 1:
-            date_from = self.make_date(date_of_creation[0])
-            date_to = self.make_date(date_of_creation[1])
-        else:
-            date_from = self.make_date(date_of_creation[0])
+        date_from_normalized = xml.xpath('//osa:dateOfCreationNormalizedStart', namespaces=NSP)[0].text
+        date_to_normalized = xml.xpath('//osa:dateOfCreationNormalizedEnd', namespaces=NSP)[0].text
+        date_from = self.make_date(date_from_normalized)
+        date_to = self.make_date(date_to_normalized)
 
         try:
             fa_entity = FindingAidsEntity.objects.get(
@@ -156,7 +156,8 @@ class Command(BaseCommand):
 
         # Dates
         fa_entity.date_from = date_from
-        fa_entity.date_to = date_to
+        if date_to != date_from:
+            fa_entity.date_to = date_to
         fa_entity.date_ca_span = int(xml.xpath('//osa:dateOfCreationSpan', namespaces=NSP)[0].text)
 
         # Primary Type
@@ -422,7 +423,10 @@ class Command(BaseCommand):
             pass
 
         self.fa_entity = fa_entity
-        print("Added record %s" % fa_entity.archival_reference_code)
+        if created:
+            print("Added record %s" % fa_entity.archival_reference_code)
+        else:
+            print("Updated record %s" % fa_entity.archival_reference_code)
 
     def get_primary_type(self, xml):
         ptype = xml.xpath('//osa:primaryType', namespaces=NSP)[0].text
@@ -437,13 +441,9 @@ class Command(BaseCommand):
         return None
 
     def make_date(self, date):
-        if date:
-            hyphen = date.count('-')
-            if hyphen == 0:
-                return "%s-00-00" % date
-            if hyphen == 1:
-                return "%s-00" % date
-            return date
+        clean_date = date.replace('T00:00:00Z', '')
+        clean_date = clean_date.replace('T23:59:59Z', '')
+        return clean_date
 
     def create_digital_version(self, did):
         access_copy, created = DigitalVersion.objects.get_or_create(
