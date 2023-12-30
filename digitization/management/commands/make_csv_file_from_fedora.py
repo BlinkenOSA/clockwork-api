@@ -129,7 +129,7 @@ class Command(BaseCommand):
     def get_reference_code(self, pid):
         xml = etree.fromstring(self.current_xml)
         arn = xml.xpath('//osa:archivalReferenceNumber', namespaces=NAMESPACE)[0].text
-        fa_entity = None
+        skip = False
 
         if self.collection == 'soviet-tv':
             container, folder = arn[16:].split('-')
@@ -141,12 +141,13 @@ class Command(BaseCommand):
 
             try:
                 fa_entity = FindingAidsEntity.objects.get(
-                    title=title,
+                    title=title
                 )
+                skip = True
             except (ObjectDoesNotExist, MultipleObjectsReturned):
-                pass
+                skip = False
 
-            if not fa_entity:
+            if not skip:
                 try:
                     fa_entity = FindingAidsEntity.objects.get(
                         title=title,
@@ -165,7 +166,7 @@ class Command(BaseCommand):
                             )
                         except ObjectDoesNotExist:
                             return None
-
+            
             arn = fa_entity.archival_reference_code
         return arn
 

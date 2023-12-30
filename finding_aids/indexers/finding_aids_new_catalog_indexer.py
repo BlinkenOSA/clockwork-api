@@ -7,6 +7,7 @@ from hashids import Hashids
 from langdetect import detect, LangDetectException
 from requests.auth import HTTPBasicAuth
 
+from digitization.models import DigitalVersion
 from finding_aids.generators.digital_version_identifier_generator import DigitalVersionIdentifierGenerator
 from finding_aids.models import FindingAidsEntity
 
@@ -116,8 +117,8 @@ class FindingAidsNewCatalogIndexer:
         self.doc['digital_version_barcode'] = digital_version_info['digital_version_barcode']
         self.doc['digital_version_technical_metadata'] = self._get_digital_version_technical_metadata()
 
-        if digital_version_info['digital_version_exists']:
-            self.doc['digital_collection_facet'] = self.finding_aids_entity.archival_unit.get_fonds().title_full
+        if digital_version_info['digital_version_online']:
+            self.doc['digital_collection_facet'] = self._get_digital_collection()
 
         # Archival Unit Specific fields
         self.doc['parent_unit'] = self._get_parent_unit()
@@ -233,6 +234,14 @@ class FindingAidsNewCatalogIndexer:
             'digital_version_barcode': did_generator.generate_identifier()
         }
         return val
+
+    def _get_digital_collection(self):
+        digital_version = DigitalVersion.objects.filter(finding_aids_entity=self.finding_aids_entity)\
+            .values('digital_collection').first()
+        if 'digital_collection' in digital_version:
+            return digital_version['digital_collection']
+        else:
+            return self.finding_aids_entity.archival_unit.get_fonds().title
 
     def _get_value_with_wikidata_id(self, obj):
         wikipedia_id = getattr(obj, "wikidata_id")
