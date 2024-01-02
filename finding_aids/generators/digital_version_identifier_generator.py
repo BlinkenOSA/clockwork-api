@@ -22,13 +22,13 @@ class DigitalVersionIdentifierGenerator:
         barcode = ''
         if self.finding_aids_entity.digitalversion_set.count() > 0:
             if self.finding_aids_entity.description_level == 'L1':
-                return "%s_%04d_%03d" % (
+                return "%s_%04d_%04d" % (
                     self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_").replace("-", "_"),
                     self.finding_aids_entity.container.container_no,
                     self.finding_aids_entity.folder_no
                 )
             else:
-                return "%s_%04d_%03d_%03d" % (
+                return "%s_%04d_%04d_%04d" % (
                     self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_").replace("-", "_"),
                     self.finding_aids_entity.container.container_no,
                     self.finding_aids_entity.folder_no,
