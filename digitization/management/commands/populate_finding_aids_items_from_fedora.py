@@ -33,6 +33,7 @@ class Command(BaseCommand):
         super().__init__(stdout, stderr, no_color)
         self.pid = None
         self.xml = None
+        self.xml_2nd_lang = None
         self.level = 'L1'
         self.title_field = 'title'
         self.carrier_type = None
@@ -46,13 +47,13 @@ class Command(BaseCommand):
         parser.add_argument('--level', nargs='?', dest='level', help='Collection identifier', default='L1')
         parser.add_argument('--container', dest='container_type', help='Collection identifier')
         parser.add_argument('--title_field', nargs='?', dest='title_field', help='Title field', default='title')
-        parser.add_argument('--locale', dest='locale', help='Locale field')
+        parser.add_argument('--locale', nargs='?', dest='locale', help='Locale field', default='EN')
 
     def handle(self, *args, **options):
         collection = options.get('collection', None)
         self.level = options.get('level', 'L1')
         self.title_field = options.get('title_field')
-        self.locale = options.get('locale', None)
+        self.locale = options.get('locale')
 
         carrier_type = options.get('container_type')
         try:
@@ -80,6 +81,12 @@ class Command(BaseCommand):
         if r.ok:
             self.xml = r.text
 
+        if self.locale != 'EN':
+            r = requests.get("%s/objects/%s/datastreams/ITEM-ARC-%s/content" % (FEDORA_URL, self.pid, self.locale))
+            r.encoding = 'UTF-8'
+            if r.ok:
+                self.xml_2nd_lang = r.text
+
     def create_finding_aids_entity(self, did):
         if self.level == 'L1':
             (hu, osa, fonds, subfonds, series, container_no, folder_no) = did.split('_')
@@ -102,6 +109,8 @@ class Command(BaseCommand):
         )
 
         xml = etree.fromstring(self.xml)
+        if self.xml_2nd_lang:
+            xml_2nd_lang = etree.fromstring(self.xml_2nd_lang)
 
         if self.title_field == 'title':
             title = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
@@ -110,8 +119,18 @@ class Command(BaseCommand):
             else:
                 title_original = None
         else:
-            title = xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
-            title_original = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
+            try:
+                title = xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
+            except IndexError:
+                title = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
+
+            if self.xml_2nd_lang:
+                try:
+                    title_original = xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
+                except IndexError:
+                    title_original = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
+            else:
+                title_original = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
 
         title_given = xml.xpath('//osa:primaryTitle/osa:titleGiven', namespaces=NSP)[0].text == 'true'
 
@@ -148,7 +167,7 @@ class Command(BaseCommand):
         fa_entity.title_given = title_given
 
         # locale
-        if self.locale:
+        if self.locale != 'EN':
             try:
                 fa_entity.original_locale = Locale.objects.get(pk=self.locale)
             except ObjectDoesNotExist:
@@ -164,22 +183,9 @@ class Command(BaseCommand):
         fa_entity.primary_type = self.get_primary_type(xml)
 
         # Contents Summary
-        contents_summary = []
-        for cs in xml.xpath('//osa:contentsSummary', namespaces=NSP):
-            contents_summary.append('%s<br/>' % cs.text)
-        if len(contents_summary) > 0:
-            contents_summary = '<p>%s</p>' % ''.join(contents_summary)
-        else:
-            contents_summary = ''
-
-        contents_table = []
-        for ct in xml.xpath('//osa:contentsTable', namespaces=NSP):
-            contents_table.append('<li>%s</li>' % ct.text)
-        if len(contents_table) > 0:
-            contents_table = '<ul>%s</ul>' % ''.join(contents_table)
-        else:
-            contents_table = ''
-        fa_entity.contents_summary = contents_summary + contents_table
+        fa_entity.contents_summary = self.get_contents_summary(xml)
+        if self.xml_2nd_lang:
+            fa_entity.contents_summary_original = self.get_contents_summary(xml_2nd_lang)
 
         # Access Rights
         fa_entity.access_rights = AccessRight.objects.get(statement='Not Restricted')
@@ -190,6 +196,12 @@ class Command(BaseCommand):
             administrative_history.append(ah.text)
         fa_entity.administrative_history = ' '.join(administrative_history)
 
+        if self.xml_2nd_lang:
+            administrative_history = []
+            for ah in xml_2nd_lang.xpath('//osa:administrativeHistory', namespaces=NSP):
+                administrative_history.append(ah.text)
+            fa_entity.administrative_history_original = ' '.join(administrative_history)
+
         # Physical condition
         elements = xml.xpath('//osa:physicalCondition', namespaces=NSP)
         if len(elements) > 0:
@@ -199,6 +211,11 @@ class Command(BaseCommand):
         elements = xml.xpath('//osa:physicalDescription', namespaces=NSP)
         if len(elements) > 0:
             fa_entity.physical_description = elements[0].text
+
+        if self.xml_2nd_lang:
+            elements = xml_2nd_lang.xpath('//osa:physicalDescription', namespaces=NSP)
+            if len(elements) > 0:
+                fa_entity.physical_description_original = elements[0].text
 
         # Language
         for language in xml.xpath('//osa:documentLanguage', namespaces=NSP):
@@ -415,6 +432,11 @@ class Command(BaseCommand):
         if len(elements) > 0:
             fa_entity.note = elements[0].text
 
+        if self.xml_2nd_lang:
+            elements = xml_2nd_lang.xpath('//osa:note', namespaces=NSP)
+            if len(elements) > 0:
+                fa_entity.note = elements[0].text
+
         fa_entity.published = True
 
         try:
@@ -439,6 +461,24 @@ class Command(BaseCommand):
         if ptype == "sound":
             return PrimaryType.objects.get(type="Audio")
         return None
+
+    def get_contents_summary(self, xml):
+        contents_summary = []
+        for cs in xml.xpath('//osa:contentsSummary', namespaces=NSP):
+            contents_summary.append('%s<br/>' % cs.text)
+        if len(contents_summary) > 0:
+            contents_summary = '<p>%s</p>' % ''.join(contents_summary)
+        else:
+            contents_summary = ''
+
+        contents_table = []
+        for ct in xml.xpath('//osa:contentsTable', namespaces=NSP):
+            contents_table.append('<li>%s</li>' % ct.text)
+        if len(contents_table) > 0:
+            contents_table = '<ul>%s</ul>' % ''.join(contents_table)
+        else:
+            contents_table = ''
+        return contents_summary + contents_table
 
     def make_date(self, date):
         clean_date = date.replace('T00:00:00Z', '')
