@@ -126,9 +126,9 @@ class Command(BaseCommand):
 
             if self.xml_2nd_lang:
                 try:
-                    title_original = xml.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
+                    title_original = xml_2nd_lang.xpath('//osa:alternativeTitle/osa:title', namespaces=NSP)[0].text
                 except IndexError:
-                    title_original = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
+                    title_original = xml_2nd_lang.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
             else:
                 title_original = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NSP)[0].text
 
