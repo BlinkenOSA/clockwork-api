@@ -75,7 +75,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     physical_description = models.TextField(blank=True, null=True)
     physical_description_original = models.TextField(blank=True, null=True)
 
-    physical_condition = models.CharField(max_length=200, blank=True, null=True)
+    physical_condition = models.CharField(max_length=300, blank=True, null=True)
 
     time_start = models.DurationField(blank=True, null=True)
     time_end = models.DurationField(blank=True, null=True)
