@@ -9,12 +9,12 @@ from catalog.views.iiif_views.archival_units_image_manifest_view import Archival
 from catalog.views.iiif_views.finding_aids_iiif_presentation_v3_view import FindingAidsIIFPresentationV3View
 from catalog.views.iiif_views.finding_aids_image_manifest_view import FindingAidsImageManifestView
 from catalog.views.research_request_views.request_views import ResearcherRequestView
+from catalog.views.research_request_views.researcher_forgot_card_number import ResearcherForgotCardNumber
 from catalog.views.research_request_views.researcher_registration import ResearcherRegistration
 from catalog.views.statistics_views.archival_unit_sizes import ArchivalUnitSizes
 from catalog.views.statistics_views.collection_specific_tags import CollectionSpecificTags
 from catalog.views.statistics_views.newly_added_content import NewlyAddedContent
 from catalog.views.tree_views.archival_units_tree_quick_view import ArchivalUnitsTreeQuickView
-from catalog.views.tree_views.archival_units_tree_view import ArchivalUnitsTreeView
 from catalog.views.tree_views.archival_units_tree_view_v2 import ArchivalUnitsTreeViewV2
 from research.views.researcher_views import ResearcherCountrySelectList, ResearcherNationalitySelectList
 from research.views.researcher_degree_views import ResearcherDegreeSelectList
@@ -36,20 +36,12 @@ urlpatterns = [
          name='finding-aids-location-view'),
 
     # Tree Views
-    path('archival-units-tree-old/<str:archival_unit_id>/', ArchivalUnitsTreeView.as_view(), kwargs={'theme': None},
-         name='archival-units-tree-old'),
     path('archival-units-tree/<str:archival_unit_id>/', ArchivalUnitsTreeViewV2.as_view(), kwargs={'theme': None},
          name='archival-units-tree'),
-
-    path('archival-units-tree-old/<str:archival_unit_id>/<str:theme>/', ArchivalUnitsTreeView.as_view(),
-         name='archival-units-tree-with-theme-old'),
     path('archival-units-tree/<str:archival_unit_id>/<str:theme>/', ArchivalUnitsTreeViewV2.as_view(),
          name='archival-units-tree-with-theme'),
-
     path('archival-units-tree-quick-view/<str:archival_unit_id>/', ArchivalUnitsTreeQuickView.as_view(),
          name='archival-units-tree-quick-view'),
-
-
 
     # Wikidata
     path('wikidata/<str:wikidata_id>/', WikidataView.as_view(), name='wikidata_view'),
@@ -61,9 +53,6 @@ urlpatterns = [
     path('finding-aids-image-manifest/<str:fa_entity_catalog_id>/manifest.json',
          FindingAidsIIFPresentationV3View.as_view(),
          name='finding-aids-manifest-view'),
-    #path('finding-aids-image-manifest/<str:fa_entity_catalog_id>/manifest.json',
-    #     FindingAidsImageManifestView.as_view(),
-    #     name='finding-aids-manifest-view'),
     path('finding-aids-image-manifest/mobile/<str:fa_entity_catalog_id>/manifest.json',
          FindingAidsImageManifestView.as_view(),
          name='finding-aids-manifest-mobile-view'),
@@ -73,6 +62,8 @@ urlpatterns = [
     path('research/degree/select/', ResearcherDegreeSelectList.as_view(), name='researcher-degree-select-list'),
     path('research/country/select/', ResearcherCountrySelectList.as_view(), name='researcher-country-select-list'),
     path('research/nationality/select/', ResearcherNationalitySelectList.as_view(), name='researcher-country-select-list'),
+
+    path('researcher-card-number/', ResearcherForgotCardNumber.as_view(), name='researcher-forgot-card-number'),
 
     # New Request
     path('request/', ResearcherRequestView.as_view(), name='new-request'),
