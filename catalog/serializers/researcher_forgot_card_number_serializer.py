@@ -6,7 +6,7 @@ from catalog.serializer_fields.hcaptcha_field import HCaptchaField
 class ResearcherForgotCardNumberSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     email_confirm = serializers.EmailField(required=True)
-    # captcha = HCaptchaField(required=True)
+    captcha = HCaptchaField(required=True)
 
     def validate(self, data):
         """
