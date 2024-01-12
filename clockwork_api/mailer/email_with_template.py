@@ -35,6 +35,10 @@ class EmailWithTemplate:
         self.template = "request_delivered_user"
         self._send_mail('user')
 
+    def send_researcher_forgot_card_number(self):
+        self.template = "researcher_forgot_card_number"
+        self._send_mail('user')
+
     def _send_mail(self, to='user'):
         message = get_template("research/emails/%s.html" % self.template).render(self.context)
         if to == 'user':
@@ -63,7 +67,7 @@ class EmailWithTemplate:
             return "Registration approved!"
 
         # Researcher forgot card number
-        if self.template == 'researcher_forgot_card_number_user':
+        if self.template == 'researcher_forgot_card_number':
             return "Your Research Card number"
 
         # New Request

@@ -398,7 +398,7 @@ class FindingAidsNewCatalogIndexer:
             archival_unit_ref_code = self.finding_aids_entity.archival_unit.reference_code\
                 .replace(" ", "_")\
                 .replace("-", "_")
-            item_reference_code = "%s_%04d_%03d" % (
+            item_reference_code = "%s_%04d_%04d" % (
                 archival_unit_ref_code,
                 self.finding_aids_entity.container.container_no,
                 self.finding_aids_entity.folder_no
