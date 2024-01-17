@@ -163,7 +163,10 @@ class Command(BaseCommand):
         fa_entity.uuid = self.pid.replace('osa:', '').replace('-', '')
         fa_entity.level = 'I'
         fa_entity.title = title
-        fa_entity.title_original = title_original
+        if len(title_original) > 300:
+            pass
+        else:
+            fa_entity.title_original = title_original
         fa_entity.title_given = title_given
 
         # locale
@@ -280,7 +283,9 @@ class Command(BaseCommand):
             alternative_names = associated_person.xpath('./osa:alternative_name', namespaces=NSP)
 
             if ',' in name:
-                last_name, first_name = name.split(', ')
+                tokens = name.split(',')
+                first_name = tokens[0]
+                last_name = tokens[1]
             else:
                 first_name = name.strip()
                 last_name = ''
@@ -299,12 +304,12 @@ class Command(BaseCommand):
 
             for alternative_name in alternative_names:
                 if ',' in alternative_name:
-                    last_name, first_name = alternative_name.split(', ')
+                    last_name, first_name = alternative_name.text.split(', ')
                 else:
-                    first_name = alternative_name.strip()
+                    first_name = alternative_name.text.strip()
                     last_name = ''
 
-                person, created = PersonOtherFormat.objects.get_or_create(
+                person_other_format, created = PersonOtherFormat.objects.get_or_create(
                     person=person,
                     first_name=first_name.strip(),
                     last_name=last_name.strip()
