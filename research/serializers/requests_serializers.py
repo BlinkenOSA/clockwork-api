@@ -3,6 +3,7 @@ from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
 from container.models import Container
+from finding_aids.models import FindingAidsEntity
 from mlr.models import MLREntity
 from research.models import RequestItem, Request
 
@@ -15,6 +16,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     carrier_type = serializers.SlugRelatedField(slug_field='type', read_only=True, source='container.carrier_type')
     archival_reference_number = serializers.SerializerMethodField()
     mlr = serializers.SerializerMethodField()
+    has_restricted_content = serializers.SerializerMethodField()
     has_digital_version = serializers.SerializerMethodField()
     digital_version_barcode = serializers.SerializerMethodField()
 
@@ -53,6 +55,15 @@ class RequestListSerializer(serializers.ModelSerializer):
     def get_has_digital_version(self, obj):
         if obj.container:
             return obj.container.digital_version_exists
+        else:
+            return False
+
+    def get_has_restricted_content(self, obj):
+        if obj.container:
+            return FindingAidsEntity.objects.filter(
+                container=obj.container,
+                access_rights__statement='Restricted'
+            ).count() > 0
         else:
             return False
 
