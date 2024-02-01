@@ -19,6 +19,9 @@
                         <strong>Title:</strong> {{ item.title }}<br/>
                         <strong>Call Number:</strong> {{ item.call_number }}<br/>
                         <strong>Origin:</strong> {{ item.origin }}<br/>
+                        {% if item.volume %}
+                            <strong>Volumes:</strong> {{ item.volume }}<br/>
+                        {% endif %}
                     </li>
                     <br/>
                 {% endfor %}
