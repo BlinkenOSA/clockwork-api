@@ -183,8 +183,15 @@ class FindingAidsNewCatalogIndexer:
     def _get_date_created_display(self):
         if self.finding_aids_entity.date_to:
             if self.finding_aids_entity.date_from != self.finding_aids_entity.date_to:
-                return "%s - %s" % (self.finding_aids_entity.date_from, self.finding_aids_entity.date_to)
-        return str(self.finding_aids_entity.date_from)
+                if self.finding_aids_entity.date_ca_span != 0:
+                    return "ca. %s - %s" % (self.finding_aids_entity.date_from, self.finding_aids_entity.date_to)
+                else:
+                    return "%s - %s" % (self.finding_aids_entity.date_from, self.finding_aids_entity.date_to)
+
+        if self.finding_aids_entity.date_ca_span != 0:
+            return "ca. %s" % str(self.finding_aids_entity.date_from)
+        else:
+            return str(self.finding_aids_entity.date_from)
 
     def _get_parent_unit(self):
         return self.finding_aids_entity.archival_unit.title_full
