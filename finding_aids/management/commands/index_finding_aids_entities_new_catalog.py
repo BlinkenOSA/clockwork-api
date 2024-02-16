@@ -19,7 +19,7 @@ class Command(BaseCommand):
             archival_units = ArchivalUnit.objects.filter()
             counter = 0
             for archival_unit in archival_units.iterator():
-                for fa in FindingAidsEntity.objects.filter(archival_unit=archival_unit).iterator():
+                for fa in FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False).iterator():
                     indexer = FindingAidsNewCatalogIndexer(fa.id)
                     if fa.published:
                         indexer.index_with_requests()
@@ -38,7 +38,7 @@ class Command(BaseCommand):
             archival_unit = ArchivalUnit.objects.get(fonds=options['fonds'],
                                                      subfonds=options['subfonds'],
                                                      series=options['series'])
-            finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit=archival_unit)
+            finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False)
             for fa in finding_aids_entities.iterator():
                 indexer = FindingAidsNewCatalogIndexer(fa.id)
                 if fa.published:
