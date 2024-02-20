@@ -23,7 +23,11 @@ class Command(BaseCommand):
         with open(csv_file, newline='', mode='r', encoding='utf-8-sig') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                uuid = row['fedora_id'].replace("osa:", "").replace("-", "")
+                if 'fedora_id' in row:
+                    uuid = row['fedora_id'].replace("osa:", "").replace("-", "")
+                else:
+                    uuid = None
+
                 reference_code = row['reference_code']
                 access_copy_id = row['access_copy']
 
@@ -37,8 +41,9 @@ class Command(BaseCommand):
 
                 try:
                     fa_entity = FindingAidsEntity.objects.get(archival_reference_code=reference_code)
-                    fa_entity.uuid = uuid
-                    fa_entity.save()
+                    if uuid:
+                        fa_entity.uuid = uuid
+                        fa_entity.save()
 
                     DigitalVersion.objects.get_or_create(
                         finding_aids_entity=fa_entity,
