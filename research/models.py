@@ -135,7 +135,7 @@ class RequestItem(models.Model):
                 self.status = '2'
 
         # If return is happening, write the return date into the record.
-        if self.status == '4':
+        if self.status == '4' or self.status == '9':
             if requested_items_count < 10:
                 requested_items_next_in_queue = RequestItem.objects.filter(
                     request__researcher=researcher,
