@@ -1,9 +1,11 @@
 import re
 
 from django.shortcuts import get_object_or_404
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView
 
+from clockwork_api.authentication import BearerAuthentication
 from finding_aids.models import FindingAidsEntity
 from workflow.permission import APIGroupPermission
 from workflow.serializers.folder_item_serializers import FADigitizedSerializer
@@ -11,6 +13,7 @@ from workflow.serializers.folder_item_serializers import FADigitizedSerializer
 
 class GetFAEntityMetadataByItemID(RetrieveAPIView):
     serializer_class = FADigitizedSerializer
+    authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
 
     def get_object(self):
