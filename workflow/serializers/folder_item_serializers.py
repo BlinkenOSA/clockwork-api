@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from archival_unit.models import ArchivalUnit
 from finding_aids.models import FindingAidsEntity
 
 
@@ -13,6 +15,10 @@ class ArchivalUnitSerializer(serializers.ModelSerializer):
             return 'Subfonds'
         else:
             return 'Series'
+
+    class Meta:
+        model = ArchivalUnit
+        fields = '__all__'
 
 
 class FADigitizedSerializer(serializers.ModelSerializer):
