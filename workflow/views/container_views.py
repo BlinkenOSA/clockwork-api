@@ -35,6 +35,7 @@ class GetContainerMetadata(ListAPIView):
 
 class GetContainerMetadataByLegacyID(RetrieveAPIView):
     serializer_class = ContainerDigitizedSerializer
+    authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
 
     def get_object(self):
