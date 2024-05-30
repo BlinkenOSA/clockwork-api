@@ -5,7 +5,23 @@ from rest_framework import serializers
 from container.models import Container
 from finding_aids.models import FindingAidsEntity
 from mlr.models import MLREntity
-from research.models import RequestItem, Request
+from research.models import RequestItem, Request, RequestItemPart
+
+
+class RequestItemPartSerializer(serializers.ModelSerializer):
+    reference_code = serializers.SlugRelatedField(
+        queryset=FindingAidsEntity.objects.all(),
+        slug_field='archival_reference_code',
+        source='findng_aids_entity'
+    )
+    is_restricted = serializers.SerializerMethodField()
+
+    def get_is_restricted(self, obj):
+        return obj.finding_aids_entity.access_rights.statement == 'Restricted'
+
+    class Meta:
+        model = RequestItemPart
+        fields = ['finding_aids_entity', 'reference_code']
 
 
 class RequestListSerializer(serializers.ModelSerializer):
@@ -16,10 +32,9 @@ class RequestListSerializer(serializers.ModelSerializer):
     carrier_type = serializers.SlugRelatedField(slug_field='type', read_only=True, source='container.carrier_type')
     archival_reference_number = serializers.SerializerMethodField()
     mlr = serializers.SerializerMethodField()
-    has_restricted_content = serializers.SerializerMethodField()
     has_digital_version = serializers.SerializerMethodField()
     digital_version_barcode = serializers.SerializerMethodField()
-
+    parts = RequestItemPartSerializer(source='requestitempart_set', many=True)
 
     def get_mlr(self, obj):
         if obj.item_origin == 'FA':
@@ -58,14 +73,6 @@ class RequestListSerializer(serializers.ModelSerializer):
         else:
             return False
 
-    def get_has_restricted_content(self, obj):
-        if obj.container:
-            return FindingAidsEntity.objects.filter(
-                container=obj.container,
-                access_rights__statement='Restricted'
-            ).count() > 0
-        else:
-            return False
 
     def get_digital_version_barcode(self, obj):
         if obj.container:
