@@ -9,19 +9,18 @@ from research.models import RequestItem, Request, RequestItemPart
 
 
 class RequestItemPartSerializer(serializers.ModelSerializer):
-    reference_code = serializers.SlugRelatedField(
-        queryset=FindingAidsEntity.objects.all(),
-        slug_field='archival_reference_code',
-        source='findng_aids_entity'
-    )
+    reference_code = serializers.SerializerMethodField()
     is_restricted = serializers.SerializerMethodField()
+
+    def get_reference_code(self, obj):
+        return obj.finding_aids_entity.archival_reference_code
 
     def get_is_restricted(self, obj):
         return obj.finding_aids_entity.access_rights.statement == 'Restricted'
 
     class Meta:
         model = RequestItemPart
-        fields = ['finding_aids_entity', 'reference_code']
+        fields = ['finding_aids_entity', 'reference_code', 'is_restricted']
 
 
 class RequestListSerializer(serializers.ModelSerializer):
@@ -32,6 +31,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     carrier_type = serializers.SlugRelatedField(slug_field='type', read_only=True, source='container.carrier_type')
     archival_reference_number = serializers.SerializerMethodField()
     mlr = serializers.SerializerMethodField()
+    has_restricted_content = serializers.SerializerMethodField()
     has_digital_version = serializers.SerializerMethodField()
     digital_version_barcode = serializers.SerializerMethodField()
     parts = RequestItemPartSerializer(source='requestitempart_set', many=True)
@@ -66,6 +66,9 @@ class RequestListSerializer(serializers.ModelSerializer):
                 return ''
 
         return 'Library Record'
+
+    def get_has_restricted_content(self, obj):
+        return obj.requestitempart_set.filter(finding_aids_entity__access_rights__statement='Restricted').count() > 0
 
     def get_has_digital_version(self, obj):
         if obj.container:
