@@ -129,6 +129,10 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     def available_online(self):
         return self.digitalversion_set.filter(available_online=True).count() > 0
 
+    @property
+    def restricted(self):
+        return self.access_rights.statement == 'Restricted'
+
     def publish(self, user):
         self.published = True
         self.user_published = user.username

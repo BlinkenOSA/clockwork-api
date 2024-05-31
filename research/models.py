@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from django.db import models
 
@@ -167,3 +168,35 @@ class RequestItem(models.Model):
 
     class Meta:
         db_table = 'research_request_items'
+
+
+class RequestItemRestriction(models.Model):
+    id = models.AutoField(primary_key=True)
+    request_item = models.OneToOneField('RequestItem', on_delete=models.CASCADE)
+
+    # Restricted material
+    restricted_uuid = models.UUIDField(default=uuid.uuid4, db_index=True)
+
+    # Restricted form data
+    research_organisation = models.TextField(blank=True)
+    research_subject = models.TextField(blank=True)
+    motivation = models.TextField(blank=True)
+
+    conditions_accepted = models.BooleanField(default=False)
+
+    approved = models.BooleanField(default=False)
+    approved_date = models.DateTimeField(blank=True, null=True)
+    approved_by = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        db_table = 'research_request_items_restrictions'
+
+
+class RequestItemPart(models.Model):
+    id = models.AutoField(primary_key=True)
+    request_item = models.ForeignKey('RequestItem', on_delete=models.PROTECT)
+    finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', on_delete=models.PROTECT)
+
+    class Meta:
+        db_table = 'research_request_items_parts'
+
