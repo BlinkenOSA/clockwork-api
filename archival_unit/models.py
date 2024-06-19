@@ -10,9 +10,9 @@ class ArchivalUnit(models.Model, DetectProtectedMixin):
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.PROTECT)
     theme = models.ManyToManyField('controlled_list.ArchivalUnitTheme', blank=True)
 
-    fonds = models.IntegerField()
-    subfonds = models.IntegerField(default=0)
-    series = models.IntegerField(default=0)
+    fonds = models.IntegerField(db_index=True)
+    subfonds = models.IntegerField(default=0, db_index=True)
+    series = models.IntegerField(default=0, db_index=True)
 
     sort = models.CharField(max_length=12, blank=True)
 
@@ -22,8 +22,8 @@ class ArchivalUnit(models.Model, DetectProtectedMixin):
     original_locale = models.ForeignKey('controlled_list.Locale', blank=True, null=True, on_delete=models.PROTECT)
 
     acronym = models.CharField(max_length=50, blank=True, null=True)
-    reference_code = models.CharField(max_length=20)
-    reference_code_id = models.CharField(max_length=20)
+    reference_code = models.CharField(max_length=20, db_index=True)
+    reference_code_id = models.CharField(max_length=20, db_index=True)
 
     level = models.CharField(max_length=2)
     status = models.CharField(max_length=10, default='Final')
