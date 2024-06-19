@@ -8,14 +8,14 @@ from hashids import Hashids
 
 class Isad(models.Model):
     id = models.AutoField(primary_key=True)
-    catalog_id = models.CharField(max_length=20, blank=True, null=True)
+    catalog_id = models.CharField(max_length=20, blank=True, null=True, db_index=True)
     archival_unit = models.OneToOneField('archival_unit.ArchivalUnit', on_delete=models.PROTECT, related_name='isad')
     original_locale = models.ForeignKey('controlled_list.Locale', blank=True, null=True, on_delete=models.PROTECT)
     legacy_id = models.IntegerField(blank=True, null=True)
 
     # Required fields
     title = models.CharField(max_length=255)
-    reference_code = models.CharField(max_length=30)
+    reference_code = models.CharField(max_length=30, db_index=True)
 
     DESCRIPTION_LEVEL = [('F', 'Fonds'), ('SF', 'Subfonds'), ('S', 'Series')]
     description_level = models.CharField(max_length=10, choices=DESCRIPTION_LEVEL)

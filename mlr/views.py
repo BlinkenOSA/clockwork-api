@@ -24,7 +24,7 @@ class MLRList(generics.ListAPIView):
         fonds = self.request.query_params.get('fonds', None)
         if fonds:
             archival_unit = get_object_or_404(ArchivalUnit, pk=fonds)
-            qs = qs.filter(series__fonds = archival_unit.fonds)
+            qs = qs.filter(series__fonds=archival_unit.fonds)
 
         carrier_type = self.request.query_params.get('carrier_type', None)
         if carrier_type:

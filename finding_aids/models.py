@@ -21,7 +21,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     archival_reference_code = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
     old_id = models.CharField(max_length=12, blank=True, null=True)
-    catalog_id = models.CharField(max_length=12, blank=True, null=True)
+    catalog_id = models.CharField(max_length=12, blank=True, null=True, db_index=True)
 
     DESCRIPTION_LEVEL = [('L1', 'Level 1'), ('L2', 'Level 2')]
     description_level = models.CharField(max_length=2, choices=DESCRIPTION_LEVEL, default='L1')
