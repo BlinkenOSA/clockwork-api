@@ -3,7 +3,7 @@ class DigitalVersionIdentifierGenerator:
         self.finding_aids_entity = finding_aids_entity
 
     def detect(self):
-        if self.finding_aids_entity.digitalversion_set.count() > 0:
+        if self.finding_aids_entity.digitalversion_set.count() > 0 or self.finding_aids_entity.digital_version_exists:
             return True
         else:
             if self.finding_aids_entity.container.digital_version_exists:
@@ -11,7 +11,7 @@ class DigitalVersionIdentifierGenerator:
         return False
 
     def detect_available_online(self):
-        if self.finding_aids_entity.available_online:
+        if self.finding_aids_entity.available_online or self.finding_aids_entity.digital_version_online:
             return True
         else:
             if self.finding_aids_entity.container.digital_version_online:
@@ -20,7 +20,7 @@ class DigitalVersionIdentifierGenerator:
 
     def generate_identifier(self):
         barcode = ''
-        if self.finding_aids_entity.digitalversion_set.count() > 0:
+        if self.finding_aids_entity.digitalversion_set.count() > 0 or self.finding_aids_entity.digital_version_exists:
             if self.finding_aids_entity.description_level == 'L1':
                 return "%s_%04d_%04d" % (
                     self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_").replace("-", "_"),
