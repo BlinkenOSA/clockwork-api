@@ -6,8 +6,6 @@ from finding_aids.indexers.finding_aids_new_catalog_indexer import FindingAidsNe
 
 @shared_task
 def index_catalog_finding_aids_entity(finding_aids_entity_id):
-    indexer = FindingAidsCatalogIndexer(finding_aids_entity_id)
-    indexer.index()
     indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
     indexer.index()
     indexer.commit()
