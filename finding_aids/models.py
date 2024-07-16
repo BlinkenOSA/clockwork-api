@@ -121,6 +121,20 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     _clone_excluded_fields = ['id', 'uuid', 'legacy_id', 'archival_reference_code', 'old_id', 'catalog_id', 'published']
     _clone_linked_m2m_fields = ['genre', 'spatial_coverage_country', 'spatial_coverage_place',
                                 'subject_person', 'subject_corporation', 'subject_keyword']
+    _clone_m2o_or_o2m_fields = [
+        'findingaidsentityalternativetitle_set',
+        'findingaidsentitydate_set',
+        'findingaidsentitycreator_set',
+        'findingaidsentityidentifier_set',
+        'findingaidsentityplaceofcreation_set',
+        'findingaidsentitysubject_set',
+        'findingaidsentityassociatedperson_set',
+        'findingaidsentityassociatedcorporation_set',
+        'findingaidsentityassociatedcountry_set',
+        'findingaidsentityassociatedplace_set',
+        'findingaidsentityextent_set',
+        'findingaidsentitylanguage_set'
+    ]
 
     class Meta:
         db_table = 'finding_aids_entities'
@@ -291,7 +305,7 @@ class FindingAidsEntityAssociatedPlace(models.Model):
         db_table = 'finding_aids_associated_places'
 
 
-class FindingAidsEntityLanguage(models.Model):
+class FindingAidsEntityLanguage(CloneMixin, models.Model):
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     language = models.ForeignKey('authority.Language', on_delete=models.PROTECT)
