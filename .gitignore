@@ -123,3 +123,9 @@ venv.bak/
 csv/
 
 o365_token.txt
+
+/finding_aids/management/commands/index_finding_aids_entities_meilisearch.py
+/finding_aids/indexers/finding_aids_meilisearch_indexer.py
+
+/isad/management/commands/index_isad_records_meilisearch.py
+/isad/indexers/isad_meilisearch_indexer.py
