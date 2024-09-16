@@ -195,7 +195,7 @@ class RequestItemRestriction(models.Model):
 class RequestItemPart(models.Model):
     id = models.AutoField(primary_key=True)
     request_item = models.ForeignKey('RequestItem', on_delete=models.PROTECT)
-    finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', on_delete=models.PROTECT)
+    finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'research_request_items_parts'
