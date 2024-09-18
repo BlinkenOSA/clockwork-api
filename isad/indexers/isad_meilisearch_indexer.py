@@ -63,8 +63,8 @@ class ISADMeilisearchIndexer:
         self.doc['archival_unit_theme'] = list(map(lambda t: t.theme, self.isad.archival_unit.theme.all()))
 
         # Search fields
-        if self.isad.title_original:
-            self.doc['title_original'] = self.isad.title_original
+        if self.isad.archival_unit.title_original:
+            self.doc['title_original'] = self.isad.archival_unit.title_original
 
         # Contents summary
         self.doc["contents_summary"] = self._get_contents_summary_search_values('en')
