@@ -53,6 +53,7 @@ class ISADMeilisearchIndexer:
         self.doc['call_number'] = self.isad.reference_code
 
         # Display field
+        self.doc['title'] = self.isad.title
         self.doc['record_origin'] = "Archives"
         self.doc['primary_type'] = "Archival Unit"
         self.doc['description_level'] = self._get_description_level()
@@ -62,7 +63,7 @@ class ISADMeilisearchIndexer:
         self.doc['parent_unit'] = self._get_parent_unit()
         self.doc['archival_unit_theme'] = list(map(lambda t: t.theme, self.isad.archival_unit.theme.all()))
 
-        # Search fields
+        # Title fields
         if self.isad.archival_unit.title_original:
             self.doc['title_original'] = self.isad.archival_unit.title_original
 
@@ -137,15 +138,6 @@ class ISADMeilisearchIndexer:
                 return None
         else:
             return None
-
-    def _get_title(self, locale):
-        if locale == 'en':
-            return self.isad.title
-        else:
-            if self.isad.archival_unit.original_locale_id == locale.upper():
-                return getattr(self.isad.archival_unit, "title_original")
-            else:
-                return None
 
     def _get_contents_summary_search_values(self, locale):
         values = []
