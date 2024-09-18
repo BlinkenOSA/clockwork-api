@@ -139,15 +139,6 @@ class ISADMeilisearchIndexer:
         else:
             return None
 
-    def _get_title(self, locale):
-        if locale == 'en':
-            return self.isad.title
-        else:
-            if self.isad.archival_unit.original_locale_id == locale.upper():
-                return getattr(self.isad.archival_unit, "title_original")
-            else:
-                return None
-
     def _get_contents_summary_search_values(self, locale):
         values = []
         if locale == 'en':
