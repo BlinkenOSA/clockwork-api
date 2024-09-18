@@ -50,13 +50,12 @@ class ISADMeilisearchIndexer:
     def _index_record(self):
         self.doc['id'] = self._get_meilisearch_id()
         self.doc['ams_id'] = self.isad.archival_unit.id
+        self.doc['call_number'] = self.isad.reference_code
 
         # Display field
         self.doc['record_origin'] = "Archives"
         self.doc['primary_type'] = "Archival Unit"
         self.doc['description_level'] = self._get_description_level()
-        self.doc['title_display'] = self.isad.title
-        self.doc['reference_code'] = self.isad.reference_code
         self.doc['date_created'] = self._get_date_created_display()
         self.doc['year_created'] = self._get_date_created_facet()
         self.doc['creator'] = self._get_creator()
@@ -64,16 +63,13 @@ class ISADMeilisearchIndexer:
         self.doc['archival_unit_theme'] = list(map(lambda t: t.theme, self.isad.archival_unit.theme.all()))
 
         # Search fields
-        self.doc["title"] = []
-        self.doc["title"].append(self._get_title("en"))
-        self.doc["title"].append(self._get_title("hu"))
-        self.doc["title"].append(self._get_title("ru"))
-        self.doc["title"].append(self._get_title("pl"))
+        if self.isad.title_original:
+            self.doc['title_original'] = self.isad.title_original
 
+        # Contents summary
         self.doc["contents_summary"] = self._get_contents_summary_search_values('en')
-        self.doc["contents_summary"] += self._get_contents_summary_search_values('hu')
-        self.doc["contents_summary"] += self._get_contents_summary_search_values('ru')
-        self.doc["contents_summary"] += self._get_contents_summary_search_values('pl')
+        if self.isad.original_locale:
+            self.doc["contents_summary_original"] = self._get_contents_summary_search_values(self.isad.original_locale.id)
 
     def _get_meilisearch_id(self):
         hashids = Hashids(salt="osaarchives", min_length=8)
@@ -154,16 +150,30 @@ class ISADMeilisearchIndexer:
     def _get_contents_summary_search_values(self, locale):
         values = []
         if locale == 'en':
-            values.append(strip_tags(self.isad.scope_and_content_abstract))
-            values.append(strip_tags(self.isad.scope_and_content_narrative))
-            values.append(strip_tags(self.isad.administrative_history))
-            values.append(strip_tags(self.isad.archival_history))
+            if self.isad.scope_and_content_abstract:
+                values.append(strip_tags(self.isad.scope_and_content_abstract))
+
+            if self.isad.scope_and_content_narrative:
+                values.append(strip_tags(self.isad.scope_and_content_narrative))
+
+            if self.isad.administrative_history:
+                values.append(strip_tags(self.isad.administrative_history))
+
+            if self.isad.archival_history:
+                values.append(strip_tags(self.isad.archival_history))
         else:
             if self.isad.original_locale_id == locale.upper():
-                values.append(self.isad.scope_and_content_abstract_original)
-                values.append(self.isad.scope_and_content_narrative_original)
-                values.append(self.isad.administrative_history_original)
-                values.append(self.isad.archival_history_original)
+                if self.isad.scope_and_content_abstract_original:
+                    values.append(self.isad.scope_and_content_abstract_original)
+
+                if self.isad.scope_and_content_narrative_original:
+                    values.append(self.isad.scope_and_content_narrative_original)
+
+                if self.isad.administrative_history_original:
+                    values.append(self.isad.administrative_history_original)
+
+                if self.isad.archival_history_original:
+                    values.append(self.isad.archival_history_original)
         return list(filter(lambda v: v and len(v) > 0, values))
 
     def _remove_duplicates(self):
