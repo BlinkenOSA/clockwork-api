@@ -17,17 +17,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['all']:
-            archival_units = ArchivalUnit.objects.filter()
-            counter = 0
-            for archival_unit in archival_units.iterator():
+            for archival_unit in ArchivalUnit.objects.all():
                 for fa in FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False).iterator():
                     indexer = FindingMeilisearchIndexer(fa.id)
                     if fa.published:
                         print("Indexing: %s" % fa.archival_reference_code)
                         indexer.index()
-                        counter += 1
                     else:
                         indexer.delete()
+                time.sleep(5)
 
         else:
             archival_unit = ArchivalUnit.objects.get(fonds=options['fonds'],
