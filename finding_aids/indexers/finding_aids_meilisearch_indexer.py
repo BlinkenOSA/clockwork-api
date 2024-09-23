@@ -123,13 +123,17 @@ class FindingMeilisearchIndexer:
         self.doc['folder_number'] = self.finding_aids_entity.folder_no
         self.doc['sequence_number'] = self.finding_aids_entity.sequence_no
 
-        # Counts
-        self.doc['subject'] = self._get_subjects()
-        self.doc['contributor'] = self._get_contributors()
-        self.doc['geo'] = self._get_geo()
+        # Facets
+        self.doc['subject'] = self._get_subjects(wikidata=True)
+        # self.doc['subject_wikidata'] = self._get_subjects(wikidata=True)
+        self.doc['contributor'] = self._get_contributors(wikidata=True)
+        # self.doc['contributor_wikidata'] = self._get_contributors(wikidata=True)
+        self.doc['geo'] = self._get_geo(wikidata=True)
+        # self.doc['geo_wikidata'] = self._get_geo(wikidata=True)
         self.doc['keyword'] = self._get_keywords()
         self.doc['year_created'] = self._get_date_created_facet()
-        self.doc['language'] = self._get_languages()
+        self.doc['language'] = self._get_languages(wikidata=True)
+        # self.doc['language_wikidata'] = self._get_languages(wikidata=True)
         self.doc['availability'] = self._get_availability()
         self.doc['series_facet'] = "%s - %s#%s" % (
             self.finding_aids_entity.archival_unit.reference_code,
@@ -222,25 +226,25 @@ class FindingMeilisearchIndexer:
     def _get_value_with_wikidata_id(self, obj):
         wikidata_id = getattr(obj, "wikidata_id")
         if wikidata_id:
-            return {
-                "value": str(obj),
-                "wikidata_id": wikidata_id
-            }
+            return "%s#%s" % (str(obj), wikidata_id)
         else:
-            return {
-                "value": str(obj),
-                "wikidata_id": None
-            }
+            return str(obj)
 
-    def _get_subjects(self):
+    def _get_subjects(self, wikidata=False):
         subjects = []
         # Subject people
         for person in self.finding_aids_entity.subject_person.all():
-            subjects.append(self._get_value_with_wikidata_id(person))
+            if wikidata:
+                subjects.append(self._get_value_with_wikidata_id(person))
+            else:
+                subjects.append(person)
 
         # Subject corporation
         for corporation in self.finding_aids_entity.subject_corporation.all():
-            subjects.append(self._get_value_with_wikidata_id(corporation))
+            if wikidata:
+                subjects.append(self._get_value_with_wikidata_id(corporation))
+            else:
+                subjects.append(corporation)
 
         return subjects
 
@@ -272,16 +276,22 @@ class FindingMeilisearchIndexer:
                 duration_string.append("%s sec." % seconds)
         return ' '.join(duration_string)
 
-    def _get_contributors(self):
+    def _get_contributors(self, wikidata=False):
         contributors = []
 
         # Associated person
         for ap in self.finding_aids_entity.findingaidsentityassociatedperson_set.all():
-            contributors.append(self._get_value_with_wikidata_id(ap.associated_person))
+            if wikidata:
+                contributors.append(self._get_value_with_wikidata_id(ap.associated_person))
+            else:
+                contributors.append(str(ap.associated_person))
 
         # Associated corporation
         for ac in self.finding_aids_entity.findingaidsentityassociatedcorporation_set.all():
-            contributors.append(self._get_value_with_wikidata_id(ac.associated_corporation))
+            if wikidata:
+                contributors.append(self._get_value_with_wikidata_id(ac.associated_corporation))
+            else:
+                contributors.append(str(ac.associated_corporation))
 
         return contributors
 
@@ -290,18 +300,27 @@ class FindingMeilisearchIndexer:
 
         # Spatial coverage country
         for country in self.finding_aids_entity.spatial_coverage_country.all():
-            geo.append(self._get_value_with_wikidata_id(country))
+            if wikidata:
+                geo.append(self._get_value_with_wikidata_id(country))
+            else:
+                geo.append(str(country))
 
         # Spatial coverage place
         for place in self.finding_aids_entity.spatial_coverage_place.all():
-            geo.append(self._get_value_with_wikidata_id(place))
+            if wikidata:
+                geo.append(self._get_value_with_wikidata_id(place))
+            else:
+                geo.append(str(place))
 
         return geo
 
     def _get_languages(self, wikidata=False):
         languages = []
         for fa_language in self.finding_aids_entity.findingaidsentitylanguage_set.all():
-            languages.append(self._get_value_with_wikidata_id(fa_language.language))
+            if wikidata:
+                languages.append(self._get_value_with_wikidata_id(fa_language.language))
+            else:
+                languages.append(str(fa_language.language))
         return languages
 
 

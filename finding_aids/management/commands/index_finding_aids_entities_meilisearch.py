@@ -25,7 +25,7 @@ class Command(BaseCommand):
                         indexer.index()
                     else:
                         indexer.delete()
-                time.sleep(5)
+                time.sleep(2)
 
         else:
             archival_unit = ArchivalUnit.objects.get(fonds=options['fonds'],
