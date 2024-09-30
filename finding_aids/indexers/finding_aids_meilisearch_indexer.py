@@ -124,16 +124,16 @@ class FindingMeilisearchIndexer:
         self.doc['sequence_number'] = self.finding_aids_entity.sequence_no
 
         # Facets
-        self.doc['subject'] = self._get_subjects(wikidata=True)
-        # self.doc['subject_wikidata'] = self._get_subjects(wikidata=True)
-        self.doc['contributor'] = self._get_contributors(wikidata=True)
-        # self.doc['contributor_wikidata'] = self._get_contributors(wikidata=True)
-        self.doc['geo'] = self._get_geo(wikidata=True)
-        # self.doc['geo_wikidata'] = self._get_geo(wikidata=True)
+        self.doc['subject'] = self._get_subjects(wikidata=False)
+        self.doc['subject_wikidata'] = self._get_subjects(wikidata=True)
+        self.doc['contributor'] = self._get_contributors(wikidata=False)
+        self.doc['contributor_wikidata'] = self._get_contributors(wikidata=True)
+        self.doc['geo'] = self._get_geo(wikidata=False)
+        self.doc['geo_wikidata'] = self._get_geo(wikidata=True)
         self.doc['keyword'] = self._get_keywords()
         self.doc['year_created'] = self._get_date_created_facet()
-        self.doc['language'] = self._get_languages(wikidata=True)
-        # self.doc['language_wikidata'] = self._get_languages(wikidata=True)
+        self.doc['language'] = self._get_languages(wikidata=False)
+        self.doc['language_wikidata'] = self._get_languages(wikidata=True)
         self.doc['availability'] = self._get_availability()
         self.doc['series_facet'] = "%s - %s#%s" % (
             self.finding_aids_entity.archival_unit.reference_code,
@@ -338,9 +338,9 @@ class FindingMeilisearchIndexer:
             if year_from > 0:
                 if year_to:
                     for year in range(year_from, year_to + 1):
-                        date.append(year)
+                        date.append(int(year))
                 else:
-                    date.append(str(year_from))
+                    date.append(int(year_from))
 
             return date
 

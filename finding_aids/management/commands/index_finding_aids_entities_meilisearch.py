@@ -23,6 +23,7 @@ class Command(BaseCommand):
                     if fa.published:
                         print("Indexing: %s" % fa.archival_reference_code)
                         indexer.index()
+                        pass
                     else:
                         indexer.delete()
                 time.sleep(2)
