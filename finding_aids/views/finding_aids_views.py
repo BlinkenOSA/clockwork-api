@@ -173,7 +173,10 @@ class FindingAidsGetNextFolder(APIView):
                 'archival_reference_code': reference_code
             })
         else:
-            fa_entities = FindingAidsEntity.objects.filter(container=container, description_level='F2', folder_no=folder_no)
+            fa_entities = FindingAidsEntity.objects.filter(
+                container=container,
+                description_level='L2',
+                folder_no=folder_no)
             sequence_no = fa_entities.count() + 1
             reference_code = "%s:%s/%s-%s" % (container.archival_unit.reference_code, container.container_no, folder_no, sequence_no)
             return Response({
