@@ -96,19 +96,33 @@ class FindingAidsNewCatalogIndexer:
         self.doc['description_level'] = self._get_description_level()
         self.doc['container_type'] = self.finding_aids_entity.container.carrier_type.type
 
-        if self.finding_aids_entity.access_rights:
-            self.doc['access_rights'] = self.finding_aids_entity.access_rights.statement
+        # Access Rights Confidential
+        if self.finding_aids_entity.confidential:
+            self.doc['access_rights'] = 'Confidential'
+        else:
+            if self.finding_aids_entity.access_rights:
+                self.doc['access_rights'] = self.finding_aids_entity.access_rights.statement
 
+        # Original Locale
         if self.finding_aids_entity.original_locale:
             self.doc['original_locale'] = self.finding_aids_entity.original_locale.id
 
-        self.doc['title'] = self.finding_aids_entity.title
-        self.doc['title_original'] = self.finding_aids_entity.title_original
-        self.doc['contents_summary'] = self.finding_aids_entity.contents_summary
-        self.doc['contents_summary_original'] = self.finding_aids_entity.contents_summary_original
-        self.doc['reference_code'] = self.finding_aids_entity.archival_reference_code
-        self.doc['date_created'] = self._get_date_created_display()
-        self.doc['info'] = self._get_info()
+        # Confidential
+        if self.finding_aids_entity.confidential:
+            if self.finding_aids_entity.confidential_display_text:
+                self.doc['title'] = self.finding_aids_entity.confidential_display_text
+            else:
+                self.doc['title'] = "The metadata of this document contains sensitive information."
+
+        # Normal fields
+        else:
+            self.doc['title'] = self.finding_aids_entity.title
+            self.doc['title_original'] = self.finding_aids_entity.title_original
+            self.doc['contents_summary'] = self.finding_aids_entity.contents_summary
+            self.doc['contents_summary_original'] = self.finding_aids_entity.contents_summary_original
+            self.doc['reference_code'] = self.finding_aids_entity.archival_reference_code
+            self.doc['date_created'] = self._get_date_created_display()
+            self.doc['info'] = self._get_info()
 
         # Digital Version related fields
         digital_version_info = self._get_digital_version_info()
@@ -130,34 +144,36 @@ class FindingAidsNewCatalogIndexer:
         self.doc['series_id'] = self.finding_aids_entity.archival_unit.id
 
         # Facet fields
-        self.doc['record_origin_facet'] = "Archives"
-        self.doc['primary_type_facet'] = self.finding_aids_entity.primary_type.type
-        self.doc['description_level_facet'] = self._get_description_level()
-        self.doc['subject_facet'] = self._get_subjects()
-        self.doc['subject_wikidata_facet'] = self._get_subjects(wikidata=True)
-        self.doc['contributor_facet'] = self._get_contributors()
-        self.doc['contributor_wikidata_facet'] = self._get_contributors(wikidata=True)
-        self.doc['geo_facet'] = self._get_geo()
-        self.doc['geo_wikidata_facet'] = self._get_geo(wikidata=True)
-        self.doc['keyword_facet'] = self._get_keywords()
-        self.doc['year_created_facet'] = self._get_date_created_facet()
-        self.doc['language_facet'] = self._get_languages()
-        self.doc['language_wikidata_facet'] = self._get_languages(wikidata=True)
-        self.doc['availability_facet'] = self._get_availability()
-        self.doc['series_facet'] = "%s - %s#%s" % (
-            self.finding_aids_entity.archival_unit.reference_code,
-            self.finding_aids_entity.archival_unit.title,
-            self.finding_aids_entity.archival_unit.id
-        )
+        if not self.finding_aids_entity.confidential:
+            self.doc['record_origin_facet'] = "Archives"
+            self.doc['primary_type_facet'] = self.finding_aids_entity.primary_type.type
+            self.doc['description_level_facet'] = self._get_description_level()
+            self.doc['subject_facet'] = self._get_subjects()
+            self.doc['subject_wikidata_facet'] = self._get_subjects(wikidata=True)
+            self.doc['contributor_facet'] = self._get_contributors()
+            self.doc['contributor_wikidata_facet'] = self._get_contributors(wikidata=True)
+            self.doc['geo_facet'] = self._get_geo()
+            self.doc['geo_wikidata_facet'] = self._get_geo(wikidata=True)
+            self.doc['keyword_facet'] = self._get_keywords()
+            self.doc['year_created_facet'] = self._get_date_created_facet()
+            self.doc['language_facet'] = self._get_languages()
+            self.doc['language_wikidata_facet'] = self._get_languages(wikidata=True)
+            self.doc['availability_facet'] = self._get_availability()
+            self.doc['series_facet'] = "%s - %s#%s" % (
+                self.finding_aids_entity.archival_unit.reference_code,
+                self.finding_aids_entity.archival_unit.title,
+                self.finding_aids_entity.archival_unit.id
+            )
 
         # Search fields
-        self.doc['identifier_search'] = self._get_identifiers()
-        self._get_search_field('title', 'title_search')
-        self._get_search_field('contents_summary', 'contents_summary_search')
-        self.doc['subject_search'] = self._get_subjects()
-        self.doc['contributor_search'] = self._get_contributors()
-        self.doc['geo_search'] = self._get_geo()
-        self.doc['keyword_search'] = self._get_keywords()
+        if not self.finding_aids_entity.confidential:
+            self.doc['identifier_search'] = self._get_identifiers()
+            self._get_search_field('title', 'title_search')
+            self._get_search_field('contents_summary', 'contents_summary_search')
+            self.doc['subject_search'] = self._get_subjects()
+            self.doc['contributor_search'] = self._get_contributors()
+            self.doc['geo_search'] = self._get_geo()
+            self.doc['keyword_search'] = self._get_keywords()
 
         # Sort fields
         self.doc["fonds_sort"] = self.finding_aids_entity.archival_unit.fonds
