@@ -81,7 +81,6 @@ class FindingAidsNewCatalogIndexer:
 
     def create_solr_document(self):
         self._index_record()
-        self._store_json()
         self._remove_duplicates()
 
     def _index_record(self):
@@ -439,6 +438,3 @@ class FindingAidsNewCatalogIndexer:
         for k, v in self.doc.items():
             if isinstance(v, list):
                 self.doc[k] = list(set(v))
-
-    def _store_json(self):
-        pass
