@@ -324,3 +324,34 @@ class FindingAidsEntityExtent(models.Model):
 
     class Meta:
         db_table = 'finding_aids_extents'
+
+
+class FindingAidsEntityRelatedMaterial(models.Model):
+    id = models.AutoField(primary_key=True)
+    source = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE, related_name='relationship_sources')
+    destination = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE, related_name='relationship_destinations')
+    relationship_source = models.CharField(max_length=300, blank=True, null=True)
+    relationship_destination = models.CharField(max_length=300, blank=True, null=True)
+
+    def save(self, **kwargs):
+        super(FindingAidsEntityRelatedMaterial, self).save()
+        # Save the other side of the relationship
+        related_material, created = FindingAidsEntityRelatedMaterial.objects.get_or_create(
+            source=self.destination,
+            destination=self.source
+        )
+        related_material.relationship_source = self.relationship_destination
+        related_material.relationship_destination = self.relationship_source
+        related_material.save()
+
+    def delete(self, using=None, keep_parents=False):
+        # Delete the other side of the relationship
+        FindingAidsEntityRelatedMaterial.objects.filter(
+            source=self.destination,
+            destination=self.source
+        ).delete()
+        super(FindingAidsEntityRelatedMaterial, self).delete()
+
+    class Meta:
+        db_table = 'finding_aids_related_materials'
+        unique_together = ('id', 'source', 'destination')

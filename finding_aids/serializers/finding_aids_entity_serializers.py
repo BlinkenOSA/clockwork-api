@@ -9,7 +9,8 @@ from container.models import Container
 from finding_aids.models import FindingAidsEntity, FindingAidsEntityAlternativeTitle, FindingAidsEntityDate, \
     FindingAidsEntityCreator, FindingAidsEntityPlaceOfCreation, FindingAidsEntitySubject, \
     FindingAidsEntityAssociatedPerson, FindingAidsEntityAssociatedCorporation, FindingAidsEntityAssociatedCountry, \
-    FindingAidsEntityAssociatedPlace, FindingAidsEntityLanguage, FindingAidsEntityExtent, FindingAidsEntityIdentifier
+    FindingAidsEntityAssociatedPlace, FindingAidsEntityLanguage, FindingAidsEntityExtent, FindingAidsEntityIdentifier, \
+    FindingAidsEntityRelatedMaterial
 
 
 class FindingAidsEntityExtentSerializer(serializers.ModelSerializer):
@@ -94,6 +95,12 @@ class FindingAidsEntityListSerializer(serializers.ModelSerializer):
                   'published', 'confidential', 'is_removable')
 
 
+class FindingAidsEntityRelatedMaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FindingAidsEntityRelatedMaterial
+        exclude = ('source',)
+
+
 class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     places_of_creation = FindingAidsEntityPlaceOfCreationSerializer(
         many=True, source='findingaidsentityplaceofcreation_set')
@@ -117,6 +124,9 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
     )
     languages = FindingAidsEntityLanguageSerializer(many=True, source='findingaidsentitylanguage_set')
     extents = FindingAidsEntityExtentSerializer(many=True, source='findingaidsentityextent_set')
+    related_materials = FindingAidsEntityRelatedMaterialSerializer(
+        many=True, source='relationship_sources'
+    )
     archival_unit_title = serializers.SerializerMethodField()
     container_title = serializers.SerializerMethodField()
     digital_version_exists_container = serializers.SerializerMethodField()
@@ -173,6 +183,9 @@ class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedMo
     )
     languages = FindingAidsEntityLanguageSerializer(many=True, source='findingaidsentitylanguage_set', required=False)
     extents = FindingAidsEntityExtentSerializer(many=True, source='findingaidsentityextent_set', required=False)
+    related_materials = FindingAidsEntityRelatedMaterialSerializer(
+        many=True, source='relationship_sources'
+    )
 
     def validate(self, data):
         date_from = data.get('date_from', None)
