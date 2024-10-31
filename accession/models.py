@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 import uuid as uuid
+
+from auditlog.registry import auditlog
 from django.db import models
 from django_date_extensions.fields import ApproximateDateField
 
@@ -76,3 +78,7 @@ class AccessionCopyrightStatus(models.Model):
     class Meta:
         db_table = 'accession_copyright_statuses'
         ordering = ['status']
+
+
+auditlog.register(Accession)
+auditlog.register(AccessionItem)

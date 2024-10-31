@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils import timezone
 from django_date_extensions.fields import ApproximateDateField
@@ -179,3 +180,18 @@ class IsadLocationOfCopies(models.Model):
 
     class Meta:
         db_table = 'isad_location_of_copies'
+
+
+auditlog.register(
+    Isad,
+    m2m_fields=['language'],
+    exclude_fields=[
+      'published',
+      'date_published', 'user_published',
+      'date_created', 'date_updated',
+      'user_created', 'user_updated',
+    ])
+auditlog.register(IsadCreator)
+auditlog.register(IsadExtent)
+auditlog.register(IsadCarrier)
+auditlog.register(IsadRelatedFindingAids)
