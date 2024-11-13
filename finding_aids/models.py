@@ -197,7 +197,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
             self.date_created = datetime.datetime.now()
         self.set_reference_code()
         if self.digital_version_exists and not self.digital_version_creation_date:
-            self.digital_version_creation_date = datetime.datetime.now()
+            self.digital_version_creation_date = datetime.date.today
         self.set_duration()
         if not self.catalog_id:
             self.set_catalog_id()
