@@ -43,6 +43,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'audit_log.middleware.SetUserMiddleware'
 ]
 
 ROOT_URLCONF = 'clockwork_api.urls'
