@@ -184,7 +184,7 @@ class FindingAidsEntityWriteSerializer(UserDataSerializerMixin, WritableNestedMo
     languages = FindingAidsEntityLanguageSerializer(many=True, source='findingaidsentitylanguage_set', required=False)
     extents = FindingAidsEntityExtentSerializer(many=True, source='findingaidsentityextent_set', required=False)
     related_materials = FindingAidsEntityRelatedMaterialSerializer(
-        many=True, source='relationship_sources'
+        many=True, source='relationship_sources', required=False
     )
 
     def validate(self, data):
