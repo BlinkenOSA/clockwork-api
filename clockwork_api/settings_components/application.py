@@ -31,8 +31,7 @@ INSTALLED_APPS = [
     'fixture_magic',
     'corsheaders',
     'djoser',
-    'drf_yasg',
-    'auditlog'
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
@@ -44,8 +43,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'auditlog.middleware.AuditlogMiddleware'
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'clockwork_api.urls'
