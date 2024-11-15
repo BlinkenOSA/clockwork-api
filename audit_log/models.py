@@ -11,11 +11,11 @@ class AuditLog(models.Model):
     ]
 
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, db_index=True)
-    action = models.CharField(max_length=10, choices=ACTION_CHOICES, db_index=True)
-    model_name = models.CharField(max_length=100, db_index=True)
-    object_id = models.PositiveIntegerField(blank=True, null=True, db_index=True)
-    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    model_name = models.CharField(max_length=100)
+    object_id = models.PositiveIntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
     changed_fields = models.JSONField(null=True, blank=True)  # Add this field
 
     class Meta:
