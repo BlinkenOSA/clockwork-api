@@ -7,6 +7,7 @@ class AuditLog(models.Model):
         ('CREATE', 'Create'),
         ('UPDATE', 'Update'),
         ('DELETE', 'Delete'),
+        ('CLONE', 'Create (Clone)'),
     ]
 
     id = models.AutoField(primary_key=True)

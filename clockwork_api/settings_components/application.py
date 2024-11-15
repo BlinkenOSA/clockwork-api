@@ -9,6 +9,7 @@ INSTALLED_APPS = [
     'accession',
     'accounts',
     'archival_unit',
+    'audit_log',
     'authority',
     'container',
     'controlled_list',

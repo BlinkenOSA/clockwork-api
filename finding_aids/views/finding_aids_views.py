@@ -7,6 +7,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.permissons.allowed_archival_unit_permission import AllowedArchivalUnitPermission
 from container.models import Container
@@ -81,16 +82,18 @@ class FindingAidsPreCreate(APIView):
         return Response(data)
 
 
-class FindingAidsCreate(generics.CreateAPIView):
+class FindingAidsCreate(AuditLogMixin, generics.CreateAPIView):
     serializer_class = FindingAidsEntityWriteSerializer
     permission_classes = [AllowedArchivalUnitPermission]
 
     def perform_create(self, serializer):
         container = get_object_or_404(Container, pk=self.kwargs.get('container_id', None))
-        serializer.save(container=container, archival_unit=container.archival_unit)
+        instance = serializer.save(container=container, archival_unit=container.archival_unit)
+        AuditLogMixin.log_audit_action(user=self.request.user, action='CREATE', instance=instance)
+        return instance
 
 
-class FindingAidsDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class FindingAidsDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = FindingAidsEntity.objects.all()
     permission_classes = [AllowedArchivalUnitPermission]
     method_serializer_classes = {
@@ -100,6 +103,7 @@ class FindingAidsDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPI
 
     def perform_destroy(self, instance):
         renumber_entries(instance, "delete")
+        AuditLogMixin.log_audit_action(user=self.request.user, action='DELETE', instance=instance)
         instance.delete()
 
 
@@ -122,6 +126,9 @@ class FindingAidsClone(APIView):
         clone.user_updated = None
         clone.date_updated = None
         clone.save()
+
+        AuditLogMixin.log_audit_action(user=request.user, action='CLONE', instance=clone)
+
         return Response(status=status.HTTP_200_OK)
 
 
