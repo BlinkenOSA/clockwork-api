@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import uuid as uuid
+
 from django.db import models
 from django_date_extensions.fields import ApproximateDateField
 
