@@ -24,6 +24,7 @@ urlpatterns = [
     path('v1/accession/', include('accession.urls', namespace='accession-v1')),
     path('v1/archival_unit/', include('archival_unit.urls', namespace='archival_unit-v1')),
     path('v1/authority_list/', include('authority.urls', namespace='authority-v1')),
+    path('v1/audit_log/', include('audit_log.urls', namespace='audit-log-v1')),
     path('v1/container/', include('container.urls', namespace='container-v1')),
     path('v1/controlled_list/', include('controlled_list.urls', namespace='controlled_list-v1')),
     path('v1/donor/', include('donor.urls', namespace='donor-v1')),
