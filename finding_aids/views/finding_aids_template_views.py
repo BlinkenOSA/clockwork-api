@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
+from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from container.models import Container
 from finding_aids.models import FindingAidsEntity
@@ -58,15 +59,17 @@ class FindingAidsTemplatePreCreate(APIView):
         return Response(data)
 
 
-class FindingAidsTemplateCreate(generics.CreateAPIView):
+class FindingAidsTemplateCreate(AuditLogMixin, generics.CreateAPIView):
     serializer_class = FindingAidsTemplateWriteSerializer
 
     def perform_create(self, serializer):
         archival_unit = get_object_or_404(ArchivalUnit, pk=self.kwargs.get('series_id', None))
-        serializer.save(archival_unit=archival_unit)
+        instance = serializer.save(archival_unit=archival_unit)
+        AuditLogMixin.log_audit_action(user=self.request.user, action='CREATE', instance=instance)
+        return instance
 
 
-class FindingAidsTemplateDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class FindingAidsTemplateDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = FindingAidsEntity.objects.filter(is_template=True)
     method_serializer_classes = {
         ('GET', ): FindingAidsEntityReadSerializer,

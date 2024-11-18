@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
 from clockwork_api.mixins.allowed_archival_unit_mixin import ListAllowedArchivalUnitMixin
+from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.permissons.allowed_archival_unit_permission import AllowedArchivalUnitPermission
 from isad.models import Isad
@@ -78,12 +79,12 @@ class IsadPreCreate(generics.RetrieveAPIView):
     serializer_class = IsadPreCreateSerializer
 
 
-class IsadCreate(generics.CreateAPIView):
+class IsadCreate(AuditLogMixin, generics.CreateAPIView):
     queryset = Isad.objects.all()
     serializer_class = IsadWriteSerializer
 
 
-class IsadDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class IsadDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [AllowedArchivalUnitPermission]
     queryset = Isad.objects.all()
     method_serializer_classes = {

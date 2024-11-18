@@ -8,6 +8,7 @@ from rest_framework.generics import get_object_or_404, RetrieveAPIView, Retrieve
 from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
+from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from mlr.models import MLREntity
 from mlr.serializers import MLRListSerializer, MLREntitySerializer
 
@@ -53,7 +54,7 @@ class MLRList(generics.ListAPIView):
         return qs
 
 
-class MLRDetail(RetrieveUpdateAPIView):
+class MLRDetail(AuditLogMixin, RetrieveUpdateAPIView):
     queryset = MLREntity.objects.all()
     serializer_class = MLREntitySerializer
 

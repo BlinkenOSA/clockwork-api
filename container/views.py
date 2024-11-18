@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
+from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from container.models import Container
 from container.serializers import ContainerReadSerializer, ContainerWriteSerializer, ContainerSelectSerializer, \
@@ -29,7 +30,7 @@ class ContainerPreCreate(APIView):
         return Response(response)
 
 
-class ContainerCreate(generics.CreateAPIView):
+class ContainerCreate(AuditLogMixin, generics.CreateAPIView):
     serializer_class = ContainerWriteSerializer
 
 
@@ -52,7 +53,7 @@ class ContainerList(generics.ListAPIView):
             return Container.objects.none()
 
 
-class ContainerDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class ContainerDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Container.objects.all()
     method_serializer_classes = {
         ('GET', ): ContainerReadSerializer,
@@ -64,6 +65,7 @@ class ContainerDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIVi
         containers = Container.objects.filter(
             archival_unit=archival_unit,
             container_no__gt=instance.container_no).order_by('container_no')
+        AuditLogMixin.log_audit_action(user=self.request.user, action='DELETE', instance=instance)
         instance.delete()
         for container in containers.iterator():
             container.container_no -= 1
@@ -99,7 +101,7 @@ class ContainerPublish(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class ContainerDetailByBarcode(MethodSerializerMixin, generics.RetrieveUpdateAPIView):
+class ContainerDetailByBarcode(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateAPIView):
     queryset = Container.objects.all()
     serializer_class = ContainerReadSerializer
     lookup_field = 'barcode'
