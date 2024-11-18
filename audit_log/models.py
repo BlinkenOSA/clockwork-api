@@ -20,6 +20,7 @@ class AuditLog(models.Model):
 
     class Meta:
         db_table = 'audit_logs'
+        ordering = ["-timestamp"]
 
     def __str__(self):
         return f"{self.user} {self.action} {self.model_name} (ID: {self.object_id})"
