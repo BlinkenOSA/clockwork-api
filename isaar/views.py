@@ -3,13 +3,14 @@ from rest_framework.filters import SearchFilter
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
+from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from isaar.models import Isaar, IsaarRelationship, IsaarPlaceQualifier
 from isaar.serializers import IsaarSelectSerializer, IsaarReadSerializer, IsaarWriteSerializer, IsaarListSerializer, \
     IsaarRelationshipSerializer, IsaarPlaceQualifierSerializer
 
 
-class IsaarList(MethodSerializerMixin, generics.ListCreateAPIView):
+class IsaarList(AuditLogMixin, MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = Isaar.objects.all()
     method_serializer_classes = {
         ('GET', ): IsaarListSerializer,
@@ -21,7 +22,7 @@ class IsaarList(MethodSerializerMixin, generics.ListCreateAPIView):
     search_fields = ('name',)
 
 
-class IsaarDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class IsaarDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Isaar.objects.all()
     method_serializer_classes = {
         ('GET', ): IsaarReadSerializer,

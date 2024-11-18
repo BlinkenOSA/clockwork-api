@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 
+from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from donor.models import Donor
 from donor.serializers import DonorSelectSerializer, DonorReadSerializer, DonorWriteSerializer, DonorListSerializer
@@ -24,7 +25,7 @@ class DonorFilterClass(filters.FilterSet):
         fields = ['search']
 
 
-class DonorList(MethodSerializerMixin, generics.ListCreateAPIView):
+class DonorList(AuditLogMixin, MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = Donor.objects.all().order_by('name')
     filterset_class = DonorFilterClass
     filter_backends = [OrderingFilter, filters.DjangoFilterBackend]
@@ -36,7 +37,7 @@ class DonorList(MethodSerializerMixin, generics.ListCreateAPIView):
     }
 
 
-class DonorDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class DonorDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Donor.objects.all()
     method_serializer_classes = {
         ('GET', ): DonorReadSerializer,

@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from accession.models import Accession
 from accession.serializers import AccessionSelectSerializer, AccessionListSerializer, \
     AccessionReadSerializer, AccessionWriteSerializer
+from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 
 
@@ -41,7 +42,7 @@ class AccessionFilterClass(filters.FilterSet):
         fields = ['search', 'transfer_year', 'fonds']
 
 
-class AccessionList(MethodSerializerMixin, generics.ListCreateAPIView):
+class AccessionList(AuditLogMixin, MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = Accession.objects.all()
     filterset_class = AccessionFilterClass
     filter_backends = [OrderingFilter, filters.DjangoFilterBackend]
@@ -62,7 +63,7 @@ class AccessionPreCreate(APIView):
         return Response(response)
 
 
-class AccessionDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class AccessionDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Accession.objects.all()
     method_serializer_classes = {
         ('GET', ): AccessionReadSerializer,
