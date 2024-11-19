@@ -9,6 +9,7 @@ from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnit
     ArchivalUnitWriteSerializer, ArchivalUnitFondsSerializer, ArchivalUnitSeriesSerializer, \
     ArchivalUnitPreCreateSerializer
 from clockwork_api.mixins.allowed_archival_unit_mixin import ListAllowedArchivalUnitMixin
+from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 
 
@@ -34,7 +35,7 @@ class ArchivalUnitPreCreate(generics.RetrieveAPIView):
     serializer_class = ArchivalUnitPreCreateSerializer
 
 
-class ArchivalUnitList(MethodSerializerMixin, generics.ListCreateAPIView):
+class ArchivalUnitList(AuditLogMixin, MethodSerializerMixin, generics.ListCreateAPIView):
     queryset = ArchivalUnit.objects.filter(level='F')
     method_serializer_classes = {
         ('GET', ): ArchivalUnitFondsSerializer,
@@ -44,7 +45,7 @@ class ArchivalUnitList(MethodSerializerMixin, generics.ListCreateAPIView):
     filterset_class = ArchivalUnitFilterClass
 
 
-class ArchivalUnitDetail(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class ArchivalUnitDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = ArchivalUnit.objects.all()
     method_serializer_classes = {
         ('GET', ): ArchivalUnitReadSerializer,
