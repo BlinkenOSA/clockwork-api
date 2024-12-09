@@ -1,7 +1,8 @@
 from django.urls.conf import path, re_path
 
 from research.views.requests_views import RequestsList, RequestsListForPrint, \
-    RequestSeriesSelect, RequestContainerSelect, RequestsCreate, RequestItemStatusStep, RequestItemRetrieveUpdate
+    RequestSeriesSelect, RequestContainerSelect, RequestsCreate, RequestItemStatusStep, RequestItemRetrieveUpdate, \
+    RequestLibraryMLR
 from research.views.researcher_views import ResearcherList, ResearcherDetail, ResearcherSelectList, \
     ResearcherCountrySelectList, ResearcherNationalitySelectList, ResearcherActivate, ResearcherApprove, \
     ResearcherCountryActiveSelectList, ResearcherNationalityActiveSelectList
@@ -32,6 +33,9 @@ urlpatterns = [
             name='request-item-status-change'),
     path('requests/series/select/', RequestSeriesSelect.as_view(), name='requests-series-select'),
     path('requests/container/select/<int:series_id>', RequestContainerSelect.as_view(), name='requests-container-select'),
+
+    # MLR info from the library record
+    path('requests/library/mlr/<int:koha_id>', RequestLibraryMLR.as_view(), name='requests-library-mlr'),
 
     path('request_item/<int:pk>/', RequestItemRetrieveUpdate.as_view(), name='request-item-update'),
 
