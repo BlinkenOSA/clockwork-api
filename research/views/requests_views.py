@@ -177,4 +177,36 @@ class RequestLibraryMLR(APIView):
             response = r.json()
             if response['response']['numFound'] > 0:
                 marc = json.loads(response['response']['docs'][0]['marc'])
-                return 'a'
+                field580 = list(filter(lambda x: '580' in x, marc['fields']))
+                items = list(filter(lambda x: '952' in x, marc['fields']))
+
+                locations = self._get_locations(items)
+                collections = self._get_collections(field580)
+
+                if len(locations) == 0:
+                    return Response(", ".join(collections))
+
+                if len(collections) == 0:
+                    return Response(", ".join(locations))
+
+                return Response('%s / %s' % (", ".join(collections), ", ".join(locations)))
+        else:
+            Response(status=r.status_code)
+
+    def _get_locations(self, items):
+        locations = set()
+        for item in items:
+            subfields = list(filter(lambda sf: 'c' in sf, item['952']['subfields']))
+            if subfields:
+                locations.add(subfields[0]['c'])
+            else:
+                locations.add("General collection")
+        return locations
+
+    def _get_collections(self, fields):
+        collections = set()
+        for field in fields:
+            for sf in field['580']['subfields']:
+                if 'a' in sf:
+                    collections.add(sf['a'])
+        return collections
