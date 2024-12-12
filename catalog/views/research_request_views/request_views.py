@@ -55,6 +55,7 @@ class ResearcherRequestView(APIView):
                         item_origin=item['origin'],
                         title=item['title'],
                         identifier=item['call_number'],
+                        library_id=item['library_id'],
                         quantity=item['volume'] if 'volume' in item.keys() else ''
                     )
 
