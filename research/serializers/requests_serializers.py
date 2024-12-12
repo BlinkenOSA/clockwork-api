@@ -112,7 +112,7 @@ class ContainerListSerializer(serializers.ModelSerializer):
 class RequestItemCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItem
-        fields = ('id', 'item_origin', 'container', 'identifier', 'title')
+        fields = ('id', 'item_origin', 'container', 'identifier', 'library_id', 'title')
 
 
 class RequestCreateSerializer(WritableNestedModelSerializer):

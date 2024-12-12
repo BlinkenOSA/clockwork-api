@@ -1,7 +1,12 @@
 import datetime
+import json
 
-from django.db.models import Q
+import requests
+from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
+from pymarc import MARCReader
+from pymarc.reader import JSONReader
+from requests.auth import HTTPBasicAuth
 from rest_framework import generics, status
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import get_object_or_404, CreateAPIView
@@ -18,7 +23,7 @@ from research.models import RequestItem, Request
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
     RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer
 from django_filters import rest_framework as filters
-
+from hashids import Hashids
 
 class RequestFilterClass(filters.FilterSet):
     researcher = filters.CharFilter(label='Researcher', method='filter_researcher')
@@ -153,3 +158,55 @@ class RequestContainerSelect(generics.ListAPIView):
     def get_queryset(self):
         series_id = self.kwargs['series_id']
         return Container.objects.filter(archival_unit__id=series_id).order_by('container_no')
+
+
+class RequestLibraryMLR(APIView):
+    def get(self, request, *args, **kwargs):
+        koha_id = self.kwargs['koha_id']
+        hashids = Hashids(salt="osalibrary", min_length=8)
+        solr_id = hashids.encode(int(koha_id))
+
+        solr_core = getattr(settings, "SOLR_CORE_CATALOG_NEW", "catalog")
+        solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), solr_core)
+
+        r = requests.get(
+            url="%s/select?q=id:%s" % (solr_url, solr_id),
+            auth=HTTPBasicAuth(getattr(settings, 'SOLR_USERNAME'), getattr(settings, 'SOLR_PASSWORD'))
+        )
+        if r.status_code == 200:
+            response = r.json()
+            if response['response']['numFound'] > 0:
+                marc = json.loads(response['response']['docs'][0]['marc'])
+                field580 = list(filter(lambda x: '580' in x, marc['fields']))
+                items = list(filter(lambda x: '952' in x, marc['fields']))
+
+                locations = self._get_locations(items)
+                collections = self._get_collections(field580)
+
+                if len(locations) == 0:
+                    return Response(", ".join(collections))
+
+                if len(collections) == 0:
+                    return Response(", ".join(locations))
+
+                return Response('%s / %s' % (", ".join(collections), ", ".join(locations)))
+        else:
+            Response(status=r.status_code)
+
+    def _get_locations(self, items):
+        locations = set()
+        for item in items:
+            subfields = list(filter(lambda sf: 'c' in sf, item['952']['subfields']))
+            if subfields:
+                locations.add(subfields[0]['c'])
+            else:
+                locations.add("General collection")
+        return locations
+
+    def _get_collections(self, fields):
+        collections = set()
+        for field in fields:
+            for sf in field['580']['subfields']:
+                if 'a' in sf:
+                    collections.add(sf['a'])
+        return collections

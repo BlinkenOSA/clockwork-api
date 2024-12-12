@@ -116,6 +116,7 @@ class RequestItem(models.Model):
     item_origin = models.CharField(max_length=3, choices=ORIGIN)
     container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.CASCADE)
     identifier = models.CharField(max_length=100, blank=True, null=True)
+    library_id = models.IntegerField(blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
     quantity = models.CharField(max_length=200, blank=True, null=True)
     return_date = models.DateTimeField(blank=True, null=True)
