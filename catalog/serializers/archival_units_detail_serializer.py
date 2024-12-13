@@ -144,9 +144,11 @@ class ArchivalUnitsFacetQuerySerializer(serializers.ModelSerializer):
         return self._clean_field(obj.archival_history)
 
     def _clean_field(self, data):
-        CLEANR = re.compile('<.*?>')
-        cleantext = re.sub(CLEANR, '', data)
-        return cleantext
+        if data:
+            CLEANR = re.compile('<.*?>')
+            cleantext = re.sub(CLEANR, '', data)
+            return cleantext
+        return data
 
     class Meta:
         model = Isad
