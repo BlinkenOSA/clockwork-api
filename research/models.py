@@ -185,10 +185,6 @@ class RequestItemRestriction(models.Model):
 
     conditions_accepted = models.BooleanField(default=False)
 
-    approved = models.BooleanField(default=False)
-    approved_date = models.DateTimeField(blank=True, null=True)
-    approved_by = models.CharField(max_length=100, blank=True)
-
     class Meta:
         db_table = 'research_request_items_restrictions'
 
@@ -197,6 +193,10 @@ class RequestItemPart(models.Model):
     id = models.AutoField(primary_key=True)
     request_item = models.ForeignKey('RequestItem', on_delete=models.PROTECT)
     finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', on_delete=models.CASCADE)
+
+    approved = models.BooleanField(default=False)
+    approved_date = models.DateTimeField(blank=True, null=True)
+    approved_by = models.CharField(max_length=100, blank=True)
 
     class Meta:
         db_table = 'research_request_items_parts'
