@@ -16,6 +16,7 @@ class RequestItemSerializer(serializers.Serializer):
     call_number = serializers.CharField(required=False, allow_blank=True)
     volume = serializers.CharField(required=False, allow_blank=True)
     digital_version = serializers.CharField(required=False, allow_blank=True)
+    restricted = serializers.BooleanField(required=False, allow_null=True, default=False)
 
     def validate(self, data):
         origin = data.get('origin', None)
@@ -54,6 +55,8 @@ class ResearchRequestSerializer(serializers.Serializer):
     request_date = serializers.DateField(required=True)
     items = RequestItemSerializer(many=True)
     captcha = HCaptchaField(required=True)
+    research_subject = serializers.CharField(required=False)
+    motivation = serializers.CharField(required=False)
 
     def validate_card_number(self, value):
         try:

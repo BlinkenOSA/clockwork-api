@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br>
+
+        <h2>A new request with restricted content has been made!</h2>
+
+        <h3>Request Data</h3>
+        <p>
+            <strong>Researcher:</strong> {{ researcher.last_name }}, {{ researcher.first_name }}<br/>
+            <strong>Request Date:</strong> {{ request.request_date }}
+        </p>
+
+        <h3>The following restricted items were requested:</h3>
+        <p>
+            <ul>
+                {% for item in items %}
+                    {% if item.restricted %}
+                        <li>
+                            <strong>Title:</strong> {{ item.title }}<br/>
+                            <strong>Call Number:</strong> {{ item.call_number }}<br/>
+                            <strong>Origin:</strong> {{ item.origin }}<br/>
+                            {% if item.volume %}
+                                <strong>Volumes:</strong> {{ item.volume }}<br/>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                    <br/>
+                {% endfor %}
+            </ul>
+        </p>
+
+        {% if has_restricted_content %}
+            <p>
+            <strong>Research Subject:</strong> {{ research_subject }}<br/>
+            <strong>Motivation:</strong> {{ motivation }}
+        </p>
+
+        {% endif %}
+        <p>
+            Regards,<br/>
+            Blinken OSA Archivum - AMS
+        </p>
+    </body>
+</html>

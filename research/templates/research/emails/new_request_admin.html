@@ -22,6 +22,9 @@
                         {% if item.volume %}
                             <strong>Volumes:</strong> {{ item.volume }}<br/>
                         {% endif %}
+                        {% if item.restricted %}
+                            (THIS ITEM IS RESTRICTED *)
+                        {% endif %}
                     </li>
                     <br/>
                 {% endfor %}

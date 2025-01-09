@@ -194,9 +194,12 @@ class RequestItemPart(models.Model):
     request_item = models.ForeignKey('RequestItem', on_delete=models.PROTECT)
     finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', on_delete=models.CASCADE)
 
-    approved = models.BooleanField(default=False)
-    approved_date = models.DateTimeField(blank=True, null=True)
-    approved_by = models.CharField(max_length=100, blank=True)
+    STATUS_CHOICES = [('new', 'New'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('lifted', 'Lifted')]
+    status = models.CharField(max_length=8, choices=RequestItem.STATUS_VALUES, default='new', db_index=True)
+
+    # If restricted, this field will be filled
+    decision_date = models.DateTimeField(blank=True, null=True)
+    decision_by = models.CharField(max_length=100, blank=True)
 
     class Meta:
         db_table = 'research_request_items_parts'

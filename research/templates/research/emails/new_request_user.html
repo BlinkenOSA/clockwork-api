@@ -24,11 +24,22 @@
                         <strong>Title:</strong> {{ item.title }}<br/>
                         <strong>Call Number:</strong> {{ item.call_number }}<br/>
                         <strong>Origin:</strong> {{ item.origin }}<br/>
+                        {% if item.restricted %}
+                            (THIS ITEM IS RESTRICTED *)
+                        {% endif %}
                     </li>
                     <br/>
                 {% endfor %}
             </ul>
         </p>
+
+        {% if has_restricted_content %}
+            <p>
+                * Serving restricted materials are going through an individual assessment.
+                It can take extra time to process your request. We will contact you if we
+                need further information to process your request.
+            </p>
+        {% endif %}
 
         <p>
             Regards,<br/>
