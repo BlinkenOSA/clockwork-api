@@ -55,8 +55,8 @@ class ResearchRequestSerializer(serializers.Serializer):
     request_date = serializers.DateField(required=True)
     items = RequestItemSerializer(many=True)
     captcha = HCaptchaField(required=True)
-    research_subject = serializers.CharField(required=False)
-    motivation = serializers.CharField(required=False)
+    research_subject = serializers.CharField(required=False, allow_blank=True)
+    motivation = serializers.CharField(required=False, allow_blank=True)
 
     def validate_card_number(self, value):
         try:
