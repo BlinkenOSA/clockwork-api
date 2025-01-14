@@ -30,7 +30,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     level = models.CharField(max_length=1, choices=FINDING_AIDS_LEVEL, default='F')
 
     # Template fields
-    is_template = models.BooleanField(default=False)
+    is_template = models.BooleanField(default=False, db_index=True)
     template_name = models.CharField(max_length=100, blank=True, null=True)
 
     # Required fields

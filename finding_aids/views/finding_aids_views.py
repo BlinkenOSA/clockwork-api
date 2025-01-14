@@ -33,10 +33,10 @@ class FindingAidsPreCreate(APIView):
 
     def get(self, request, *args, **kwargs):
         container = get_object_or_404(Container, pk=self.kwargs.get('container_id', None))
-        description_level = self.kwargs.get('description_level', 'L1')
-        folder_no = self.kwargs.get('folder_no', 0)
-        level = self.kwargs.get('level', 'F')
-        guid = self.kwargs.get('uuid', uuid.uuid4())
+        description_level = self.request.query_params.get('description_level', 'L1')
+        folder_no = self.request.query_params.get('folder_no', 0)
+        level = self.request.query_params.get('level', 'F')
+        guid = self.request.query_params.get('uuid', uuid.uuid4())
 
         if description_level == 'L1':
             fa_entities = FindingAidsEntity.objects.filter(container=container, level=level)

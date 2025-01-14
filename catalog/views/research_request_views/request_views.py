@@ -14,6 +14,9 @@ class ResearcherRequestView(APIView):
 
     def post(self, request):
         serializer = ResearchRequestSerializer(data=request.data)
+
+        has_restricted_content = False
+
         if serializer.is_valid():
             data = serializer.data
             researcher = Researcher.objects.get(id=data['researcher'])
@@ -41,13 +44,17 @@ class ResearcherRequestView(APIView):
                         request_item=request_item,
                         finding_aids_entity=finding_aids_entity
                     )
+
+                    # Handle restriction
                     if finding_aids_entity.restricted:
+                        has_restricted_content = True
                         request_item_restriction, created = RequestItemRestriction.objects.get_or_create(
                             request_item=request_item
                         )
-                        if created:
-                            # Send out email about the restricted form stuff
-                            pass
+                        # Set the restriction data
+                        request_item_restriction.research_subject = data['research_subject']
+                        request_item_restriction.motivation = data['motivation']
+                        request_item_restriction.save()
 
                 else:
                     request_item, created = RequestItem.objects.get_or_create(
@@ -59,19 +66,27 @@ class ResearcherRequestView(APIView):
                         quantity=item['volume'] if 'volume' in item.keys() else ''
                     )
 
-            # Email template
+            # Notification email template
             mail = EmailWithTemplate(
                 researcher=researcher,
                 context={
                     'researcher': researcher,
                     'request': request,
-                    'items': items
+                    'items': items,
+                    'has_restricted_content': has_restricted_content,
+                    'research_subject': data['research_subject'] if 'research_subject' in data else '',
+                    'motivation': data['motivation'] if 'motivation' in data else ''
                 }
             )
 
             # Send out admin email.
             mail.send_new_request_admin()
             mail.send_new_request_user()
+
+            # Send out restricted content email to decision makers
+            if has_restricted_content:
+                mail.send_new_request_restricted_decision_maker()
+
             return Response('ok', status=HTTP_200_OK)
         else:
             return Response(serializer.errors, status=404)

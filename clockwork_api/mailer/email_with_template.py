@@ -7,6 +7,7 @@ from django.conf import settings
 class EmailWithTemplate:
     def __init__(self, researcher, context):
         self.staff_emails = getattr(settings, 'RESEARCH_ROOM_STAFF_EMAIL')
+        self.restricted_decision_maker_emails = getattr(settings, 'RESTRICTED_DECISION_MAKER_EMAIL')
         self.researcher = researcher
         self.template = ""
         self.context = context
@@ -31,6 +32,14 @@ class EmailWithTemplate:
         self.template = "new_request_user"
         self._send_mail('user')
 
+    def send_new_request_restricted_decision_maker(self):
+        self.template = "new_request_restricted_decision_maker"
+        self._send_mail('restricted_decision_maker')
+
+    def send_new_request_restricted_decision_user(self):
+        self.template = "new_request_restricted_decision_user"
+        self._send_mail('user')
+
     def send_request_delivered_user(self):
         self.template = "request_delivered_user"
         self._send_mail('user')
@@ -43,6 +52,8 @@ class EmailWithTemplate:
         message = get_template("research/emails/%s.html" % self.template).render(self.context)
         if to == 'user':
             to_address = [self.researcher.email]
+        elif to == 'restricted_decision_maker':
+            to_address = self.restricted_decision_maker_emails
         else:
             to_address = self.staff_emails
         mail = EmailMessage(
@@ -77,6 +88,14 @@ class EmailWithTemplate:
         if self.template == 'new_request_user':
             return "Request confirmation"
 
+        # New Request with restricted content
+        if self.template == 'new_request_restricted_decision_maker':
+            return "New request with restricted content arrived!"
+
+        if self.template == 'new_request_restricted_decision_user':
+            return "Decision about requesting restricted content!"
+
         # Request Item status change
         if self.template == 'request_delivered_user':
             return "Requested items are prepared"
+

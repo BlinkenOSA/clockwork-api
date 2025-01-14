@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br>
+
+        <h2>Dear {{ researcher.last_name }}, {{ researcher.first_name }},</h2>
+
+        <p>
+            The Archivum has reviewed your request for review of access to the following document:<br/>
+
+            <strong>{{ archival_reference_code }} - {{ title }}</strong>
+        </p>
+
+        <p>
+            And made the following decision: <strong>{{ decision }}</strong>
+        </p>
+
+        <p>
+            If you requested a restricted document from an Open Society Foundations or Central European University
+            archival fonds and were granted access, you will be required to sign a Non-Disclosure Agreement
+            prior to starting your research. <br/>
+            Please let us know if you have further questions regarding this request at archivum@ceu.edu.
+        </p>
+
+        <p>
+            Thank you!<br/><br/>
+            Reference Services</br>
+            Blinken OSA Archivum
+        </p>
+    </body>
+</html>

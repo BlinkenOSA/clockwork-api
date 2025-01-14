@@ -173,7 +173,7 @@ class RequestItem(models.Model):
 
 class RequestItemRestriction(models.Model):
     id = models.AutoField(primary_key=True)
-    request_item = models.OneToOneField('RequestItem', on_delete=models.CASCADE)
+    request_item = models.OneToOneField('RequestItem', on_delete=models.CASCADE, related_name='restriction')
 
     # Restricted material
     restricted_uuid = models.UUIDField(default=uuid.uuid4, db_index=True)
@@ -185,10 +185,6 @@ class RequestItemRestriction(models.Model):
 
     conditions_accepted = models.BooleanField(default=False)
 
-    approved = models.BooleanField(default=False)
-    approved_date = models.DateTimeField(blank=True, null=True)
-    approved_by = models.CharField(max_length=100, blank=True)
-
     class Meta:
         db_table = 'research_request_items_restrictions'
 
@@ -197,6 +193,13 @@ class RequestItemPart(models.Model):
     id = models.AutoField(primary_key=True)
     request_item = models.ForeignKey('RequestItem', on_delete=models.PROTECT)
     finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', on_delete=models.CASCADE)
+
+    STATUS_CHOICES = [('new', 'New'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('lifted', 'Lifted')]
+    status = models.CharField(max_length=8, choices=RequestItem.STATUS_VALUES, default='new', db_index=True)
+
+    # If restricted, this field will be filled
+    decision_date = models.DateTimeField(blank=True, null=True)
+    decision_by = models.CharField(max_length=100, blank=True)
 
     class Meta:
         db_table = 'research_request_items_parts'

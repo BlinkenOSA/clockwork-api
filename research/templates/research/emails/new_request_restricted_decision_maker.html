@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br>
+
+        <h2>Dear Access Review Committee,</h2>
+
+        <p>
+            Researcher <strong>{{ researcher.last_name }}, {{ researcher.first_name }}</strong> has requested the
+            restricted documents shown below, and provided the following explanation:
+        </p>
+
+        <p>
+            <ul>
+                {% for item in items %}
+                    {% if item.restricted %}
+                        <li>
+                            <strong>Title:</strong> {{ item.title }}<br/>
+                            <strong>Call Number:</strong> {{ item.call_number }}<br/>
+                            <strong>Origin:</strong> {{ item.origin }}<br/>
+                            {% if item.volume %}
+                                <strong>Volumes:</strong> {{ item.volume }}<br/>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                    <br/>
+                {% endfor %}
+            </ul>
+        </p>
+
+        {% if has_restricted_content %}
+            <p>
+                <strong>Research Subject:</strong> {{ research_subject }}<br/>
+                <strong>Motivation:</strong> {{ motivation }}
+            </p>
+        {% endif %}
+
+        <p>
+            Please review their request and make your decision known to the researcher
+            <u>within 72 hours of receiving this notification.</u>
+        </p>
+
+        <p>
+            Thank you!<br/><br/>
+            Reference Services</br>
+            Blinken OSA Archivum
+        </p>
+    </body>
+</html>

@@ -10,6 +10,7 @@ from research.views.researcher_visit_views import ResearcherVisitsList, Research
     ResearcherVisitsCheckIn
 from research.views.researcher_degree_views import ResearcherDegreeList, ResearcherDegreeDetail, \
     ResearcherDegreeSelectList
+from research.views.restricted_requests_views import RestrictedRequestsList, RestrictedRequestAction
 
 app_name = 'research'
 
@@ -33,6 +34,11 @@ urlpatterns = [
             name='request-item-status-change'),
     path('requests/series/select/', RequestSeriesSelect.as_view(), name='requests-series-select'),
     path('requests/container/select/<int:series_id>', RequestContainerSelect.as_view(), name='requests-container-select'),
+
+    # Restricted requests
+    path('restricted-requests', RestrictedRequestsList.as_view(), name='restricted-requests-list'),
+    re_path(r'restricted-requests/(?P<action>["approve"|"reject"|"lift"|"reset"]+)/(?P<request_item_part_id>[0-9]+)/$',
+            RestrictedRequestAction.as_view(), name='restricted-requests-action'),
 
     # MLR info from the library record
     path('requests/library/mlr/<int:koha_id>', RequestLibraryMLR.as_view(), name='requests-library-mlr'),

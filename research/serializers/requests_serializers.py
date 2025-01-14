@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
@@ -20,7 +21,7 @@ class RequestItemPartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RequestItemPart
-        fields = ['finding_aids_entity', 'reference_code', 'is_restricted']
+        fields = ['finding_aids_entity', 'reference_code', 'is_restricted', 'status']
 
 
 class RequestListSerializer(serializers.ModelSerializer):
@@ -32,6 +33,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     archival_reference_number = serializers.SerializerMethodField()
     mlr = serializers.SerializerMethodField()
     has_restricted_content = serializers.SerializerMethodField()
+    research_allowed = serializers.SerializerMethodField()
     has_digital_version = serializers.SerializerMethodField()
     digital_version_barcode = serializers.SerializerMethodField()
     parts = RequestItemPartSerializer(source='requestitempart_set', many=True)
@@ -70,12 +72,30 @@ class RequestListSerializer(serializers.ModelSerializer):
     def get_has_restricted_content(self, obj):
         return obj.requestitempart_set.filter(finding_aids_entity__access_rights__statement='Restricted').count() > 0
 
+    def get_research_allowed(self, obj):
+        count_total = obj.requestitempart_set.count()
+        count_not_restricted = obj.requestitempart_set.filter(finding_aids_entity__access_rights__statement='Not restricted').count()
+        count_new = obj.requestitempart_set.filter(Q(status='new')).count()
+        count_approved = obj.requestitempart_set.filter(Q(status='approved')).count()
+
+        # If all the records are not restricted
+        if count_not_restricted == count_total:
+            return True
+
+        if count_not_restricted > 0 and count_new == 0:
+            return True
+
+        # If there is at least one approved and no new one
+        if count_approved > 0 and count_new == 0:
+            return True
+
+        return False
+
     def get_has_digital_version(self, obj):
         if obj.container:
             return obj.container.digital_version_exists
         else:
             return False
-
 
     def get_digital_version_barcode(self, obj):
         if obj.container:
