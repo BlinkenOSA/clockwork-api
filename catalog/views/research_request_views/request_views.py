@@ -51,11 +51,10 @@ class ResearcherRequestView(APIView):
                         request_item_restriction, created = RequestItemRestriction.objects.get_or_create(
                             request_item=request_item
                         )
-                        if created:
-                            # Set the restriction data
-                            request_item_restriction.research_subject = data['research_subject']
-                            request_item_restriction.motivation = data['motivation']
-                            request_item_restriction.save()
+                        # Set the restriction data
+                        request_item_restriction.research_subject = data['research_subject']
+                        request_item_restriction.motivation = data['motivation']
+                        request_item_restriction.save()
 
                 else:
                     request_item, created = RequestItem.objects.get_or_create(

@@ -73,12 +73,22 @@ class RequestListSerializer(serializers.ModelSerializer):
         return obj.requestitempart_set.filter(finding_aids_entity__access_rights__statement='Restricted').count() > 0
 
     def get_research_allowed(self, obj):
-        count_restricted = obj.requestitempart_set.filter(finding_aids_entity__access_rights__statement='Restricted').count()
-        count_not_new = obj.requestitempart_set.filter(~Q(status='new')).count()
-        if count_restricted == 0:
+        count_total = obj.requestitempart_set.count()
+        count_not_restricted = obj.requestitempart_set.filter(finding_aids_entity__access_rights__statement='Not restricted').count()
+        count_new = obj.requestitempart_set.filter(Q(status='new')).count()
+        count_approved = obj.requestitempart_set.filter(Q(status='approved')).count()
+
+        # If all the records are not restricted
+        if count_not_restricted == count_total:
             return True
-        if count_not_new == count_restricted:
+
+        if count_not_restricted > 0 and count_new == 0:
             return True
+
+        # If there is at least one approved and no new one
+        if count_approved > 0 and count_new == 0:
+            return True
+
         return False
 
     def get_has_digital_version(self, obj):

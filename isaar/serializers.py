@@ -74,11 +74,11 @@ class IsaarReadSerializer(serializers.ModelSerializer):
 class IsaarWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     date_existence_from = ApproximateDateSerializerField()
     date_existence_to = ApproximateDateSerializerField()
-    parallel_names = IsaarParallelNameSerializer(many=True, source='isaarparallelname_set')
-    other_names = IsaarOtherNameSerializer(many=True, source='isaarothername_set')
-    standardized_names = IsaarStandardizedNameSerializer(many=True, source='isaarstandardizedname_set')
-    corporate_body_identifiers = IsaarCorporateBodyIdentifierSerizlier(many=True, source='isaarcorporatebodyidentifier_set')
-    places = IsaarPlaceWriteSerializer(many=True, source='isaarplace_set')
+    parallel_names = IsaarParallelNameSerializer(many=True, source='isaarparallelname_set', required=False)
+    other_names = IsaarOtherNameSerializer(many=True, source='isaarothername_set', required=False)
+    standardized_names = IsaarStandardizedNameSerializer(many=True, source='isaarstandardizedname_set', required=False)
+    corporate_body_identifiers = IsaarCorporateBodyIdentifierSerizlier(many=True, source='isaarcorporatebodyidentifier_set', required=False)
+    places = IsaarPlaceWriteSerializer(many=True, source='isaarplace_set', required=False)
 
     class Meta:
         model = Isaar

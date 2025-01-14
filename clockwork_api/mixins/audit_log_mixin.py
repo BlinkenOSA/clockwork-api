@@ -7,7 +7,7 @@ class AuditLogMixin(object):
         user = self.request.user
         instance = serializer.save()
         self.log_audit_action(user=user, action='CREATE', instance=instance)
-        return instance
+
 
     def perform_update(self, serializer):
         changed_fields = []
@@ -23,34 +23,38 @@ class AuditLogMixin(object):
         m2m_fields = self.get_related_fields(old_instance, 'm2m')
         # Check m2m fields - old instance
         for field in m2m_fields:
-            old_m2m_values[field] = [value.id for value in getattr(old_instance, field).all()]
+            if hasattr(old_instance, field):
+                old_m2m_values[field] = [value.id for value in getattr(old_instance, field).all()]
 
         old_o2m_values = {}
         o2m_fields = self.get_related_fields(old_instance, 'o2m')
         # Check o2m fields - old instance
         for field in o2m_fields:
-            old_o2m_values[field] = [record for record in getattr(old_instance, field).values().all()]
+            if hasattr(old_instance, field):
+                old_o2m_values[field] = [record for record in getattr(old_instance, field).values().all()]
 
         # Save new records
         instance = serializer.save()
 
         # Check m2m fields - new instance
         for field in m2m_fields:
-            if old_m2m_values.get(field, []) != [value.id for value in getattr(instance, field).all()]:
-                changed_m2m_fields.append(field)
+            if hasattr(instance, field):
+                if old_m2m_values.get(field, []) != [value.id for value in getattr(instance, field).all()]:
+                    changed_m2m_fields.append(field)
 
         # Check m2o fields - new instance
         for field in o2m_fields:
-            if old_o2m_values.get(field, []) != [record for record in getattr(instance, field).values().all()]:
-                instance_model_name = instance._meta.object_name
-                o2m_model_name = getattr(instance, field).model._meta.object_name
-                field_name = o2m_model_name.replace(instance_model_name, '')
+            if hasattr(instance, field):
+                if old_o2m_values.get(field, []) != [record for record in getattr(instance, field).values().all()]:
+                    instance_model_name = instance._meta.object_name
+                    o2m_model_name = getattr(instance, field).model._meta.object_name
+                    field_name = o2m_model_name.replace(instance_model_name, '')
 
-                # Create the proper field name, similar to the regular field names
-                pattern = re.compile(r'(?<!^)(?=[A-Z])')
-                fn = pattern.sub('_', field_name).lower()
+                    # Create the proper field name, similar to the regular field names
+                    pattern = re.compile(r'(?<!^)(?=[A-Z])')
+                    fn = pattern.sub('_', field_name).lower()
 
-                changed_o2m_fields.append(fn)
+                    changed_o2m_fields.append(fn)
 
         changed_fields += self.compare_objects(old_instance=old_instance, new_instance=instance)
         changed_fields += changed_m2m_fields
@@ -60,12 +64,10 @@ class AuditLogMixin(object):
             # Log only if there are actually changes
             self.log_audit_action(user=user, action='UPDATE', instance=instance, changed_fields=changed_fields)
 
-        return instance
-
     def perform_destroy(self, instance):
         user = self.request.user
         self.log_audit_action(user=user, action='DELETE', instance=instance)
-        return instance
+        instance.delete()
 
     @staticmethod
     def get_related_fields(instance, type):

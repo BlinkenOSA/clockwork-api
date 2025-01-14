@@ -173,7 +173,7 @@ class RequestItem(models.Model):
 
 class RequestItemRestriction(models.Model):
     id = models.AutoField(primary_key=True)
-    request_item = models.OneToOneField('RequestItem', on_delete=models.CASCADE)
+    request_item = models.OneToOneField('RequestItem', on_delete=models.CASCADE, related_name='restriction')
 
     # Restricted material
     restricted_uuid = models.UUIDField(default=uuid.uuid4, db_index=True)
