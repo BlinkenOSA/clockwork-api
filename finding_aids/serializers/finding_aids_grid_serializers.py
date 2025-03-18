@@ -11,6 +11,6 @@ class FindingAidsGridSerializer(UserDataSerializerMixin, WritableNestedModelSeri
 
     class Meta:
         model = FindingAidsEntity
-        fields = ('id', 'legacy_id', 'archival_reference_code', 'title', 'title_original', 'original_locale',
+        fields = ('id', 'archival_reference_code', 'title', 'title_original', 'original_locale',
                   'contents_summary', 'contents_summary_original', 'date_from', 'date_to',
                   'time_start', 'time_end', 'note', 'note_original', 'access_rights', 'access_rights_restriction_date')
