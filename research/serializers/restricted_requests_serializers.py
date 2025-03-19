@@ -24,13 +24,13 @@ class RestrictedRequestsListSerializer(serializers.ModelSerializer):
         return obj.finding_aids_entity.access_rights.statement == 'Restricted'
 
     def get_research_subject(self, obj):
-        if obj.request_item.restriction:
+        if hasattr('restriction', obj.request_item):
             return obj.request_item.restriction.research_subject
         else:
             return "N/A"
 
     def get_motivation(self, obj):
-        if obj.request_item.restriction:
+        if hasattr('restriction', obj.request_item):
             return obj.request_item.restriction.motivation
         else:
             return "N/A"
