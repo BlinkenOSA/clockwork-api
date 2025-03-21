@@ -37,7 +37,7 @@ urlpatterns = [
 
     # Restricted requests
     path('restricted-requests', RestrictedRequestsList.as_view(), name='restricted-requests-list'),
-    re_path(r'restricted-requests/(?P<action>["approve"|"reject"|"lift"|"reset"]+)/(?P<request_item_part_id>[0-9]+)/$',
+    re_path(r'restricted-requests/(?P<action>["approve"|"approve_on_site","reject"|"lift"|"reset"]+)/(?P<request_item_part_id>[0-9]+)/$',
             RestrictedRequestAction.as_view(), name='restricted-requests-action'),
 
     # MLR info from the library record
