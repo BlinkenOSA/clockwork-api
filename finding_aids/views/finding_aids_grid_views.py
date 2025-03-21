@@ -27,7 +27,7 @@ class FindingAidsGridListExport(XLSXFileMixin, generics.ListAPIView):
     renderer_classes = [XLSXRenderer]
     column_header = {
         'titles': [
-            "ID", "Archival Reference Number",
+            "ID", "Legacy ID", "Archival Reference Number",
             "Title", "Title (Original)", "Locale",
             "Contents Summary", "Contents Summary (Original)",
             "Date (from)", "Date (to)", "Start Time", "End Time",
