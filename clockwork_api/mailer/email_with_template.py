@@ -99,6 +99,9 @@ class EmailWithTemplate:
         if self.template == 'new_request_restricted_decision_user':
             return "Decision about requesting restricted content!"
 
+        if self.template == 'new_request_restricted_decision_admin':
+            return "Decision about requesting restricted content!"
+
         # Request Item status change
         if self.template == 'request_delivered_user':
             return "Requested items are prepared"
