@@ -54,6 +54,9 @@ class RestrictedRequestAction(APIView):
             if action == 'approve':
                 request_item_part.status = 'approved'
                 decision = 'Access granted (with conditions)'
+            elif action == 'approve_on_site':
+                request_item_part.status = 'approved_on_site'
+                decision = 'Access granted (on-site viewing only)'
             elif action == 'reject':
                 request_item_part.status = 'rejected'
                 decision = 'Access denied'
@@ -81,11 +84,13 @@ class RestrictedRequestAction(APIView):
                         'researcher': request_item_part.request_item.request.researcher,
                         'archival_reference_code': request_item_part.finding_aids_entity.archival_reference_code,
                         'title': request_item_part.finding_aids_entity.title,
-                        'decision': decision
+                        'decision': decision,
+                        'decision_maker': request.user.username
                     }
                 )
 
                 mail.send_new_request_restricted_decision_user()
+                mail.send_new_request_restricted_decision_admin()
 
             return Response(status=status.HTTP_200_OK)
         except ObjectDoesNotExist:

@@ -15,6 +15,13 @@
             And made the following decision: <strong>{{ decision }}</strong>
         </p>
 
+        {% if decision == 'approve_on_site' %}
+            <p>
+                Your requested material is available only for on-site research at the Blinken OSA Archivum, even if it's
+                available digitally. Please visit us during our opening hours to access the material.
+            </p>
+        {% endif %}
+
         <p>
             If you requested a restricted document from an Open Society Foundations or Central European University
             archival fonds and were granted access, you will be required to sign a Non-Disclosure Agreement

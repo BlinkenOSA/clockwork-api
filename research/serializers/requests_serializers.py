@@ -76,7 +76,7 @@ class RequestListSerializer(serializers.ModelSerializer):
         count_total = obj.requestitempart_set.count()
         count_not_restricted = obj.requestitempart_set.filter(finding_aids_entity__access_rights__statement='Not restricted').count()
         count_new = obj.requestitempart_set.filter(Q(status='new')).count()
-        count_approved = obj.requestitempart_set.filter(Q(status='approved')).count()
+        count_approved = obj.requestitempart_set.filter(Q(status='approved') | Q(status='approved_on_site')).count()
 
         # If all the records are not restricted
         if count_not_restricted == count_total:

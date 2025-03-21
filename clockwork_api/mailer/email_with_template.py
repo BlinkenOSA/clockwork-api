@@ -40,6 +40,10 @@ class EmailWithTemplate:
         self.template = "new_request_restricted_decision_user"
         self._send_mail('user')
 
+    def send_new_request_restricted_decision_admin(self):
+        self.template = "new_request_restricted_decision_admin"
+        self._send_mail('admin')
+
     def send_request_delivered_user(self):
         self.template = "request_delivered_user"
         self._send_mail('user')
@@ -93,6 +97,9 @@ class EmailWithTemplate:
             return "New request with restricted content arrived!"
 
         if self.template == 'new_request_restricted_decision_user':
+            return "Decision about requesting restricted content!"
+
+        if self.template == 'new_request_restricted_decision_admin':
             return "Decision about requesting restricted content!"
 
         # Request Item status change
