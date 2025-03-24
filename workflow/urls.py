@@ -28,5 +28,9 @@ urlpatterns = [
     path('translate_to_original/', GetTranslationToOriginal.as_view(),
          name='get_translation'),
     path('translate_to_english/', GetTranslationToEnglish.as_view(),
-         name='get_translation')
+         name='get_translation'),
+
+    # Get back the data for digital object upload
+    path('create_digital_object/(?P<level>["access"|"master"]+)/<str:digital_object_id>',
+         CreateDigitalObject.as_view(), name='create_digital_object'),
 ]
