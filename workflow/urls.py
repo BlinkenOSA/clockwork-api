@@ -34,6 +34,6 @@ urlpatterns = [
     # Get back the data for digital object upload
     path('digital_object/info/<str:digital_object_id>',
          DigitalObjectInfo.as_view(), name='digital_object_info'),
-    path('digital_object/upsert/(?P<level>["access"|"master"]+)/<str:digital_object_id>',
+    path('digital_object/upsert/<str:level>/<str:digital_object_id>/',
          DigitalObjectUpsert.as_view(), name='digital_object_upsert'),
 ]
