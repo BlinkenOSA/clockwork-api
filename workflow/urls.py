@@ -2,6 +2,7 @@ from django.urls import path
 
 from workflow.views.container_views import GetSetDigitizedContainer, GetContainerMetadata, \
     GetContainerMetadataByLegacyID
+from workflow.views.digital_object_views import DigitalObjectInfo, DigitalObjectUpsert
 from workflow.views.finding_aids_views import GetFAEntityMetadataByItemID
 from workflow.views.translation_view import GetTranslationToOriginal, GetTranslationToEnglish
 
@@ -28,5 +29,11 @@ urlpatterns = [
     path('translate_to_original/', GetTranslationToOriginal.as_view(),
          name='get_translation'),
     path('translate_to_english/', GetTranslationToEnglish.as_view(),
-         name='get_translation')
+         name='get_translation'),
+
+    # Get back the data for digital object upload
+    path('digital_object/info/<str:digital_object_id>',
+         DigitalObjectInfo.as_view(), name='digital_object_info'),
+    path('digital_object/upsert/<str:level>/<str:digital_object_id>/',
+         DigitalObjectUpsert.as_view(), name='digital_object_upsert'),
 ]
