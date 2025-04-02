@@ -49,3 +49,14 @@ DJOSER = {
         'current_user': 'accounts.serializers.CurrentUserSerializer',
     },
 }
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Bearer',
+            'in': 'header'
+        }
+    },
+    'USE_SESSION_AUTH': False
+}

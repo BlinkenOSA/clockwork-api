@@ -12,6 +12,8 @@ from archival_unit.models import ArchivalUnit
 from container.models import Container
 from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
+from workflow.serializers.digital_object_serializers import DigitalObjectInfoResponseSerializer, \
+    DigitalObjectUpsertResponseSerializer
 
 
 def matches_any_pattern(s):
@@ -211,11 +213,14 @@ class DigitalObjectInfo(APIView):
     """
     Get info about where to copy the access copies of a digital object.
     """
-    @swagger_auto_schema(operation_id='digital_object_info')
-    def get(self, request, digital_object_id):
-        if matches_any_pattern(digital_object_id):
+    @swagger_auto_schema(responses={
+        200: DigitalObjectInfoResponseSerializer(),
+        400: 'Invalid filename'
+    })
+    def get(self, request, access_copy_file):
+        if matches_any_pattern(access_copy_file):
             finding_aids_entity = None
-            doi, _, extension = digital_object_id.rpartition(".")
+            doi, _, extension = access_copy_file.rpartition(".")
 
             resolved_object = resolve_archival_unit_or_container(doi)
 
@@ -241,10 +246,13 @@ class DigitalObjectUpsert(APIView):
     """
         Create or update a Digital Object and give back the data.
     """
-    @swagger_auto_schema(operation_id='digital_object_create_or_update')
-    def post(self, request, level, digital_object_id):
-        if matches_any_pattern(digital_object_id):
-            doi, _, extension = digital_object_id.rpartition(".")
+    @swagger_auto_schema(responses={
+        200: DigitalObjectUpsertResponseSerializer(),
+        400: 'Invalid filename'
+    })
+    def post(self, request, level, access_copy_file):
+        if matches_any_pattern(access_copy_file):
+            doi, _, extension = access_copy_file.rpartition(".")
             resolved_object = resolve_archival_unit_or_container(doi)
 
             primary_type = resolved_object['finding_aids_entity'].primary_type.type \

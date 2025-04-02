@@ -48,9 +48,9 @@ urlpatterns = [
          name='get_translation'),
 
     # Get back the data for digital object upload
-    path('digital_object/info/<str:digital_object_id>',
+    path('digital_object/info/<str:access_copy_file>',
          DigitalObjectInfo.as_view(), name='digital_object_info'),
-    path('digital_object/upsert/<str:level>/<str:digital_object_id>/',
+    path('digital_object/upsert/<str:level>/<str:access_copy_file>/',
          DigitalObjectUpsert.as_view(), name='digital_object_upsert'),
 
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
