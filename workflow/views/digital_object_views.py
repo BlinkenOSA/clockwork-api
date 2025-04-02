@@ -244,7 +244,7 @@ class DigitalObjectInfo(APIView):
 
 class DigitalObjectUpsert(APIView):
     """
-        Create or update a Digital Object and give back the data.
+        Create or update a Digital Object and give back the data. (level parameter is either 'access' or 'master')
     """
     @swagger_auto_schema(responses={
         200: DigitalObjectUpsertResponseSerializer(),
