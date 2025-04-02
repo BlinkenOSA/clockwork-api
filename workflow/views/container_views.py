@@ -14,6 +14,7 @@ from workflow.serializers.container_serializers import ContainerDigitizedSeriali
 
 
 class GetSetDigitizedContainer(AuditLogMixin, RetrieveUpdateAPIView):
+    swagger_schema = None
     queryset = Container.objects.all()
     serializer_class = ContainerDigitizedSerializer
     lookup_field = 'barcode'
@@ -22,6 +23,7 @@ class GetSetDigitizedContainer(AuditLogMixin, RetrieveUpdateAPIView):
 
 
 class GetContainerMetadata(ListAPIView):
+    swagger_schema = None
     serializer_class = FindingAidsEntityReadSerializer
     lookup_field = 'barcode'
     authentication_classes = [BearerAuthentication, SessionAuthentication]
@@ -35,6 +37,7 @@ class GetContainerMetadata(ListAPIView):
 
 
 class GetContainerMetadataByLegacyID(RetrieveAPIView):
+    swagger_schema = None
     serializer_class = ContainerDigitizedSerializer
     authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )

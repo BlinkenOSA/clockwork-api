@@ -6,20 +6,6 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-schema_view = get_schema_view(
-   openapi.Info(
-      title="Clockwork API Documentation",
-      default_version='v1',
-      description="API documentation of the API serving the Clockwork Archival Management System",
-      contact=openapi.Contact(email="bonej@ceu.edu"),
-      license=openapi.License(name="BSD License"),
-   ),
-   validators=['flex'],
-   public=True,
-   permission_classes=[permissions.AllowAny]
-)
-
-
 urlpatterns = [
     path('v1/accession/', include('accession.urls', namespace='accession-v1')),
     path('v1/archival_unit/', include('archival_unit.urls', namespace='archival_unit-v1')),
@@ -39,11 +25,6 @@ urlpatterns = [
     path('v1/research/', include('research.urls', namespace='research-v1')),
 
     path('admin/', admin.site.urls),
-
-    # Swagger endpoints
-    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None), name='schema-json'),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=None), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=None), name='schema-redoc'),
 
     # JWT endpoints
     path('auth/', include('djoser.urls')),

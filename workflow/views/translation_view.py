@@ -8,6 +8,8 @@ from workflow.serializers.translation_serializer import TranslationToEnglishSeri
 
 
 class GetTranslationToOriginal(APIView):
+    swagger_schema = None
+
     def post(self, request):
         serializer = TranslationToOriginalSerializer(data=request.data)
         serializer.is_valid()
@@ -24,6 +26,8 @@ class GetTranslationToOriginal(APIView):
 
 
 class GetTranslationToEnglish(APIView):
+    swagger_schema = None
+
     def post(self, request):
         serializer = TranslationToEnglishSerializer(data=request.data)
         serializer.is_valid()
