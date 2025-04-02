@@ -12,6 +12,7 @@ from workflow.serializers.folder_item_serializers import FADigitizedSerializer
 
 
 class GetFAEntityMetadataByItemID(RetrieveAPIView):
+    swagger_schema = None
     serializer_class = FADigitizedSerializer
     authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )

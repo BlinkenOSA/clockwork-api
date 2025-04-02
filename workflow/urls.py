@@ -1,4 +1,7 @@
 from django.urls import path
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 
 from workflow.views.container_views import GetSetDigitizedContainer, GetContainerMetadata, \
     GetContainerMetadataByLegacyID
@@ -7,6 +10,19 @@ from workflow.views.finding_aids_views import GetFAEntityMetadataByItemID
 from workflow.views.translation_view import GetTranslationToOriginal, GetTranslationToEnglish
 
 app_name = 'workflow'
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="AMS Workflow APIs Documentation",
+      default_version='v1',
+      description="API documentation of the API endpoints used by the AMS Workflow",
+      contact=openapi.Contact(email="bonej@ceu.edu"),
+      license=openapi.License(name="BSD License"),
+   ),
+   validators=['flex'],
+   public=True,
+   permission_classes=[permissions.AllowAny]
+)
 
 urlpatterns = [
     # Used by the digitization workflow to push technical metadata
@@ -36,4 +52,8 @@ urlpatterns = [
          DigitalObjectInfo.as_view(), name='digital_object_info'),
     path('digital_object/upsert/<str:level>/<str:digital_object_id>/',
          DigitalObjectUpsert.as_view(), name='digital_object_upsert'),
+
+    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

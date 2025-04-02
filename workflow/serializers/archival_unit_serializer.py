@@ -45,5 +45,6 @@ class ArchivalUnitSerializer(serializers.ModelSerializer):
         }
 
     class Meta:
+        ref_name = 'ArchivalUnitWorkflowSerializer'
         model = ArchivalUnit
         fields = ['fonds', 'subfonds', 'series']

@@ -3,6 +3,7 @@ import re
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -210,6 +211,7 @@ class DigitalObjectInfo(APIView):
     """
     Get info about where to copy the access copies of a digital object.
     """
+    @swagger_auto_schema(operation_id='digital_object_info')
     def get(self, request, digital_object_id):
         if matches_any_pattern(digital_object_id):
             finding_aids_entity = None
@@ -239,6 +241,7 @@ class DigitalObjectUpsert(APIView):
     """
         Create or update a Digital Object and give back the data.
     """
+    @swagger_auto_schema(operation_id='digital_object_create_or_update')
     def post(self, request, level, digital_object_id):
         if matches_any_pattern(digital_object_id):
             doi, _, extension = digital_object_id.rpartition(".")
