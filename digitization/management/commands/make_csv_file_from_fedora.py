@@ -104,6 +104,8 @@ class Command(BaseCommand):
                         item['download_command'] = self.get_download_command(pid, did, main_directory, fa_entity.primary_type.type)
                         item['thumbnail_command'] = self.get_thumbnail_command(pid, did, main_directory, fa_entity.primary_type.type)
                         item['access_copy_command'] = self.get_access_copy_command(pid, did, main_directory, fa_entity.primary_type.type)
+                    except MultipleObjectsReturned:
+                        print("Multiple objects returned for %s" % reference_code)
                     except ObjectDoesNotExist:
                         item['access_copy'] = 'N/A'
 
