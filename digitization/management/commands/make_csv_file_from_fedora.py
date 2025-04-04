@@ -7,7 +7,10 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.management import BaseCommand
 from lxml import etree
 
+from archival_unit.models import ArchivalUnit
 from clockwork_api import settings
+from container.models import Container
+from controlled_list.models import CarrierType, PrimaryType
 from finding_aids.models import FindingAidsEntity
 
 FEDORA_URL = getattr(settings, "FEDORA_URL")
@@ -90,7 +93,7 @@ class Command(BaseCommand):
                         fa_entity = FindingAidsEntity.objects.get(
                             archival_reference_code=reference_code
                         )
-                        did = "HU_OSA_%s_%s_%s_%04d_%03d" % (
+                        did = "HU_OSA_%s_%s_%s_%04d_%04d" % (
                             fa_entity.archival_unit.fonds, fa_entity.archival_unit.subfonds, fa_entity.archival_unit.series,
                             fa_entity.container.container_no, fa_entity.folder_no
                         )
@@ -134,6 +137,34 @@ class Command(BaseCommand):
         if self.collection == 'soviet-tv':
             container, folder = arn[16:].split('-')
             arn = "HU OSA 300-81-9:%s/%s" % (container, folder)
+
+        if self.collection == 'samizdat-audio':
+            title = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NAMESPACE)[0].text
+            date_from = xml.xpath('//osa:dateOfCreationNormalizedStart', namespaces=NAMESPACE)[0].text
+            date_from = date_from[0:10]
+
+            container, folder = arn[16:].split('/')
+            container = int(container) - 159
+
+            au = ArchivalUnit.objects.get(
+                fonds='300', subfonds='85', series='54'
+            )
+            c, created = Container.objects.get_or_create(
+                archival_unit=au,
+                container_no=container,
+                carrier_type=CarrierType.objects.get(type='Digital container')
+            )
+            fa_entity, created = FindingAidsEntity.objects.get_or_create(
+                archival_unit=c.archival_unit,
+                container=c,
+                folder_no=folder,
+                title=title,
+                date_from=date_from
+            )
+            fa_entity.primary_type = PrimaryType.objects.get(type='Audio')
+            fa_entity.save()
+            arn = fa_entity.archival_reference_code
+
         if self.collection == 'information-items':
             title = xml.xpath('//osa:primaryTitle/osa:title', namespaces=NAMESPACE)[0].text
             date_from = xml.xpath('//osa:dateOfCreationNormalizedStart', namespaces=NAMESPACE)[0].text

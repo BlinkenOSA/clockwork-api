@@ -477,17 +477,17 @@ class Command(BaseCommand):
     def get_contents_summary(self, xml):
         contents_summary = []
         for cs in xml.xpath('//osa:contentsSummary', namespaces=NSP):
-            contents_summary.append('%s<br/>' % cs.text)
+            contents_summary.append('%s' % cs.text)
         if len(contents_summary) > 0:
-            contents_summary = '<p>%s</p>' % ''.join(contents_summary)
+            contents_summary = '%s' % ''.join(contents_summary)
         else:
             contents_summary = ''
 
         contents_table = []
         for ct in xml.xpath('//osa:contentsTable', namespaces=NSP):
-            contents_table.append('<li>%s</li>' % ct.text)
+            contents_table.append('%s' % ct.text)
         if len(contents_table) > 0:
-            contents_table = '<ul>%s</ul>' % ''.join(contents_table)
+            contents_table = '%s' % ''.join(contents_table)
         else:
             contents_table = ''
         return contents_summary + contents_table
@@ -498,11 +498,22 @@ class Command(BaseCommand):
         return clean_date
 
     def create_digital_version(self, did):
+        if self.fa_entity.primary_type.type == 'Textual':
+            extension = '.pdf'
+        elif self.fa_entity.primary_type.type == 'Moving Image':
+            extension = '.m3u8'
+        elif self.fa_entity.primary_type.type == 'Still Image':
+            extension = '.jpg'
+        elif self.fa_entity.primary_type.type == 'Audio':
+            extension = '.mp3'
+        else:
+            extension = '.pdf'
+
         access_copy, created = DigitalVersion.objects.get_or_create(
             finding_aids_entity=self.fa_entity,
             identifier=did,
             level='A',
-            filename="%s.pdf" % did,
+            filename="%s.%s" % (did, extension),
             available_online=True
         )
         access_copy.finding_aids_entity.save()
