@@ -284,6 +284,7 @@ class Command(BaseCommand):
                 )
 
         # Associated Person
+        FindingAidsEntityAssociatedPerson.objects.filter(fa_entity=fa_entity).delete()
         for associated_person in xml.xpath('//osa:associatedPersonal', namespaces=NSP):
             name = associated_person.xpath('./osa:name', namespaces=NSP)[0].text
             role = None
@@ -332,6 +333,7 @@ class Command(BaseCommand):
                 fa_ap.save()
 
         # Associated Corporation
+        FindingAidsEntityAssociatedCorporation.objects.filter(fa_entity=fa_entity).delete()
         for associated_corporation in xml.xpath('//osa:associatedCorporate', namespaces=NSP):
             name = associated_corporation.xpath('./osa:name', namespaces=NSP)[0].text
             role = None
@@ -357,6 +359,7 @@ class Command(BaseCommand):
                 fa_ac.save()
 
         # Associated Place
+        FindingAidsEntityAssociatedPlace.objects.filter(fa_entity=fa_entity).delete()
         for ap in xml.xpath('//osa:associatedPlace/osa:place', namespaces=NSP):
             if ap.text.strip():
                 place, created = Place.objects.get_or_create(
@@ -369,6 +372,7 @@ class Command(BaseCommand):
                 )
 
         # Associated Country
+        FindingAidsEntityAssociatedCountry.objects.filter(fa_entity=fa_entity).delete()
         for ac in xml.xpath('//osa:associatedCountry/osa:country', namespaces=NSP):
             if ac.text.strip():
                 country, created = Country.objects.get_or_create(
