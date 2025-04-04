@@ -157,12 +157,11 @@ class Command(BaseCommand):
             fa_entity, created = FindingAidsEntity.objects.get_or_create(
                 archival_unit=c.archival_unit,
                 container=c,
+                primary_type=PrimaryType.objects.get(type='Audio'),
                 folder_no=int(folder),
                 title=title,
                 date_from=date_from
             )
-            fa_entity.primary_type = PrimaryType.objects.get(type='Audio')
-            fa_entity.save()
             arn = fa_entity.archival_reference_code
 
         if self.collection == 'information-items':
