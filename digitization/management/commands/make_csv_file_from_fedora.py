@@ -157,7 +157,7 @@ class Command(BaseCommand):
             fa_entity, created = FindingAidsEntity.objects.get_or_create(
                 archival_unit=c.archival_unit,
                 container=c,
-                folder_no=folder,
+                folder_no=int(folder),
                 title=title,
                 date_from=date_from
             )
@@ -225,7 +225,10 @@ class Command(BaseCommand):
                           'thumbnail_command', 'access_copy_command']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
-            for row in self.csv:
+
+            sorted_data = sorted(self.csv, key=lambda x: x["access_copy"])
+
+            for row in sorted_data:
                 writer.writerow(row)
 
     def get_download_command(self, pid, did, main_directory, type):
