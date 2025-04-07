@@ -66,6 +66,7 @@ def get_access_copy_actions(doi, primary_type):
         data['target_server'] = getattr(settings, 'DIGITAL_OBJECTS_STORAGE_IMAGE_SERVER', '')
         data['target_path'] = f'{getattr(settings, "DIGITAL_OBJECTS_STORAGE_IMAGE_BASE_DIR", "")}'
         data['target_path'] = ''
+        data['filename'] = f'{doi}.jpg'
     elif primary_type == 'Moving Image':
         main_dir = '_'.join(doi_parts[:5])
         if len(doi_parts) == 6:
@@ -148,6 +149,55 @@ def get_finding_aids_entity(container, folder_no, sequence_no):
         return fa_entity
     except ObjectDoesNotExist:
         raise ValidationError({'error': 'No Folder / Item record exists with these specifications'})
+
+
+def get_doi(doi):
+    digital_object_identifier = doi
+    parts = doi.split("_")
+
+    # HU_OSA_386_1_1_0001_0001_P001
+    if len(parts) == 8:
+        if "P" in doi:
+            digital_object_identifier = '_'.join(parts[:7])
+
+    # HU_OSA_386_1_1_0001_0001_0001_P001 OR HU_OSA_386_1_1_0001_0001_P001_A
+    elif len(parts) == 9:
+        if 'P' in parts[7]:
+            digital_object_identifier = '_'.join(parts[:7])
+        elif 'P' in parts[8]:
+            digital_object_identifier = '_'.join(parts[:8])
+
+    return digital_object_identifier
+
+
+def get_label(doi):
+    digital_object_identifier = doi
+    parts = doi.split("_")
+    label = None
+
+    # HU_OSA_386_1_1_0001_0001_P001
+    if len(parts) == 8:
+        page = int(parts[7][1:])
+        if "P" in doi:
+            if page == 0:
+                label = 'Front Page'
+            else:
+                page = f"{int(parts[7][1:])}/{parts[8]}"
+                label = f'Page {page}'
+
+    # HU_OSA_386_1_1_0001_0001_0001_P001 OR HU_OSA_386_1_1_0001_0001_P001_A
+    elif len(parts) == 9:
+        if 'P' in parts[7]:
+            page = f"{int(parts[7][1:])}/{parts[8]}"
+        elif 'P' in parts[8]:
+            page = int(parts[8][1:])
+
+        if page == 0:
+            label = 'Front Page'
+        else:
+            label = f'Page {page}'
+
+    return label
 
 
 def resolve_archival_unit_or_container(doi):
@@ -248,7 +298,7 @@ class DigitalObjectInfo(APIView):
 
             if resolved_object['archival_unit'] and resolved_object['level']:
                 return Response({
-                    'doi': doi,
+                    'doi': get_doi(doi),
                     'container_reference_code': f'{resolved_object["archival_unit"].reference_code}:'
                                                 f'{resolved_object["container"].container_no}',
                     'fa_entity_reference_code': resolved_object["finding_aids_entity"].archival_reference_code
@@ -281,11 +331,14 @@ class DigitalObjectUpsert(APIView):
                 if resolved_object['finding_aids_entity'] else 'Moving Image'
             access_copy = get_access_copy_actions(doi, primary_type)
 
+            label = get_label(doi)
+
             if resolved_object['finding_aids_entity']:
                 dv, created = DigitalVersion.objects.get_or_create(
                     finding_aids_entity=resolved_object['finding_aids_entity'],
-                    identifier=doi,
+                    identifier=get_doi(doi),
                     level='A' if level == 'access' else 'M',
+                    label=label,
                     digital_collection=resolved_object['finding_aids_entity'].archival_unit.title,
                     filename=access_copy['filename'],
                     available_online=True
@@ -293,7 +346,7 @@ class DigitalObjectUpsert(APIView):
             else:
                 dv, created = DigitalVersion.objects.get_or_create(
                     container=resolved_object['container'],
-                    identifier=doi,
+                    identifier=get_doi(doi),
                     level='A' if level == 'access' else 'M',
                     digital_collection=resolved_object['finding_aids_entity'].archival_unit.title_full,
                     filename=access_copy['filename'],
