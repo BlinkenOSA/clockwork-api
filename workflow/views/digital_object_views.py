@@ -4,14 +4,17 @@ import re
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
+from clockwork_api.authentication import BearerAuthentication
 from container.models import Container
 from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
+from workflow.permission import APIGroupPermission
 from workflow.serializers.digital_object_serializers import DigitalObjectInfoResponseSerializer, \
     DigitalObjectUpsertResponseSerializer
 
@@ -213,6 +216,9 @@ class DigitalObjectInfo(APIView):
     """
     Get info about where to copy the access copies of a digital object.
     """
+    authentication_classes = [BearerAuthentication, SessionAuthentication]
+    permission_classes = (APIGroupPermission, )
+
     @swagger_auto_schema(responses={
         200: DigitalObjectInfoResponseSerializer(),
         400: 'Invalid filename'
@@ -246,6 +252,9 @@ class DigitalObjectUpsert(APIView):
     """
         Create or update a Digital Object and give back the data. (level parameter is either 'access' or 'master')
     """
+    authentication_classes = [BearerAuthentication, SessionAuthentication]
+    permission_classes = (APIGroupPermission, )
+
     @swagger_auto_schema(responses={
         200: DigitalObjectUpsertResponseSerializer(),
         400: 'Invalid filename'
