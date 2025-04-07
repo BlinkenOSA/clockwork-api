@@ -30,6 +30,9 @@ def matches_any_pattern(s):
         # HU_OSA_386_1_1_0001_0001_P001
         r'HU_OSA_\d{1,3}_\d{1,3}_\d{1,3}_\d{4}_\d{4}_P\d{3}\.[a-zA-Z0-9]+$',
 
+        # HU_OSA_384_0_2_0023_0001_P050_A - Special cases for the Bartok Colleciton
+        r'HU_OSA_\d{1,3}_\d{1,3}_\d{1,3}_\d{4}_\d{4}_P\d{3}_[a-zA-Z]\.[a-zA-Z0-9]+$',
+
         # HU_OSA_386_1_1_0001_0001_0001
         r'HU_OSA_\d{1,3}_\d{1,3}_\d{1,3}_\d{4}_\d{4}_\d{4}\.[a-zA-Z0-9]+$',
 
@@ -193,16 +196,27 @@ def resolve_archival_unit_or_container(doi):
                 container, int(parts[6]), int(parts[7]))
             level = 'item with archival reference number'
 
-    # HU_OSA_386_1_1_0001_0001_0001_P001
+    # HU_OSA_386_1_1_0001_0001_0001_P001 OR HU_OSA_386_1_1_0001_0001_P001_A
     elif len(parts) == 9:
-        archival_unit = get_archival_unit(int(parts[2]), int(parts[3]), int(parts[4]))
-        container = get_container(archival_unit, int(parts[5]))
-        finding_aids_entity = get_finding_aids_entity(container, int(parts[6]), int(parts[7]))
-        page = int(parts[8][1:])
-        level = (f"{make_ordinal(page)} page of the "
-                 f"{make_ordinal(int(parts[7]))} item in the "
-                 f"{make_ordinal(int(parts[6]))} folder in the "
-                 f"{make_ordinal(int(parts[5]))} container.")
+        if 'P' in parts[7]:
+            archival_unit = get_archival_unit(int(parts[2]), int(parts[3]), int(parts[4]))
+            container = get_container(archival_unit, int(parts[5]))
+            finding_aids_entity = get_finding_aids_entity(container, int(parts[6]), 0)
+            page = int(parts[7][1:])
+            level = (f"{make_ordinal(page) if page != 0 else 'Front'} page of the "
+                     f"{make_ordinal(int(parts[6]))} folder in the "
+                     f"{make_ordinal(int(parts[5]))} container.")
+        elif 'P' in parts[8]:
+            archival_unit = get_archival_unit(int(parts[2]), int(parts[3]), int(parts[4]))
+            container = get_container(archival_unit, int(parts[5]))
+            finding_aids_entity = get_finding_aids_entity(container, int(parts[6]), int(parts[7]))
+            page = int(parts[8][1:])
+            level = (f"{make_ordinal(page)} page of the "
+                     f"{make_ordinal(int(parts[7]))} item in the "
+                     f"{make_ordinal(int(parts[6]))} folder in the "
+                     f"{make_ordinal(int(parts[5]))} container.")
+        else:
+            pass
 
     return {
         'archival_unit': archival_unit,
@@ -225,7 +239,6 @@ class DigitalObjectInfo(APIView):
     })
     def get(self, request, access_copy_file):
         if matches_any_pattern(access_copy_file):
-            finding_aids_entity = None
             doi, _, extension = access_copy_file.rpartition(".")
 
             resolved_object = resolve_archival_unit_or_container(doi)
@@ -239,7 +252,7 @@ class DigitalObjectInfo(APIView):
                     'container_reference_code': f'{resolved_object["archival_unit"].reference_code}:'
                                                 f'{resolved_object["container"].container_no}',
                     'fa_entity_reference_code': resolved_object["finding_aids_entity"].archival_reference_code
-                        if finding_aids_entity else 'N/A',
+                        if resolved_object["finding_aids_entity"] else 'N/A',
                     'primary_type': primary_type,
                     'level': resolved_object['level'],
                     'access_copy_to_catalog': get_access_copy_actions(doi, primary_type)
