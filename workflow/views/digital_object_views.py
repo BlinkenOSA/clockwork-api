@@ -182,7 +182,7 @@ def get_label(doi):
             if page == 0:
                 label = 'Front Page'
             else:
-                page = f"{int(parts[7][1:])}/{parts[8]}"
+                page = f"{int(parts[7][1:])}"
                 label = f'Page {page}'
 
     # HU_OSA_386_1_1_0001_0001_0001_P001 OR HU_OSA_386_1_1_0001_0001_P001_A
@@ -352,6 +352,9 @@ class DigitalObjectUpsert(APIView):
                     filename=access_copy['filename'],
                     available_online=True
                 )
+
+            dv.finding_aids_entity.published = True
+            dv.finding_aids_entity.save()
 
             return Response({
                 'digital_version_id': dv.id,
