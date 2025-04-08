@@ -353,6 +353,9 @@ class DigitalObjectUpsert(APIView):
                     available_online=True
                 )
 
+            dv.finding_aids_entity.published = True
+            dv.finding_aids_entity.save()
+
             return Response({
                 'digital_version_id': dv.id,
                 'filename': dv.filename,
