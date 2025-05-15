@@ -3,12 +3,13 @@
     <body>
         <br>
 
-        <h2>Restricted material has been approved!</h2>
+        <h2>Restricted material has been reviewed!</h2>
 
         <p>
-            The following materials were approved by {{ decision_maker }}:<br/>
+            The following materials were reviewed by {{ decision_maker }}:<br/>
 
-            <strong>{{ archival_reference_code }} - {{ title }}</strong>
+            <strong>{{ archival_reference_code }} - {{ title }}</strong><br/>
+            Requested by {{ researcher.last_name }}, {{ researcher.first_name }}
         </p>
 
         <p>

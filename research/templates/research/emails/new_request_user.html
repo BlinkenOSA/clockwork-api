@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <br>
-
-        <h2>Your request is being sent!</h2>
-
         <p>Dear {{ researcher.last_name }}, {{ researcher.first_name }},</p>
         <p>
-            Blinken OSA Archivum received your request!<br/>
+            Blinken OSA Archivum received your request.<br/>
             Our colleagues will start processing your request. You will get a notification email once the items are
             prepared in our Research Room.
         </p>
         <p>
             Here are the details of your request<br/><br/>
-            <strong>Request Date:</strong> {{ request.request_date }}
+            <strong>Planned Visit/Access Date:</strong> {{ request.request_date }}
         </p>
 
         <h3>The following items were requested:</h3>
