@@ -7,6 +7,7 @@ from django_date_extensions.fields import ApproximateDate
 
 from archival_unit.models import ArchivalUnit
 from container.models import Container
+from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
 
 
@@ -29,6 +30,7 @@ class Command(BaseCommand):
                 folder = int(row['Folder'])
                 sequence = int(row['FolderSequence'])
                 date = row['Date']
+                identifier = row['FileName v1 - FolderSequence'].replace('.pdf', '')
 
                 # Get container record
                 container, created = Container.objects.get_or_create(
@@ -50,6 +52,18 @@ class Command(BaseCommand):
                     user_published='jozsef.bone'
                 )
                 print("Created: %s" % finding_aids_entity.archival_reference_code)
+                
+                # Digital Version
+                digital_version, dv_created = DigitalVersion.objects.get_or_create(
+                    finding_aids_entity=finding_aids_entity,
+                    container=container,
+                    identifier=identifier,
+                    level='A',
+                    digital_collection='Hungarian Monitoring',
+                    filename=row['FileName v1 - FolderSequence'],
+                    available_online=True
+                )
+                finding_aids_entity.save()
 
         # Unpublish the old ones
         for fa_entity in FindingAidsEntity.objects.filter(
