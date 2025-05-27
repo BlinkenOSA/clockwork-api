@@ -26,7 +26,7 @@ class MLREntity(models.Model):
             r = str(l.row) if l.row else "-"
             s = str(l.section) if l.section else "-"
             sh = str(l.shelf) if l.shelf else "-"
-            loc.append("%s/%s/%s/%s (%s)" % (m, r, s, sh, l.building.building))
+            loc.append("%s/%s/%s/%s (%s)" % (m, r, s, sh, l.building.building if l.building else ''))
         return "; ".join(loc)
 
 
