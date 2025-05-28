@@ -1,29 +1,34 @@
 import csv
-import glob
 import os
 
 from django.core.management import BaseCommand
-from django_date_extensions.fields import ApproximateDate
-
 from archival_unit.models import ArchivalUnit
 from container.models import Container
 from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
 
 
-class FindingAids:
-    pass
-
-
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument('--fonds', dest='fonds', help='Fonds')
+        parser.add_argument('--subfonds', dest='subfonds', help='Fonds')
+        parser.add_argument('--series', dest='series', help='Fonds')
+        parser.add_argument('--file', help='File name')
+        parser.add_argument('--collection', help='Digital collection name')
+
     def handle(self, *args, **options):
-        output_file = "HungarianMonitoring.csv"
+        fonds = options.get('fonds')
+        subfonds = options.get('subfonds')
+        series = options.get('series')
+        file = options.get('file')
+        collection = options.get('collection')
+
         csv_file = os.path.join(
-            os.getcwd(), 'digitization', 'management', 'commands', 'csv', output_file)
+            os.getcwd(), 'digitization', 'management', 'commands', 'csv', file)
 
         with open(csv_file, mode='r', newline='', encoding='utf-8') as file:
             reader = csv.DictReader(file)
-            archival_unit = ArchivalUnit.objects.get(fonds=300, subfonds=40, series=8)
+            archival_unit = ArchivalUnit.objects.get(fonds=fonds, subfonds=subfonds, series=series)
 
             for row in reader:
                 box = int(row['Box'])
@@ -43,7 +48,7 @@ class Command(BaseCommand):
                     container=container,
                     folder_no=folder,
                     sequence_no=sequence,
-                    title='Hungarian Monitoring',
+                    title=collection,
                     date_from=date,
                     description_level='L2',
                     level='I',
@@ -59,7 +64,7 @@ class Command(BaseCommand):
                     container=container,
                     identifier=identifier,
                     level='A',
-                    digital_collection='Hungarian Monitoring',
+                    digital_collection=collection,
                     filename=row['FileName v1 - FolderSequence'],
                     available_online=True
                 )
