@@ -58,7 +58,10 @@ def get_access_copy_actions(doi, primary_type):
         data['target_server'] = getattr(settings, 'DIGITAL_OBJECTS_STORAGE_TEXT_SERVER', '')
         main_dir = '_'.join(doi_parts[:5])
         sub_dir = '_'.join(doi_parts[:6])
-        filename = '_'.join(doi_parts[:7])
+        if len(doi_parts) == 7:
+            filename = '_'.join(doi_parts[:7])
+        else:
+            filename = '_'.join(doi_parts[:8])
         data['filename'] = f'{filename}.pdf'
         data['target_path'] = f'{getattr(settings, "DIGITAL_OBJECTS_STORAGE_TEXT_BASE_DIR", "")}{main_dir}/{sub_dir}/{filename}.pdf'
         data['thumbnail_path'] = f'{getattr(settings, "DIGITAL_OBJECTS_STORAGE_TEXT_BASE_DIR", "")}{main_dir}/{sub_dir}/{filename}.jpg'
