@@ -38,11 +38,20 @@ class Command(BaseCommand):
             archival_unit = ArchivalUnit.objects.get(fonds=options['fonds'],
                                                      subfonds=options['subfonds'],
                                                      series=options['series'])
+            counter = 0
             finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False)
             for fa in finding_aids_entities.iterator():
                 indexer = FindingAidsNewCatalogIndexer(fa.id)
                 if fa.published:
                     indexer.index_with_requests()
+
+                    if counter % 500 == 0:
+                        print("Commit changes")
+                        indexer = FindingAidsNewCatalogIndexer(1)
+                        indexer.commit()
+                        time.sleep(3)
+
+                    counter += 1
                 else:
                     indexer.delete()
 
