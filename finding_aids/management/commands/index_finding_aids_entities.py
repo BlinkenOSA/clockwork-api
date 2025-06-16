@@ -2,6 +2,7 @@ from django.core.management import BaseCommand
 
 from archival_unit.models import ArchivalUnit
 from finding_aids.indexers.finding_aids_catalog_indexer import FindingAidsCatalogIndexer
+from finding_aids.indexers.finding_aids_new_catalog_indexer import FindingAidsNewCatalogIndexer
 from finding_aids.models import FindingAidsEntity
 
 
@@ -17,7 +18,7 @@ class Command(BaseCommand):
             archival_units = ArchivalUnit.objects.filter()
             for archival_unit in archival_units.iterator():
                 for fa in FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False).iterator():
-                    indexer = FindingAidsCatalogIndexer(fa.id)
+                    indexer = FindingAidsNewCatalogIndexer(fa.id)
                     if fa.published:
                         indexer.index()
                     else:
@@ -28,7 +29,7 @@ class Command(BaseCommand):
                                                      series=options['series'])
             finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False)
             for fa in finding_aids_entities.iterator():
-                indexer = FindingAidsCatalogIndexer(fa.id)
+                indexer = FindingAidsNewCatalogIndexer(fa.id)
                 if fa.published:
                     indexer.index()
                 else:
