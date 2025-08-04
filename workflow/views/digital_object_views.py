@@ -307,6 +307,8 @@ class DigitalObjectInfo(APIView):
                     'fa_entity_reference_code': resolved_object["finding_aids_entity"].archival_reference_code
                         if resolved_object["finding_aids_entity"] else 'N/A',
                     'primary_type': primary_type,
+                    'catalog_id': resolved_object["finding_aids_entity"].catalog_id if resolved_object["finding_aids_entity"] else 'N/A',
+                    'title': resolved_object["finding_aids_entity"].title if resolved_object["finding_aids_entity"] else 'N/A',
                     'level': resolved_object['level'],
                     'access_copy_to_catalog': get_access_copy_actions(doi, primary_type)
                 }, status=200)
