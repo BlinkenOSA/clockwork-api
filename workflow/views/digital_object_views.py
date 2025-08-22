@@ -116,7 +116,7 @@ def get_mime_category(extension):
     """
     Return the mime category of a file based on its extension.
     """
-    mime, _ = mimetypes.guess_type("file" + extension)
+    mime, _ = mimetypes.guess_type("file." + extension)
     if mime:
         if mime.startswith("video/"):
             return "Moving Image"
@@ -174,7 +174,6 @@ def get_doi(doi):
 
 
 def get_label(doi):
-    digital_object_identifier = doi
     parts = doi.split("_")
     label = None
 
@@ -216,7 +215,7 @@ def resolve_archival_unit_or_container(doi):
         try:
             container = Container.objects.get(barcode=doi)
             archival_unit = container.archival_unit
-            level = 'container with barcode'
+            level = 'container'
         except ObjectDoesNotExist:
             raise ValidationError({'error': 'No container exists with this barcode'})
 
@@ -224,15 +223,14 @@ def resolve_archival_unit_or_container(doi):
     elif len(parts) == 6:
         archival_unit = get_archival_unit(int(parts[2]), int(parts[3]), int(parts[4]))
         container = get_container(archival_unit, int(parts[5]))
-        level = 'container with archival reference number'
+        level = 'container'
 
     # HU_OSA_386_1_1_0001_0001
     elif len(parts) == 7:
         archival_unit = get_archival_unit(int(parts[2]), int(parts[3]), int(parts[4]))
         container = get_container(archival_unit, int(parts[5]))
         finding_aids_entity = get_finding_aids_entity(container, int(parts[6]), 0)
-        level = (f"{make_ordinal(int(parts[6]))} folder in "
-                 f"{make_ordinal(int(parts[5]))} container.")
+        level = 'folder'
 
     # HU_OSA_386_1_1_0001_0001_P001 or HU_OSA_386_1_1_0001_0001_0001
     elif len(parts) == 8:
@@ -240,14 +238,12 @@ def resolve_archival_unit_or_container(doi):
         container = get_container(archival_unit, int(parts[5]))
 
         if "P" in doi:
-            page = int(parts[7][1:])
             finding_aids_entity = get_finding_aids_entity(container, int(parts[6]), 0)
-            level = (f"{make_ordinal(page)} page in {make_ordinal(int(parts[6]))} folder in "
-                     f"{make_ordinal(int(parts[5]))} container.")
+            level = "folder"
         else:
             finding_aids_entity = get_finding_aids_entity(
                 container, int(parts[6]), int(parts[7]))
-            level = 'item with archival reference number'
+            level = 'item'
 
     # HU_OSA_386_1_1_0001_0001_0001_P001 OR HU_OSA_386_1_1_0001_0001_P001_A
     elif len(parts) == 9:
@@ -255,19 +251,12 @@ def resolve_archival_unit_or_container(doi):
             archival_unit = get_archival_unit(int(parts[2]), int(parts[3]), int(parts[4]))
             container = get_container(archival_unit, int(parts[5]))
             finding_aids_entity = get_finding_aids_entity(container, int(parts[6]), 0)
-            page = int(parts[7][1:])
-            level = (f"{make_ordinal(page) if page != 0 else 'Front'} page of the "
-                     f"{make_ordinal(int(parts[6]))} folder in the "
-                     f"{make_ordinal(int(parts[5]))} container.")
+            level = 'folder'
         elif 'P' in parts[8]:
             archival_unit = get_archival_unit(int(parts[2]), int(parts[3]), int(parts[4]))
             container = get_container(archival_unit, int(parts[5]))
             finding_aids_entity = get_finding_aids_entity(container, int(parts[6]), int(parts[7]))
-            page = int(parts[8][1:])
-            level = (f"{make_ordinal(page)} page of the "
-                     f"{make_ordinal(int(parts[7]))} item in the "
-                     f"{make_ordinal(int(parts[6]))} folder in the "
-                     f"{make_ordinal(int(parts[5]))} container.")
+            level = 'item'
         else:
             pass
 
@@ -296,22 +285,60 @@ class DigitalObjectInfo(APIView):
 
             resolved_object = resolve_archival_unit_or_container(doi)
 
-            primary_type = resolved_object['finding_aids_entity'].primary_type.type \
-                if resolved_object['finding_aids_entity'] else 'Moving Image'
+            # Get the primary type of the digital object
+            if resolved_object['finding_aids_entity']:
+                primary_type = resolved_object['finding_aids_entity'].primary_type.type
+            else:
+                primary_type = get_mime_category(extension)
 
             if resolved_object['archival_unit'] and resolved_object['level']:
-                return Response({
+                archival_unit = resolved_object['archival_unit']
+                container = resolved_object['container']
+
+                response = {
                     'doi': get_doi(doi),
-                    'container_reference_code': f'{resolved_object["archival_unit"].reference_code}:'
-                                                f'{resolved_object["container"].container_no}',
-                    'fa_entity_reference_code': resolved_object["finding_aids_entity"].archival_reference_code
-                        if resolved_object["finding_aids_entity"] else 'N/A',
+                    'container_reference_code': f'{archival_unit.reference_code}:'
+                                                f'{container.container_no}',
                     'primary_type': primary_type,
-                    'catalog_id': resolved_object["finding_aids_entity"].catalog_id if resolved_object["finding_aids_entity"] else 'N/A',
-                    'title': resolved_object["finding_aids_entity"].title if resolved_object["finding_aids_entity"] else 'N/A',
                     'level': resolved_object['level'],
+                    'archival_unit': {
+                        'fonds': {
+                            'reference_number': archival_unit.parent.parent.reference_code,
+                            'title': archival_unit.parent.parent.title,
+                            'catalog_id': f"https://catalog.archivum.org/catalog/"
+                                          f"{archival_unit.parent.parent.isad.catalog_id}"
+                            if hasattr(archival_unit.parent.parent, "isad") else "",
+                        },
+                        'subfonds': {
+                            'reference_number': archival_unit.parent.reference_code,
+                            'title': archival_unit.parent.title,
+                            'catalog_id': f"https://catalog.archivum.org/catalog/"
+                                          f"{archival_unit.parent.isad.catalog_id}"
+                            if hasattr(archival_unit.parent, "isad") else "",
+                        },
+                        'series': {
+                            'reference_number': archival_unit.reference_code,
+                            'title': archival_unit.title,
+                            'catalog_id': f"https://catalog.archivum.org/catalog/"
+                                          f"{archival_unit.isad.catalog_id}"
+                            if hasattr(archival_unit, "isad") else "",
+                        }
+                    },
                     'access_copy_to_catalog': get_access_copy_actions(doi, primary_type)
-                }, status=200)
+                }
+
+                fa_entity = resolved_object['finding_aids_entity']
+                if fa_entity:
+                    response['reference_number'] = fa_entity.archival_reference_code
+                    response['title'] = fa_entity.title
+                    response['catalog_id'] = f"https://catalog.archivum.org/catalog/{fa_entity.catalog_id}"
+                else:
+                    response['reference_number'] = f"{archival_unit.reference_code}:{container.container_no}"
+                    response['title'] = f"{container.carrier_type.type} #{container.container_no}"
+                    response['catalog_id'] = (f"https://catalog.archivum.org/catalog/{archival_unit.isad.catalog_id}"
+                                              f"?tab=content&start={container.container_no}")
+
+                return Response(response, status=200)
         else:
             return Response({'error': 'Invalid filename'}, status=400)
 
