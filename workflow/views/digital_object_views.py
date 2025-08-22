@@ -174,7 +174,6 @@ def get_doi(doi):
 
 
 def get_label(doi):
-    digital_object_identifier = doi
     parts = doi.split("_")
     label = None
 
@@ -300,18 +299,54 @@ class DigitalObjectInfo(APIView):
                 if resolved_object['finding_aids_entity'] else 'Moving Image'
 
             if resolved_object['archival_unit'] and resolved_object['level']:
-                return Response({
+                archival_unit = resolved_object['archival_unit']
+                container = resolved_object['container']
+
+                response = {
                     'doi': get_doi(doi),
-                    'container_reference_code': f'{resolved_object["archival_unit"].reference_code}:'
-                                                f'{resolved_object["container"].container_no}',
-                    'fa_entity_reference_code': resolved_object["finding_aids_entity"].archival_reference_code
-                        if resolved_object["finding_aids_entity"] else 'N/A',
+                    'container_reference_code': f'{archival_unit.reference_code}:'
+                                                f'{container.container_no}',
                     'primary_type': primary_type,
-                    'catalog_id': resolved_object["finding_aids_entity"].catalog_id if resolved_object["finding_aids_entity"] else 'N/A',
-                    'title': resolved_object["finding_aids_entity"].title if resolved_object["finding_aids_entity"] else 'N/A',
                     'level': resolved_object['level'],
+                    'archival_unit': {
+                        'fonds': {
+                            'reference_number': archival_unit.parent.parent.reference_code,
+                            'title': archival_unit.parent.parent.title,
+                            'catalog_id': f"https://catalog.archivum.org/catalog/"
+                                          f"{archival_unit.parent.parent.isad.catalog_id}"
+                            if hasattr(archival_unit.parent.parent, "isad") else "",
+                        },
+                        'subfonds': {
+                            'reference_number': archival_unit.parent.reference_code,
+                            'title': archival_unit.parent.title,
+                            'catalog_id': f"https://catalog.archivum.org/catalog/"
+                                          f"{archival_unit.parent.isad.catalog_id}"
+                            if hasattr(archival_unit.parent, "isad") else "",
+                        },
+                        'series': {
+                            'reference_number': archival_unit.reference_code,
+                            'title': archival_unit.title,
+                            'catalog_id': f"https://catalog.archivum.org/catalog/"
+                                          f"{archival_unit.isad.catalog_id}"
+                            if hasattr(archival_unit, "isad") else "",
+                        },
+                        'container': {
+                            'reference_number': f"{archival_unit.reference_code}:{container.container_no}",
+                            'title': f"{container.carrier_type.type} #{container.container_no}",
+                            'catalog_id': f"https://catalog.archivum.org/catalog/"
+                                          f"{archival_unit.isad.catalog_id}?tab=content&start={container.container_no}"
+                        }
+                    },
                     'access_copy_to_catalog': get_access_copy_actions(doi, primary_type)
-                }, status=200)
+                }
+
+                fa_entity = resolved_object['finding_aids_entity']
+                if fa_entity:
+                    response['fa_entity_reference_code'] = fa_entity.archival_reference_code
+                    response['title'] = fa_entity.title
+                    response['catalog_id'] = f"https://catalog.archivum.org/catalog/{fa_entity.catalog_id}"
+
+                return Response(response, status=200)
         else:
             return Response({'error': 'Invalid filename'}, status=400)
 
