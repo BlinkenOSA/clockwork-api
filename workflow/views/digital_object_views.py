@@ -297,8 +297,6 @@ class DigitalObjectInfo(APIView):
 
                 response = {
                     'doi': get_doi(doi),
-                    'container_reference_code': f'{archival_unit.reference_code}:'
-                                                f'{container.container_no}',
                     'primary_type': primary_type,
                     'level': resolved_object['level'],
                     'archival_unit': {
