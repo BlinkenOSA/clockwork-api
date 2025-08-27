@@ -12,6 +12,7 @@ from archival_unit.models import ArchivalUnit
 from authority.models import Corporation, Person
 from container.models import Container
 from controlled_list.models import CarrierType, Locale, PrimaryType, AccessRight, PersonRole, CorporationRole
+from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity, FindingAidsEntityAssociatedPerson, \
     FindingAidsEntityAssociatedCorporation
 
@@ -23,6 +24,7 @@ FEDORA_ADMIN_PASS = getattr(settings, "FEDORA_ADMIN_PASS")
 NSP = {'osa': 'http://greenfield.osaarchivum.org/ns/item'}
 
 unicode = str
+
 
 class Command(BaseCommand):
     def __init__(self, stdout=None, stderr=None, no_color=False):
@@ -70,6 +72,9 @@ class Command(BaseCommand):
 
                 # Create FA record
                 self.create_finding_aids_entity()
+
+                # Create Digital version
+                self.create_digital_version()
 
     def get_document(self):
         r = requests.get("%s/objects/%s/datastreams/ITEM-LIB-EN/content" % (FEDORA_URL, self.current_pid))
@@ -209,4 +214,19 @@ class Command(BaseCommand):
                 )
 
         fa_entity.save()
+
+        self.create_digital_version(fa_entity)
+
         print(f"Processed: {fa_entity.archival_reference_code} - {fa_entity.title}")
+
+    def create_digital_version(self, fa_entity):
+        identifier = "HU_OSA_444_0_1_%04d_%04d" % (fa_entity.container.container_no, fa_entity.folder_no)
+
+        digital_version, created = DigitalVersion.objects.get_or_create(
+            finding_aids_entity=fa_entity,
+            identifier=identifier,
+            level='A',
+            digital_collection='Polish Underground Periodicals',
+            filename=f"{identifier}.pdf",
+            available_online=True
+        )
