@@ -215,11 +215,6 @@ class Command(BaseCommand):
 
         fa_entity.save()
 
-        self.create_digital_version(fa_entity)
-
-        print(f"Processed: {fa_entity.archival_reference_code} - {fa_entity.title}")
-
-    def create_digital_version(self, fa_entity):
         identifier = "HU_OSA_444_0_1_%04d_%04d" % (fa_entity.container.container_no, fa_entity.folder_no)
 
         digital_version, created = DigitalVersion.objects.get_or_create(
@@ -230,3 +225,5 @@ class Command(BaseCommand):
             filename=f"{identifier}.pdf",
             available_online=True
         )
+
+        print(f"Processed: {fa_entity.archival_reference_code} - {fa_entity.title}")
