@@ -73,9 +73,6 @@ class Command(BaseCommand):
                 # Create FA record
                 self.create_finding_aids_entity()
 
-                # Create Digital version
-                self.create_digital_version()
-
     def get_document(self):
         r = requests.get("%s/objects/%s/datastreams/ITEM-LIB-EN/content" % (FEDORA_URL, self.current_pid))
         r.encoding = 'UTF-8'
