@@ -191,7 +191,7 @@ class RequestItemRestriction(models.Model):
 
 class RequestItemPart(models.Model):
     id = models.AutoField(primary_key=True)
-    request_item = models.ForeignKey('RequestItem', on_delete=models.PROTECT)
+    request_item = models.ForeignKey('RequestItem', on_delete=models.CASCADE)
     finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', on_delete=models.CASCADE)
 
     STATUS_CHOICES = [('new', 'New'), ('approved', 'Approved'), ('approved_on_site', 'Approved for on-site'),
