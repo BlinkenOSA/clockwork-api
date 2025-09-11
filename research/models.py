@@ -108,7 +108,7 @@ class Request(models.Model):
 
 class RequestItem(models.Model):
     id = models.AutoField(primary_key=True)
-    request = models.ForeignKey('Request', on_delete=models.PROTECT)
+    request = models.ForeignKey('Request', on_delete=models.CASCADE)
     STATUS_VALUES = [('1', 'In Queue'), ('2', 'Pending'), ('3', 'Processed and prepared'),
                      ('4', 'Returned'), ('5', 'Reshelved'), ('9', 'Uploaded')]
     status = models.CharField(max_length=1, choices=STATUS_VALUES, default='1')
