@@ -16,7 +16,7 @@ class ContainerPreCreate(APIView):
     def get(self, *args, **kwargs):
         archival_unit_id = self.kwargs.get('pk', None)
         archival_unit = get_object_or_404(ArchivalUnit, pk=archival_unit_id)
-        container = Container.objects.filter(archival_unit=archival_unit).reverse().first()
+        container = Container.objects.filter(archival_unit=archival_unit).order_by('container_no').reverse().first()
         if container:
             response = {
                 'archival_unit': archival_unit_id,
