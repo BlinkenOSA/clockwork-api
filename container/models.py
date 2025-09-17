@@ -37,7 +37,7 @@ class Container(models.Model, DetectProtectedMixin):
 
     def save(self, *args, **kwargs):
         if self.pk is None:
-            container = Container.objects.filter(archival_unit=self.archival_unit).reverse().first()
+            container = Container.objects.filter(archival_unit=self.archival_unit).order_by('container_no').reverse().first()
             if container:
                 self.container_no = container.container_no + 1
             else:
