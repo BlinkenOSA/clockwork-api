@@ -20,7 +20,7 @@ class GetFAEntityMetadataByItemID(RetrieveAPIView):
     def get_object(self):
         item_id = self.kwargs['item_id']
 
-        if re.match(r'^HU OSA [0-9]+-[0-9]+-[0-9]*_[0-9]{3}-[0-9]{3}', item_id):
+        if re.match(r'^HU_OSA_[0-9]+_[0-9]+_[0-9]*_[0-9]{4}_[0-9]{4}', item_id):
             item_id = item_id.replace("HU OSA ", "")
             fonds, subfonds, rest, folder_no = item_id.split('-')
             series, container_no = rest.split('_')
