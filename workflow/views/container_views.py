@@ -7,6 +7,7 @@ from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, get_obje
 from clockwork_api.authentication import BearerAuthentication
 from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from container.models import Container
+from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
 from finding_aids.serializers.finding_aids_entity_serializers import FindingAidsEntityReadSerializer
 from workflow.permission import APIGroupPermission
@@ -20,6 +21,11 @@ class GetSetDigitizedContainer(AuditLogMixin, RetrieveUpdateAPIView):
     lookup_field = 'barcode'
     authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        for fa_entity in FindingAidsEntity.objects.filter(container=instance).all():
+            fa_entity.save()
 
 
 class GetContainerMetadata(ListAPIView):
@@ -50,10 +56,9 @@ class GetContainerMetadataByLegacyID(RetrieveAPIView):
             fa_object = fa_objects.first()
             return fa_object.container
         else:
-            if re.match(r'^HU OSA [0-9]+-[0-9]+-[0-9]*_[0-9]{3}', legacy_id):
-                legacy_id = legacy_id.replace("HU OSA ", "")
-                fonds, subfonds, rest = legacy_id.split('-')
-                series, container_no = rest.split('_')
+            if re.match(r'^HU_OSA_[0-9]+_[0-9]+_[0-9]*_[0-9]{4}', legacy_id):
+                legacy_id = legacy_id.replace("HU_OSA_", "")
+                fonds, subfonds, series, container_no, rest = legacy_id.split('_')
                 container = get_object_or_404(
                     Container,
                     archival_unit__fonds=int(fonds),
