@@ -11,19 +11,19 @@ class VIAFMixin(object):
             return []
         else:
             if request_type == 'person':
-                query = 'local.personalNames+all+"' + query + '"'
+                query = 'local.names all "' + query + '"'
             elif request_type == 'corporation':
-                query = 'local.corporateNames+all+"' + query + '"'
+                query = 'local.corporateNames all "' + query + '"'
             elif request_type == 'country':
-                query = 'local.geographicNames+all+"' + query + '"'
+                query = 'local.geographicNames all "' + query + '"'
             elif request_type == 'place':
-                query = 'local.geographicNames+all+"' + query + '"'
+                query = 'local.geographicNames all "' + query + '"'
 
             session = requests.Session()
             session.trust_env = False
 
-            r = session.get('http://www.viaf.org/viaf/search?query=%s&sortKeys=holdingscount&maximumRecords=5&httpAccept'
-                            '=application/json&recordSchema=http://viaf.org/BriefVIAFCluster' % query)
+            r = session.get('http://www.viaf.org/viaf/search?query=%s&maximumRecords=5&sortKey=holdingscount' % query,
+                            headers={'Accept': 'application/json'}, timeout=10)
             if r.status_code == 200:
                 session.close()
                 return self.assemble_data_stream(json.loads(r.text))
@@ -35,16 +35,16 @@ class VIAFMixin(object):
     @staticmethod
     def assemble_data_stream(json_data):
         data = []
-        counter = 1
+        counter = 2
         if 'records' in json_data['searchRetrieveResponse']:
-            for record in json_data['searchRetrieveResponse']['records']:
-                record_data = record['record']['recordData']
-                viaf_id = 'http://www.viaf.org/viaf/%s' % record_data['viafID']['#text']
+            for record in json_data['searchRetrieveResponse']['records']['record']:
+                record_data = record['recordData']
+                viaf_id = 'http://www.viaf.org/viaf/%s' % record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:viafID']
 
-                if isinstance(record_data['mainHeadings']['data'], list):
-                    name = record_data['mainHeadings']['data'][0]['text']
+                if isinstance(record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:mainHeadings'][f'ns{counter}:data'], list):
+                    name = record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:mainHeadings'][f'ns{counter}:data'][0][f'ns{counter}:text']
                 else:
-                    name = record_data['mainHeadings']['data']['text']
+                    name = record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:mainHeadings'][f'ns{counter}:data'][f'ns{counter}:text']
 
                 rec = {
                     'viaf_id': viaf_id,

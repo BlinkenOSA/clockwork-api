@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
@@ -5,7 +7,7 @@ from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 
 class FindingAidsPublishTest(TestViewsBaseClass):
     """ Testing Finding Aids publishing endpoints"""
-    fixtures = ['finding_aids', 'carrier_types', 'primary_types']
+    fixtures = ['carrier_types', 'primary_types', 'access_rights', 'archival_unit_themes', 'finding_aids']
 
     def setUp(self):
         self.init()
@@ -16,13 +18,15 @@ class FindingAidsPublishTest(TestViewsBaseClass):
     def test_fa_create(self):
         finding_aids = {
             'folder_no': 3,
-            'title': 'Test Folder'
+            'title': 'Test Folder',
+            'date_from': '1990-01-01',
         }
         response = self.client.post(
             reverse('finding_aids-v1:finding_aids-create', kwargs={'container_id': self.container_id}),
             data=finding_aids
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED,
+                         msg=f"Failed with {response.status_code}. Response:\n{json.dumps(response.json(), indent=2)}")
         self.assertEqual(response.data['title'], finding_aids['title'])
         self.assertEqual(response.data['container'], self.container_id)
         self.assertEqual(response.data['archival_unit'], self.series_id)

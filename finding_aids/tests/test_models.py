@@ -4,13 +4,13 @@ from hashids import Hashids
 
 from archival_unit.models import ArchivalUnit
 from container.models import Container
-from controlled_list.models import CarrierType, PrimaryType
+from controlled_list.models import CarrierType, PrimaryType, AccessRight
 from finding_aids.models import FindingAidsEntity
 
 
 class FindingAidsTest(TestCase):
     """ Test module for FindingAids model """
-    fixtures = ['carrier_types', 'primary_types']
+    fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):
         self.fonds = ArchivalUnit.objects.create(

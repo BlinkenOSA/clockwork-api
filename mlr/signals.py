@@ -15,7 +15,7 @@ def downsync_mlr(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=Container)
 def check_empty_mlr(sender, instance, *args, **kwargs):
-    if instance.pk:
+    if instance.pk and Container.objects.filter(id=instance.pk).exists():
         previous_container = Container.objects.get(id=instance.pk)
         carrier_type = previous_container.carrier_type
         archival_unit = previous_container.archival_unit
