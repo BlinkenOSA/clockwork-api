@@ -31,27 +31,36 @@ class VIAFMixin(object):
                 session.close()
                 return []
 
-
     @staticmethod
-    def assemble_data_stream(json_data):
+    def assemble_record(record, counter):
+        record_data = record['recordData']
+        viaf_id = 'http://www.viaf.org/viaf/%s' % record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:viafID']
+
+        if isinstance(record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:mainHeadings'][f'ns{counter}:data'], list):
+            name = record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:mainHeadings'][f'ns{counter}:data'][0][
+                f'ns{counter}:text']
+        else:
+            name = record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:mainHeadings'][f'ns{counter}:data'][
+                f'ns{counter}:text']
+
+        rec = {
+            'viaf_id': viaf_id,
+            'name': name
+        }
+        return rec
+
+    def assemble_data_stream(self, json_data):
         data = []
         counter = 2
         if 'records' in json_data['searchRetrieveResponse']:
-            for record in json_data['searchRetrieveResponse']['records']['record']:
-                record_data = record['recordData']
-                viaf_id = 'http://www.viaf.org/viaf/%s' % record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:viafID']
-
-                if isinstance(record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:mainHeadings'][f'ns{counter}:data'], list):
-                    name = record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:mainHeadings'][f'ns{counter}:data'][0][f'ns{counter}:text']
-                else:
-                    name = record_data[f'ns{counter}:VIAFCluster'][f'ns{counter}:mainHeadings'][f'ns{counter}:data'][f'ns{counter}:text']
-
-                rec = {
-                    'viaf_id': viaf_id,
-                    'name': name
-                }
+            if json_data['searchRetrieveResponse']['records']['record'].__class__.__name__ == 'dict':
+                rec = self.assemble_record(json_data['searchRetrieveResponse']['records']['record'], counter)
                 data.append(rec)
-                counter += 1
+            else:
+                for record in json_data['searchRetrieveResponse']['records']['record']:
+                    rec = self.assemble_record(record, counter)
+                    data.append(rec)
+                    counter += 1
         return data
 
 
