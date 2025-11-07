@@ -1,4 +1,4 @@
-import wikipedia
+import wikipediaapi
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,7 +11,9 @@ class WikipediaMixin(object):
         data = []
 
         if len(query) > 0:
-            ws = wikipedia.search(query, results=2)
+            wiki = wikipediaapi.Wikipedia(user_agent='Blinken OSA Archivum - Archival Management System', language=lang)
+
+            ws = wiki.page(query)
             for entry in ws:
                 wiki_url = 'http://%s.wikipedia.org/wiki/%s' % (lang, entry)
                 data.append({

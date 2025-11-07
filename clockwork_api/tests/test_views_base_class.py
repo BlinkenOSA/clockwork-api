@@ -3,6 +3,8 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 
+from accounts.models import UserProfile
+
 
 class TestViewsBaseClass(APITestCase):
     def init(self):
@@ -10,6 +12,9 @@ class TestViewsBaseClass(APITestCase):
                                                   email='testuser@eqar.eu',
                                                   password='testpassword')
         self.user.save()
+
+        self.user_profile = UserProfile.objects.create(user=self.user)
+
         self.client.force_authenticate(self.user)
 
         # url = reverse('jwt-create')

@@ -1,0 +1,55 @@
+version: 2.1
+orbs:
+  coveralls: coveralls/coveralls@2.2.5
+jobs:
+  build:
+    docker:
+      - image: cimg/python:3.10
+        environment:
+          DATABASE_URL: "mysql://root:root@127.0.0.1:3306/test_db"
+      - image: cimg/mysql:8.0
+        environment:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+      - image: cimg/redis:5.0
+    working_directory: ~/clockwork-api
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - restore_cache:
+          keys:
+            - python-devel
+      - run:
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
+      - run:
+          name: Wait for redis
+          command: dockerize -wait tcp://localhost:6379 -timeout 1m
+      - run:
+          name: Install dependencies
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
+
+      - run:
+          name: Run migrations
+          command: |
+            . venv/bin/activate
+            python manage.py migrate
+      - run:
+          command: |
+            python -m venv python3
+            echo "source ./python3/bin/activate" >> $BASH_ENV;
+      - run:
+          command: |
+            pip install -r requirements.txt
+      - save_cache:
+          key: python-devel-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - ".python3"
+      - run:
+          command: |
+            coverage run --source='.' manage.py test
+      - coveralls/upload

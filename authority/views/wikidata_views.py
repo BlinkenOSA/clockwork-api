@@ -15,6 +15,9 @@ class WikidataMixin(object):
 
             r = session.get(
                 'https://www.wikidata.org/w/api.php',
+                headers={
+                    'User-Agent': 'Blinken OSA Archivum - Archival Management System'
+                },
                 params={
                     'action': 'query',
                     'list': 'search',
