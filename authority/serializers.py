@@ -70,6 +70,18 @@ class PersonSelectSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class SimilarPersonSerializer(serializers.ModelSerializer):
+    similarity_percent = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Person
+        fields = [
+            'id', 'first_name', 'last_name',
+            'wikidata_id', 'wiki_url', 'authority_url', 'other_url',
+            'similarity_percent'
+        ]
+
+
 # Corporation serializers
 class CorporationOtherFormatSerializer(serializers.ModelSerializer):
     class Meta:

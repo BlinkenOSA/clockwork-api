@@ -1,3 +1,5 @@
+import unicodedata
+
 from django.db import models
 
 
@@ -71,10 +73,57 @@ class Place(models.Model):
         ordering = ['place']
 
 
+def fold(s: str) -> str:
+    return (
+        unicodedata.normalize('NFKD', s or '')
+        .encode('ascii', 'ignore')
+        .decode('ascii')
+        .lower()
+        .strip()
+    )
+
+# --- SimHash helpers (64-bit) over character 3-grams ---
+def _trigrams(s: str):
+    s = f"  {s}  "  # padding to keep edges informative
+    return [s[i:i+3] for i in range(len(s) - 2)]
+
+def _hash64(s: str) -> int:
+    # a tiny, fast 64-bit non-cryptographic hash
+    # (splitmix-like; good enough for SimHash purposes)
+    x = 0x9E3779B97F4A7C15
+    h = 0
+    for ch in s:
+        x ^= ord(ch)
+        x = (x * 0xBF58476D1CE4E5B9) & 0xFFFFFFFFFFFFFFFF
+        x ^= (x >> 30)
+        x = (x * 0x94D049BB133111EB) & 0xFFFFFFFFFFFFFFFF
+        h ^= x
+    return h & 0xFFFFFFFFFFFFFFFF
+
+def simhash64(s: str) -> int:
+    # Character-3gram SimHash
+    grams = _trigrams(s)
+    if not grams:
+        return 0
+    bits = [0]*64
+    for g in grams:
+        h = _hash64(g)
+        for i in range(64):
+            bits[i] += 1 if (h >> i) & 1 else -1
+    out = 0
+    for i, val in enumerate(bits):
+        if val >= 0:
+            out |= (1 << i)
+    return out & 0xFFFFFFFFFFFFFFFF
+
 class Person(models.Model):
     id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+
+    full_name_folded = models.CharField(max_length=210, db_index=True, blank=True, default="")
+    simhash64 = models.PositiveBigIntegerField(db_index=True, default=0)
+
     wikidata_id = models.CharField(max_length=20, blank=True, null=True)
     wiki_url = models.CharField(max_length=200, blank=True, null=True)
     authority_url = models.CharField(max_length=200, blank=True, null=True)
@@ -86,8 +135,17 @@ class Person(models.Model):
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
+    def save(self, *args, **kwargs):
+        full = f"{(self.first_name or '').strip()} {(self.last_name or '').strip()}".strip()
+        folded = fold(full)
+        self.full_name_folded = folded
+        self.simhash64 = simhash64(folded)
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return ', '.join((self.last_name.strip(), self.first_name.strip()))
+        last = (self.last_name or "").strip()
+        first = (self.first_name or "").strip()
+        return ', '.join((last, first)) if last or first else str(self.id)
 
     class Meta:
         db_table = 'authority_people'
