@@ -56,10 +56,30 @@ class PersonOtherFormatSerializer(serializers.ModelSerializer):
 class PersonSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     name = serializers.CharField(source='__str__', read_only=True)
     person_other_formats = PersonOtherFormatSerializer(many=True, required=False, source='personotherformat_set')
+    fa_subject_count = serializers.IntegerField(read_only=True)
+    fa_associated_count = serializers.IntegerField(read_only=True)
+    fa_total_count = serializers.IntegerField(read_only=True)
+    is_removable = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Person
         fields = '__all__'
+
+
+class PersonListSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
+    name = serializers.CharField(source='__str__', read_only=True)
+    fa_subject_count = serializers.IntegerField(read_only=True)
+    fa_associated_count = serializers.IntegerField(read_only=True)
+    fa_total_count = serializers.IntegerField(read_only=True)
+    is_removable = serializers.SerializerMethodField()
+
+    def get_is_removable(self, obj):
+        return obj.fa_total_count == 0
+
+    class Meta:
+        model = Person
+        fields = ('id', 'name', 'wikidata_id', 'authority_url', 'is_removable', 'fa_subject_count',
+                  'fa_associated_count', 'fa_total_count')
 
 
 class PersonSelectSerializer(serializers.ModelSerializer):
@@ -71,13 +91,13 @@ class PersonSelectSerializer(serializers.ModelSerializer):
 
 
 class SimilarPersonSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='__str__')
     similarity_percent = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Person
         fields = [
-            'id', 'first_name', 'last_name',
-            'wikidata_id', 'wiki_url', 'authority_url', 'other_url',
+            'id', 'name', 'wikidata_id', 'wiki_url', 'authority_url', 'other_url',
             'similarity_percent'
         ]
 
