@@ -11,6 +11,7 @@ class WikipediaMixin(object):
         data = []
 
         if len(query) > 0:
+            wikipedia.set_lang(lang)
             ws = wikipedia.search(query, results=2)
             for entry in ws:
                 wiki_url = 'http://%s.wikipedia.org/wiki/%s' % (lang, entry)
