@@ -7,6 +7,7 @@ from authority.views.language_views import LanguageList, LanguageDetail, Languag
 from authority.views.person_views import PersonList, PersonDetail, PersonSelectList
 from authority.views.place_views import PlaceList, PlaceDetail, PlaceSelectList
 from authority.views.lcsh_views import LCSHList
+from authority.views.similarity_views.person_similarity_views import PersonSimilarById
 from authority.views.subject_views import SubjectList, SubjectDetail, SubjectSelectList
 from authority.views.viaf_views import VIAFList
 from authority.views.wikidata_views import WikidataList
@@ -34,6 +35,7 @@ urlpatterns = [
     path('people/', PersonList.as_view(), name='person-list'),
     path('people/<int:pk>/', PersonDetail.as_view(), name='person-detail'),
     path('select/people/', PersonSelectList.as_view(), name='person-select-list'),
+    path("people/<int:pk>/similar/", PersonSimilarById.as_view(), name="person-similar-by-id"),
 
     # Corporation URLs
     path('corporations/', CorporationList.as_view(), name='corporation-list'),

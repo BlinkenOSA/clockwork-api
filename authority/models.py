@@ -1,4 +1,9 @@
+import unicodedata
+
 from django.db import models
+
+from authority.helpers.similarity_helpers import fold, simhash64
+from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 
 class Country(models.Model):
@@ -75,6 +80,10 @@ class Person(models.Model):
     id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+
+    full_name_folded = models.CharField(max_length=210, db_index=True, blank=True, default="")
+    simhash64 = models.PositiveBigIntegerField(db_index=True, default=0)
+
     wikidata_id = models.CharField(max_length=20, blank=True, null=True)
     wiki_url = models.CharField(max_length=200, blank=True, null=True)
     authority_url = models.CharField(max_length=200, blank=True, null=True)
@@ -86,8 +95,17 @@ class Person(models.Model):
     user_updated = models.CharField(max_length=100, blank=True)
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
+    def save(self, *args, **kwargs):
+        full = f"{(self.first_name or '').strip()} {(self.last_name or '').strip()}".strip()
+        folded = fold(full)
+        self.full_name_folded = folded
+        self.simhash64 = simhash64(folded)
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return ', '.join((self.last_name.strip(), self.first_name.strip()))
+        last = (self.last_name or "").strip()
+        first = (self.first_name or "").strip()
+        return ', '.join((last, first)) if last or first else str(self.id)
 
     class Meta:
         db_table = 'authority_people'

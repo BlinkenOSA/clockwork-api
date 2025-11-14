@@ -26,7 +26,7 @@ iiif-prezi3==1.2.1
 langdetect==1.0.9
 lxml==4.9.2
 Markdown==3.4.1
-mysqlclient==2.1.1
+mysqlclient==2.2.7
 O365==2.0.27
 Office365-REST-Python-Client==2.4.0
 openpyxl==3.1.1
@@ -36,11 +36,12 @@ pyreportjasper==1.0.2
 pysolr==3.9.0
 python-dateutil==2.8.2
 pyWikiCommons==0.0.5
+RapidFuzz==3.14.3
 redis==4.5.2
 requests==2.32.3
 requests-oauthlib==1.3.0
+scikit-learn==1.7.2
 urllib3==1.26.13
 # uuid==1.30
 Wikidata==0.7.0
 wikipedia==1.4.0
-Wikipedia-API==0.8.1
