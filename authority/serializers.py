@@ -56,10 +56,6 @@ class PersonOtherFormatSerializer(serializers.ModelSerializer):
 class PersonSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
     name = serializers.CharField(source='__str__', read_only=True)
     person_other_formats = PersonOtherFormatSerializer(many=True, required=False, source='personotherformat_set')
-    fa_subject_count = serializers.IntegerField(read_only=True)
-    fa_associated_count = serializers.IntegerField(read_only=True)
-    fa_total_count = serializers.IntegerField(read_only=True)
-    is_removable = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Person
