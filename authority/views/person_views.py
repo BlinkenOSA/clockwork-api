@@ -11,7 +11,12 @@ class PersonList(generics.ListCreateAPIView):
     filter_backends = (OrderingFilter, SearchFilter)
     ordering_fields = ['last_name', 'fa_subject_count', 'fa_associated_count', 'fa_total_count']
     search_fields = ('first_name', 'last_name', 'personotherformat__first_name', 'personotherformat__last_name')
-    serializer_class = PersonListSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return PersonSerializer
+        else:
+            return PersonListSerializer
 
     def get_queryset(self):
         qs = Person.objects.annotate(

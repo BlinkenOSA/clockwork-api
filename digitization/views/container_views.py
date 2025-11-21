@@ -7,7 +7,7 @@ from digitization.serializers.container_serializers import DigitizationContainer
 
 class DigitizationContainerList(ListAPIView):
     filter_backends = (SearchFilter, OrderingFilter)
-    ordering_fields = ('barcode', 'digital_version_exists', 'digital_version_creation_date')
+    ordering_fields = ('barcode', 'date_updated', 'digital_version_exists', 'digital_version_creation_date')
     search_fields = ('archival_unit__reference_code', 'barcode',
                      'findingaidsentity__title', 'findingaidsentity__title_original')
     serializer_class = DigitizationContainerLogSerializer
