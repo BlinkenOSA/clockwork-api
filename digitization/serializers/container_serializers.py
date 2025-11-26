@@ -6,6 +6,7 @@ from controlled_list.models import CarrierType
 
 
 class DigitizationContainerLogSerializer(serializers.ModelSerializer):
+    archival_unit_id = serializers.PrimaryKeyRelatedField(source='archival_unit', read_only=True)
     container_no = serializers.SerializerMethodField()
     duration = serializers.SerializerMethodField()
     carrier_type = serializers.SlugRelatedField(slug_field='type', queryset=CarrierType.objects.all())
@@ -27,7 +28,7 @@ class DigitizationContainerLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Container
-        fields = ('id', 'container_no', 'barcode', 'digital_version_exists',
+        fields = ('id', 'container_no', 'archival_unit_id', 'barcode', 'digital_version_exists',
                   'digital_version_research_cloud', 'digital_version_online',
                   'digital_version_research_cloud_path', 'digital_version_creation_date',
                   'duration', 'carrier_type', 'date_updated')
