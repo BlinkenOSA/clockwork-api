@@ -4,12 +4,13 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 
 from authority.models import Person
 from authority.serializers import PersonSerializer, PersonSelectSerializer, PersonListSerializer
+from django_filters import rest_framework as filters
 
 
 class PersonList(generics.ListCreateAPIView):
     queryset = Person.objects.all()
     filter_backends = (OrderingFilter, SearchFilter)
-    ordering_fields = ['last_name', 'fa_subject_count', 'fa_associated_count', 'fa_total_count']
+    ordering_fields = ['last_name', 'last_name', 'fa_subject_count', 'fa_associated_count', 'fa_total_count']
     search_fields = ('first_name', 'last_name', 'personotherformat__first_name', 'personotherformat__last_name')
 
     def get_serializer_class(self):
@@ -28,6 +29,20 @@ class PersonList(generics.ListCreateAPIView):
         ).annotate(
             fa_total_count=F('fa_subject_count') + F('fa_associated_count')
         )
+
+        ordering = self.request.query_params.get('ordering')
+
+        # Name ordering
+        if ordering == 'name':
+            return qs.order_by('last_name', 'first_name')
+        elif ordering == '-name':
+            return qs.order_by('-last_name', '-first_name')
+
+        if ordering == 'fa_total_count':
+            return qs.order_by('fa_total_count', 'last_name', 'first_name')
+        elif ordering == '-name':
+            return qs.order_by('-fa_total_count', 'last_name', 'first_name')
+
         return qs
 
 class PersonDetail(generics.RetrieveUpdateDestroyAPIView):
