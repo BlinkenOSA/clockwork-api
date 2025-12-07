@@ -1,3 +1,18 @@
+"""
+URL configuration for the accession app.
+
+This module defines all HTTP endpoints related to accession records,
+including:
+    - Listing and creating accessions
+    - Retrieving, updating, or deleting a specific accession
+    - Pre-create utilities (sequence number generation)
+    - Lightweight selection endpoints for dropdown fields
+    - Controlled vocabulary selection endpoints (methods, copyright statuses)
+
+The structure is organized so that:
+    - Main CRUD endpoints remain at the root level
+    - Selection lists live under `/select/`
+"""
 from django.urls import path
 
 from accession.views.accession_views import AccessionList, AccessionDetail, AccessionSelectList, AccessionPreCreate
