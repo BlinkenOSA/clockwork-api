@@ -78,11 +78,11 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
             restricted_count = FindingAidsEntity.objects.filter(
                 archival_unit=obj.archival_unit, access_rights__id=3).count()
 
-        if fa_entity_count == restricted_count:
-            return 'Restricted'
-
         if restricted_count == 0:
             return 'Not Restricted'
+
+        if fa_entity_count == restricted_count:
+            return 'Restricted'
 
         return 'Partially Restricted (%s Folder/Item Restricted - %s Folder/Item Not Restricted)' % (
             restricted_count, (fa_entity_count - restricted_count)
