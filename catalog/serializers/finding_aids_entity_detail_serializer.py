@@ -1,3 +1,17 @@
+"""
+Serializers for detailed Finding Aids Entity catalog views.
+
+This module defines a comprehensive, read-only serialization layer
+used by the public catalog to display full descriptive metadata
+for archival folders and items.
+
+The serializers here:
+    - normalize deeply relational archival data
+    - resolve authority-controlled entities (persons, places, subjects, etc.)
+    - compute derived display fields (citation, digital identifiers, access copies)
+    - are optimized for read-only catalog presentation
+"""
+
 from rest_framework import serializers
 
 from archival_unit.models import ArchivalUnit
@@ -12,6 +26,13 @@ from finding_aids.models import FindingAidsEntity, FindingAidsEntityAlternativeT
 
 
 class ArchivalUnitSerializer(serializers.ModelSerializer):
+    """
+    Lightweight representation of an archival unit linked to a finding aid.
+
+    Includes catalog-level identifiers and normalized title fields
+    for display and navigation.
+    """
+
     catalog_id = serializers.SlugRelatedField(slug_field='catalog_id', source='isad', read_only=True)
 
     class Meta:
@@ -20,6 +41,13 @@ class ArchivalUnitSerializer(serializers.ModelSerializer):
 
 
 class ContainerSerializer(serializers.ModelSerializer):
+    """
+    Serializer for physical or logical containers holding finding aids entities.
+
+    Used to expose container identifiers, carrier type,
+    and digital availability status.
+    """
+
     carrier_type = serializers.SlugRelatedField(slug_field='type', read_only=True)
 
     class Meta:
@@ -28,12 +56,20 @@ class ContainerSerializer(serializers.ModelSerializer):
 
 
 class AlternativeTitleSerializer(serializers.ModelSerializer):
+    """
+    Represents alternative or supplied titles for a finding aids entity.
+    """
+
     class Meta:
         model = FindingAidsEntityAlternativeTitle
         fields = ['alternative_title', 'title_given']
 
 
 class DateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for normalized date ranges associated with a finding aids entity.
+    """
+
     date_type = serializers.SlugRelatedField(slug_field='type', read_only=True)
 
     class Meta:
@@ -42,9 +78,18 @@ class DateSerializer(serializers.ModelSerializer):
 
 
 class CreatorSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creators or collectors associated with a finding aids entity.
+
+    Converts internal role codes into human-readable values.
+    """
+
     role = serializers.SerializerMethodField()
 
     def get_role(self, obj):
+        """
+        Maps internal creator role codes to display labels.
+        """
         if obj.role == 'COL':
             return 'Collector'
         else:
@@ -68,6 +113,11 @@ class FASubjectSerializer(serializers.ModelSerializer):
 
 
 class AssociatedPersonSerializer(serializers.ModelSerializer):
+    """
+    Serializer for persons associated with a finding aids entity
+    in a non-primary (contextual) role.
+    """
+
     associated_person = PersonSerializer(read_only=True)
     role = serializers.SlugRelatedField(slug_field='role', read_only=True)
 
@@ -77,6 +127,11 @@ class AssociatedPersonSerializer(serializers.ModelSerializer):
 
 
 class AssociatedCorporationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for corporations associated with a finding aids entity
+    in a non-primary (contextual) role.
+    """
+
     associated_corporation = CorporationSerializer(read_only=True)
     role = serializers.SlugRelatedField(slug_field='role', read_only=True)
 
@@ -86,6 +141,10 @@ class AssociatedCorporationSerializer(serializers.ModelSerializer):
 
 
 class AssociatedCountrySerializer(serializers.ModelSerializer):
+    """
+    Serializer for countries associated with a finding aids entity
+    in a non-primary (contextual) role.
+    """
     associated_country = CountrySerializer(read_only=True)
     role = serializers.SlugRelatedField(slug_field='role', read_only=True)
 
@@ -95,6 +154,10 @@ class AssociatedCountrySerializer(serializers.ModelSerializer):
 
 
 class AssociatedPlaceSerializer(serializers.ModelSerializer):
+    """
+    Serializer for places associated with a finding aids entity
+    in a non-primary (contextual) role.
+    """
     associated_place = PlaceSerializer(read_only=True)
     role = serializers.SlugRelatedField(slug_field='role', read_only=True)
 
@@ -121,12 +184,34 @@ class FAExtentSerializer(serializers.ModelSerializer):
 
 
 class DigitalVersionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for digital versions.
+
+    Excludes internal identifiers and exposes only
+    catalog-relevant metadata.
+    """
     class Meta:
         model = DigitalVersion
         exclude = ['id',]
 
 
 class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
+    """
+    Full-detail serializer for a Finding Aids Entity.
+
+    This serializer provides the canonical public representation
+    of archival folders and items in the institutional catalog.
+
+    Responsibilities:
+        - aggregate descriptive metadata
+        - resolve authority-controlled relations
+        - compute catalog-specific display fields
+        - expose digital access information
+        - generate human-readable citations
+
+    This serializer is read-only and intended exclusively
+    for public catalog consumption.
+    """
     archival_unit = ArchivalUnitSerializer()
     container = ContainerSerializer()
     primary_type = serializers.SlugRelatedField(slug_field='type', read_only=True)
@@ -156,14 +241,42 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
     access_copies = serializers.SerializerMethodField()
 
     def get_description_level(self, obj):
+        """
+        Returns a human-readable description level label.
+
+        Maps internal codes:
+            L1 → Level 1
+            L2 → Level 2
+        """
         dl = {'L1': 'Level 1', 'L2': 'Level 2'}
         return dl[obj.description_level]
 
     def get_level(self, obj):
+        """
+        Returns a human-readable level label.
+
+        Maps internal codes:
+            F → Folder
+            I → Item
+        """
         fl = {'F': 'Folder', 'I': 'Item'}
         return fl[obj.level]
 
     def get_digital_version_identifier(self, obj):
+        """
+        Computes a stable identifier used for digital object references.
+
+        Resolution order:
+            1. Folder-level digital version identifier
+            2. Container barcode (if available)
+            3. Container label
+            4. Generated container reference code
+
+        This identifier is used for:
+            - IIIF manifests
+            - download references
+            - viewer integration
+        """
         archival_unit_ref_code = obj.archival_unit.reference_code.replace(" ", "_")
 
         # Folder level indicator
@@ -181,6 +294,19 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
                     return "%s-%04d" % (archival_unit_ref_code, obj.container.container_no)
 
     def get_citation(self, obj):
+        """
+        Constructs a human-readable archival citation string.
+
+        The citation includes:
+            - title (quoted or bracketed as appropriate)
+            - date or date range
+            - archival reference code
+            - series / subfonds / fonds hierarchy
+            - institutional attribution
+
+        The resulting string is suitable for
+        scholarly and catalog citation use.
+        """
         citation = []
 
         # Title
@@ -223,9 +349,19 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
         return "".join(citation)
 
     def get_digital_version_online(self, obj):
+        """
+        Indicates whether at least one digital version
+        of the entity is available online.
+        """
         return obj.digitalversion_set.filter(available_online=True).count() > 0
 
     def get_access_copies(self, obj):
+        """
+        Returns serialized access-level digital copies.
+
+        Only digital versions marked as access-level ('A')
+        are included in the response.
+        """
         digital_versions = obj.digitalversion_set.filter(level='A')
         serializer = DigitalVersionSerializer(instance=digital_versions, many=True)
         return serializer.data

@@ -1,3 +1,14 @@
+"""
+Statistics endpoint for retrieving recently added or published catalog content.
+
+This module provides a public API endpoint used by the catalog frontend
+to display newly added archival descriptions or series based on
+publication date.
+
+The returned content depends on the requested content type and applies
+different aggregation rules accordingly.
+"""
+
 import datetime
 
 from rest_framework.response import Response
@@ -8,9 +19,45 @@ from isad.models import Isad
 
 
 class NewlyAddedContent(APIView):
+    """
+    Returns recently published catalog content.
+
+    The behavior of this endpoint depends on the `content_type` URL parameter:
+
+    - `isad`:
+        Returns the 5 most recently published ISAD descriptions
+        at series level (`description_level = 'S'`).
+
+    - any other value (e.g. 'folder'):
+        Returns up to 5 distinct archival series that have had
+        finding aids published within the last two years.
+
+    This endpoint is primarily used for:
+        - "Newly added content" widgets
+        - catalog landing pages
+        - discovery and promotional features
+    """
+
     permission_classes = []
 
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs) -> Response:
+        """
+        Retrieves newly added or recently published content.
+
+        URL parameters:
+           content_type (str):
+               Determines which publication logic to apply.
+               Expected values:
+                   - 'isad'
+                   - any other value (treated as finding aids based)
+
+        Returns:
+           A list of dictionaries containing:
+               - id: catalog identifier
+               - reference_code: archival reference code
+               - title: full archival unit title
+               - date_published: publication date
+        """
         response = []
         if kwargs['content_type'] == 'isad':
             for isad in Isad.objects.filter(
