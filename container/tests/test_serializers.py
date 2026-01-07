@@ -132,7 +132,7 @@ class ContainerSelectSerializerTest(TestCase):
         )
         serializer = ContainerSelectSerializer(instance=container)
         data = serializer.data
-        self.assertEqual(data['reference_code'], 'HU OSA 206-3-1/1')
+        self.assertEqual(data['reference_code'], 'HU OSA 206-3-1:1')
 
     def test_digital_version_duration(self):
         container = Container.objects.create(
