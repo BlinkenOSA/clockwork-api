@@ -1,4 +1,3 @@
-# myapp/api/views.py
 from django.db import transaction
 from rest_framework import status
 from rest_framework.views import APIView
@@ -11,9 +10,49 @@ from finding_aids.models import FindingAidsEntity, FindingAidsEntityAssociatedPe
 
 
 class PersonSimilarById(APIView):
+    """
+    Returns persons similar to a given Person record.
+
+    This endpoint uses the internal similarity engine to find potential
+    duplicates or closely related authority records based on name
+    similarity.
+
+    Permissions:
+        - Read-only access allowed to unauthenticated users
+        - Authentication recommended for administrative workflows
+    """
+
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get(self, request, pk: int):
+    def get(self, request, pk: int) -> Response:
+        """
+        Retrieves similar Person records for a given Person ID.
+
+        Query parameters:
+            limit:
+                Maximum number of results to return (default: 10)
+
+            min_similarity:
+                Minimum similarity threshold on a 0–1 scale (default: 0.2)
+
+            max_candidates:
+                Maximum number of candidates evaluated (default: 5000)
+
+            max_hamming:
+                Maximum SimHash Hamming distance (default: 8)
+
+        Args:
+            request:
+                HTTP request object.
+
+            pk:
+                Primary key of the target Person.
+
+        Returns:
+            HTTP 200 with a list of similar persons, each including
+            a similarity percentage.
+        """
+
         try:
             person = Person.objects.get(pk=pk)
         except Person.DoesNotExist:
@@ -32,9 +71,43 @@ class PersonSimilarById(APIView):
 
 
 class PersonSimilarMerge(APIView):
+    """
+    Merges two Person authority records into one.
+
+    This operation is destructive:
+        - One Person record is kept
+        - The other is deleted
+        - All references are reassigned atomically
+
+    Intended for administrative deduplication workflows.
+    """
+
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def post(self, request):
+    def post(self, request) -> Response:
+        """
+        Merges one Person record into another.
+
+        Request body:
+            keep_id:
+                ID of the Person record to keep.
+
+            merge_id:
+                ID of the Person record to merge and delete.
+
+        Behavior:
+            - Reassigns all subject relationships (M2M)
+            - Reassigns all associated-person relationships (FK)
+            - Deletes the merged Person
+            - Executes inside a single database transaction
+
+        Returns:
+            HTTP 200 on success with merge details.
+            HTTP 400 for invalid input.
+            HTTP 404 if one or both persons are not found.
+            HTTP 500 for unexpected errors (transaction rolled back).
+        """
+
         keep_id = request.data.get("keep_id")
         merge_id = request.data.get("merge_id")
 

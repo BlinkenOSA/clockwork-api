@@ -1,3 +1,27 @@
+"""
+Public catalog API URL configuration.
+
+This module defines the read-only, public-facing API surface used
+by the institutional archival catalog.
+
+Endpoints are grouped into:
+    - Archival unit discovery and navigation
+    - Finding aids access
+    - Tree-based hierarchical navigation
+    - IIIF image presentation
+    - External authority enrichment
+    - Researcher workflows
+    - Public statistics
+
+All endpoints in this module are:
+    - Read-only (except researcher registration/request flows)
+    - Safe for unauthenticated access
+    - Intended for frontend and external consumption
+
+Detailed request/response schemas are documented separately via
+OpenAPI / Swagger.
+"""
+
 from django.urls import path, re_path
 
 from catalog.views.archival_unit_views.archival_units_detail_view import ArchivalUnitsDetailView, \
@@ -15,7 +39,7 @@ from catalog.views.statistics_views.archival_unit_sizes import ArchivalUnitSizes
 from catalog.views.statistics_views.collection_specific_tags import CollectionSpecificTags
 from catalog.views.statistics_views.newly_added_content import NewlyAddedContent
 from catalog.views.tree_views.archival_units_tree_quick_view import ArchivalUnitsTreeQuickView
-from catalog.views.tree_views.archival_units_tree_view_v2 import ArchivalUnitsTreeViewV2
+from catalog.views.tree_views.archival_units_tree_view import ArchivalUnitsTreeView
 from research.views.researcher_views import ResearcherCountrySelectList, ResearcherNationalitySelectList
 from research.views.researcher_degree_views import ResearcherDegreeSelectList
 
@@ -36,9 +60,9 @@ urlpatterns = [
          name='finding-aids-location-view'),
 
     # Tree Views
-    path('archival-units-tree/<str:archival_unit_id>/', ArchivalUnitsTreeViewV2.as_view(), kwargs={'theme': None},
+    path('archival-units-tree/<str:archival_unit_id>/', ArchivalUnitsTreeView.as_view(), kwargs={'theme': None},
          name='archival-units-tree'),
-    path('archival-units-tree/<str:archival_unit_id>/<str:theme>/', ArchivalUnitsTreeViewV2.as_view(),
+    path('archival-units-tree/<str:archival_unit_id>/<str:theme>/', ArchivalUnitsTreeView.as_view(),
          name='archival-units-tree-with-theme'),
     path('archival-units-tree-quick-view/<str:archival_unit_id>/', ArchivalUnitsTreeQuickView.as_view(),
          name='archival-units-tree-quick-view'),

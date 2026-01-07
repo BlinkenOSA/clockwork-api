@@ -36,6 +36,7 @@ urlpatterns = [
     path('people/<int:pk>/', PersonDetail.as_view(), name='person-detail'),
     path('select/people/', PersonSelectList.as_view(), name='person-select-list'),
 
+    # Person similarity and deduplication URLs
     path("people/<int:pk>/similar/", PersonSimilarById.as_view(), name="person-similar-by-id"),
     path("people/merge/", PersonSimilarMerge.as_view(), name='person-merge'),
 

@@ -1,4 +1,22 @@
-# similarity.py
+"""
+Similarity helpers for authority Person records.
+
+This module implements a hybrid name-similarity search designed for
+archival authority data, where spelling variants, transliteration,
+initials, and partial names are common.
+
+The algorithm combines multiple techniques:
+    - Unicode folding and normalization
+    - SimHash (Hamming-distance prefilter)
+    - Regex-based token bucketing
+    - RapidFuzz string similarity
+    - Optional TF–IDF cosine similarity (character n-grams)
+
+The output is a ranked list of Person objects with an additional
+attribute `similarity_percent` (0–100), suitable for display in UI
+components or duplicate-detection workflows.
+"""
+
 import re
 from typing import List, Optional, Tuple
 from django.db.models import Q, Value
@@ -12,22 +30,77 @@ _PUNCT_RE = re.compile(r"[^\w\s]", flags=re.UNICODE)
 _WS_RE = re.compile(r"\s+")
 
 def normalize_for_match(s: str) -> str:
+    """
+    Normalizes a string for similarity matching.
+
+    Steps:
+        - Removes punctuation
+        - Normalizes whitespace
+        - Lowercases the string
+
+    Args:
+        s: Input string.
+
+    Returns:
+        A normalized string suitable for fuzzy matching.
+    """
+
     s = _PUNCT_RE.sub(" ", s or "")
     s = _WS_RE.sub(" ", s).strip().lower()
     return s
 
 def first_token(s: str) -> str:
+    """
+    Returns the first whitespace-separated token of a string.
+
+    Args:
+        s: Input string.
+
+    Returns:
+        First token, or empty string if none exist.
+    """
+
     toks = (s or "").split()
     return toks[0] if toks else ""
 
 def last_token(s: str) -> str:
+    """
+    Returns the last whitespace-separated token of a string.
+
+    Args:
+        s: Input string.
+
+    Returns:
+        Last token, or empty string if none exist.
+    """
+
     toks = (s or "").split()
     return toks[-1] if toks else ""
 
 def _full_expr():
+    """
+    Returns a database expression concatenating first and last name.
+
+    Used for annotating querysets with a searchable full-name field.
+    """
+
     return Lower(Concat('first_name', Value(' '), 'last_name'))
 
 def _initials_boost(target_norm: str, cand_norm: str) -> int:
+    """
+    Applies a small score boost when the target appears to be an initial.
+
+    Example:
+        "J Smith" vs "John Smith"
+
+    Args:
+        target_norm: Normalized target string.
+        cand_norm: Normalized candidate string.
+
+    Returns:
+        Integer boost value (0 or small positive number).
+    """
+
     t_first = first_token(target_norm)
     c_first = first_token(cand_norm)
     if len(t_first) == 1 and c_first.startswith(t_first):
@@ -35,7 +108,21 @@ def _initials_boost(target_norm: str, cand_norm: str) -> int:
     return 0
 
 def _mononym_boost(single: str, cand_norm: str) -> int:
-    # Boost if the single token matches or prefixes first/last tokens
+    """
+    Applies score boosts for single-token (mononym) queries.
+
+    Boosts when the single token:
+        - Matches exactly the first or last token
+        - Prefix-matches the first or last token
+
+    Args:
+        single: Normalized single-token query.
+        cand_norm: Normalized candidate name.
+
+    Returns:
+        Integer boost value.
+    """
+
     f = first_token(cand_norm)
     l = last_token(cand_norm)
     boost = 0
@@ -56,6 +143,57 @@ def similar_people(
     w_tfidf: float = 0.55,         # blend weights
     w_fuzz: float = 0.45,
 ) -> List[Person]:
+    """
+    Finds Person records similar to the given full name.
+
+    The function dynamically chooses one of two strategies based on
+    token count:
+
+    SINGLE-TOKEN QUERIES
+    --------------------
+    - Uses regex word-boundary matching and prefix buckets
+    - Ranks candidates using RapidFuzz (WRatio / partial_ratio)
+    - Applies mononym-specific boosts
+
+    MULTI-TOKEN QUERIES
+    ------------------
+    - Uses SimHash (Hamming distance) as a prefilter
+    - Widens candidates with last-token regex bucket
+    - Ranks using a weighted blend of:
+        * TF–IDF cosine similarity (char n-grams)
+        * RapidFuzz similarity
+    - Applies small boosts for initials and last-token matches
+
+    Args:
+        target_full_name:
+            The input name to search for.
+
+        exclude_id:
+            Optional Person ID to exclude from results (useful for
+            deduplication workflows).
+
+        limit:
+            Maximum number of results to return.
+
+        min_similarity:
+            Minimum similarity threshold on a 0–1 scale.
+
+        max_candidates:
+            Upper bound on candidate pool size before scoring.
+
+        max_hamming:
+            Maximum SimHash Hamming distance for multi-token queries.
+
+        w_tfidf:
+            Weight of TF–IDF similarity in final score.
+
+        w_fuzz:
+            Weight of RapidFuzz similarity in final score.
+
+    Returns:
+        A list of Person objects, each annotated with:
+            - similarity_percent (int, 0–100)
+    """
 
     target_raw = (target_full_name or "").strip()
     if not target_raw:

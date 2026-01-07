@@ -1,5 +1,17 @@
-# coding=utf-8
+"""
+Serializers for public-facing archival unit detail views.
+
+These serializers power the catalog detail pages for archival units
+(Fonds, Subfonds, and Series) and expose enriched, read-only metadata
+derived from ISAD, containers, finding aids, and authority records.
+
+They are optimized for:
+    - catalog browsing
+    - public discovery
+    - read-only presentation (not editing)
+"""
 import re
+from typing import List
 
 from django.db.models import Sum, Count
 from rest_framework import serializers
@@ -14,18 +26,39 @@ from isad.models import Isad
 
 
 class ArchivalUnitSerializer(serializers.ModelSerializer):
+    """
+    Lightweight serializer for embedding basic archival unit title information
+    within larger ISAD-based serializers.
+    """
     class Meta:
         model = ArchivalUnit
         fields = ['title', 'title_original', 'title_full']
 
 
 class IsaarSerializer(serializers.ModelSerializer):
+    """
+    Minimal serializer for ISAAR creator authority records.
+
+    Used to embed creator information associated with an ISAD description.
+    """
     class Meta:
         model = Isaar
         fields = ['id', 'name']
 
 
 class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
+    """
+    Full detail serializer for a published ISAD archival description.
+
+    This serializer aggregates data from:
+        - ArchivalUnit
+        - FindingAidsEntity
+        - Container
+        - ISAAR creator records
+        - Controlled vocabularies (languages, rights)
+
+    It is used by the public catalog detail endpoint and is read-only.
+    """
     archival_unit = ArchivalUnitSerializer()
     title_original = serializers.SerializerMethodField()
     access_rights = serializers.SerializerMethodField()
@@ -40,23 +73,58 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
     container_count = serializers.SerializerMethodField()
     folder_item_count = serializers.SerializerMethodField()
 
-    def get_title_original(self, obj):
+    def get_title_original(self, obj) -> str:
+        """
+        Returns the original-language title from the linked archival unit.
+        """
         return obj.archival_unit.title_original
 
-    def get_description_level(self, obj):
+    def get_description_level(self, obj) -> str:
+        """
+        Maps archival description level codes to human-readable labels.
+
+        F  -> Fonds
+        SF -> Subfonds
+        S  -> Series
+        """
         description_level_values = {'F': 'Fonds', 'SF': 'Subfonds', 'S': 'Series'}
         return description_level_values[obj.description_level]
 
-    def get_extent_processed(self, obj):
+    def get_extent_processed(self, obj) -> list:
+        """
+        Returns the processed physical extent of the archival unit
+        in English.
+        """
         return self.get_extent(obj.archival_unit)
 
-    def get_extent_processed_original(self, obj):
+    def get_extent_processed_original(self, obj) -> list:
+        """
+        Returns the processed physical extent translated into the
+        original description language, if available.
+        """
         return self.get_extent(obj.archival_unit, obj.original_locale.id if obj.original_locale else None)
 
-    def get_digital_content_online(self, obj):
+    def get_digital_content_online(self, obj) -> int:
+        """
+        Counts published finding aids linked to this archival unit
+        that have digital versions available online.
+        """
         return FindingAidsEntity.objects.filter(archival_unit=obj.archival_unit, digital_version_online=True).count()
 
-    def get_access_rights(self, obj):
+    def get_access_rights(self, obj) -> str:
+        """
+        Computes a summarized access restriction status.
+
+        Possible return values:
+            - "Not Restricted" - If all the underlying folders/items are unrestricted
+            - "Restricted" - If all the underlying folders/items are restricted
+            - "Partially Restricted (X Folder/Item Restricted - Y Not Restricted)" - If some folders/items are restricted
+
+        The calculation scope depends on description level:
+            - Fonds: all descendant series
+            - Subfonds: all descendant series
+            - Series: direct children only
+        """
         fa_entity_count = 0
         restricted_count = 0
 
@@ -88,7 +156,24 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
             restricted_count, (fa_entity_count - restricted_count)
         )
 
-    def get_extent(self, archival_unit, lang='EN'):
+    def get_extent(self, archival_unit, lang='EN') -> List[str]:
+        """
+        Calculates physical extent grouped by carrier type.
+
+        The calculation scope depends on archival unit level:
+         - Fonds: all containers within fonds
+         - Subfonds: containers within subfonds
+         - Series: containers directly linked
+
+        Output is localized based on language code:
+         - EN (default)
+         - HU
+         - PL
+         - IT
+
+        Returns:
+         List[str]: human-readable extent descriptions
+        """
         extent = []
         total = 0
 
@@ -118,10 +203,16 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
                               str(round(c['width'] / 1000.00, 2)) + ' linear meters')
         return extent
 
-    def get_folder_item_count(self, obj):
+    def get_folder_item_count(self, obj) -> int:
+        """
+        Returns the number of published finding aids linked to the archival unit.
+        """
         return FindingAidsEntity.objects.filter(archival_unit=obj.archival_unit, published=True).count()
 
-    def get_container_count(self, obj):
+    def get_container_count(self, obj) -> int:
+        """
+        Returns the number of physical containers linked to the archival unit.
+        """
         return Container.objects.filter(archival_unit=obj.archival_unit).count()
 
     class Meta:
@@ -130,6 +221,12 @@ class ArchivalUnitsDetailSerializer(serializers.ModelSerializer):
 
 
 class ArchivalUnitsFacetQuerySerializer(serializers.ModelSerializer):
+    """
+    Lightweight serializer used for facet-based preview queries.
+
+    This serializer cleans HTML markup from narrative fields
+    to produce plain-text summaries suitable for UI facets.
+    """
     scope_and_content_narrative = serializers.SerializerMethodField()
     scope_and_content_abstract = serializers.SerializerMethodField()
     archival_history = serializers.SerializerMethodField()
@@ -144,6 +241,12 @@ class ArchivalUnitsFacetQuerySerializer(serializers.ModelSerializer):
         return self._clean_field(obj.archival_history)
 
     def _clean_field(self, data):
+        """
+        Strips HTML tags from narrative text fields.
+
+        Used to safely display ISAD narrative content
+        in compact UI components.
+        """
         if data:
             CLEANR = re.compile('<.*?>')
             cleantext = re.sub(CLEANR, '', data)

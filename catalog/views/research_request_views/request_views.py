@@ -1,3 +1,23 @@
+"""
+Public endpoint for submitting archival research requests.
+
+This module implements the main workflow for researchers to request
+archival materials (finding aids or external/library items).
+
+The endpoint:
+    - validates researcher identity via email + card number
+    - validates request items
+    - creates or reuses a Request record
+    - creates request items and item parts
+    - detects restricted content
+    - sends notification emails to relevant parties
+
+This endpoint is intentionally unauthenticated and protected via:
+    - hCaptcha
+    - strict validation rules
+    - external rate limiting
+"""
+
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
@@ -10,24 +30,70 @@ from research.models import Request, Researcher, RequestItem, RequestItemPart, R
 
 
 class ResearcherRequestView(APIView):
+    """
+    Handles submission of archival research requests.
+
+    This endpoint processes a complete research request, including:
+        - researcher identification
+        - requested items
+        - restriction handling
+        - email notifications
+
+    The endpoint is designed to be idempotent per researcher and request_date.
+    """
+
     permission_classes = []
 
-    def post(self, request):
+    def post(self, request) -> Response:
+        """
+        Submits a new research request.
+
+        Expected request payload:
+            - researcher identity (email + card_number)
+            - request_date
+            - one or more request items
+            - hCaptcha token
+            - optional research subject and motivation
+
+        Validation:
+            - researcher identity must match an existing Researcher
+            - request items must be valid and resolvable
+            - hCaptcha must be verified
+
+        Side effects:
+            - Creates or reuses a Request record
+            - Creates RequestItem, RequestItemPart, and restriction records
+            - Sends email notifications to:
+                * researcher
+                * administrators
+                * restriction decision makers (if applicable)
+
+        Returns:
+            HTTP 200 with "ok" on success.
+        """
         serializer = ResearchRequestSerializer(data=request.data)
 
         has_restricted_content = False
 
+        # Serializer validation
         if serializer.is_valid():
             data = serializer.data
+
+            # Researcher resolution
+            # Researcher identity is resolved in the serializer and trusted here.
             researcher = Researcher.objects.get(id=data['researcher'])
 
+            # Request creation
+            # A researcher can only have one request per date.
             request, created = Request.objects.get_or_create(
                 researcher=researcher,
                 request_date=data['request_date']
             )
 
+            # Item processing loop
             items = data.get('items', [])
             for item in items:
+                # Finding Aids Item
                 if item['origin'] == 'FA':
                     request_item, created = RequestItem.objects.get_or_create(
                         request=request,
@@ -56,6 +122,7 @@ class ResearcherRequestView(APIView):
                         request_item_restriction.motivation = data['motivation']
                         request_item_restriction.save()
 
+                # Library/Film Library Item
                 else:
                     request_item, created = RequestItem.objects.get_or_create(
                         request=request,
