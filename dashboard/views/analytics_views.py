@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,7 +10,29 @@ from isad.models import Isad
 
 
 class AnalyticsActivityView(APIView):
+    """
+    Returns monthly creation activity for dashboard analytics.
+
+    The response provides per-month counts for the last three years for:
+        - Accessions
+        - ISAD(G) records
+        - ISAAR records
+        - Finding aids entities
+
+    Response format:
+        A flat list of objects with:
+            - month: "YYYY/MM"
+            - type: one of the tracked entity labels
+            - value: count created in that month
+    """
+
     def get(self, request):
+        """
+        Builds a month sequence for the last three years and counts creations per month.
+
+        The month list includes each month boundary starting at the first day
+        of the month and ending at the current month.
+        """
         date_from = datetime.now() - relativedelta(years=3)
         date_to = datetime.now()
 
@@ -55,7 +77,30 @@ class AnalyticsActivityView(APIView):
 
 
 class AnalyticsTotalView(APIView):
+    """
+    Returns cumulative totals for dashboard analytics.
+
+    The response provides per-month cumulative counts (<= month boundary)
+    for the last three years for:
+        - Accessions
+        - ISAD(G) records
+        - ISAAR records
+        - Finding aids entities
+
+    Response format:
+        A flat list of objects with:
+            - month: "YYYY/MM"
+            - type: one of the tracked entity labels
+            - value: cumulative count up to that month
+    """
+
     def get(self, request):
+        """
+        Builds a month sequence for the last three years and counts cumulative totals.
+
+        Cumulative values are computed using `date_created__lte=month`, where
+        `month` is the first day of the month.
+        """
         date_from = datetime.now() - relativedelta(years=3)
         date_to = datetime.now()
 
