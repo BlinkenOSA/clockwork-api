@@ -14,10 +14,33 @@ from finding_aids.models import FindingAidsEntity
 
 class FindingAidsNewCatalogIndexer:
     """
-    Class to index Finding Aids records to Solr for the catalog.
+    Indexes Finding Aids entities into the Solr "catalog" core.
+
+    Responsibilities:
+        - fetch a fully-related FindingAidsEntity record efficiently
+        - build a Solr document with:
+            - display fields
+            - facet fields
+            - search fields (multilingual aware)
+            - sort fields
+        - enforce publication gating (only index if parent ISAD is published)
+        - enforce confidentiality rules (redact sensitive fields when confidential)
+        - enrich some records with external technical metadata
+
+    The resulting Solr document is stored in `self.doc`.
     """
 
     def __init__(self, finding_aids_entity_id):
+        """
+        Initializes the indexer and prepares Solr connectivity.
+
+        Args:
+            finding_aids_entity_id: Primary key of the FindingAidsEntity to index.
+
+        Side effects:
+            - loads the FindingAidsEntity with related objects needed for indexing
+            - prepares a pysolr client using SOLR_URL and SOLR_CORE_CATALOG_NEW settings
+        """
         self.finding_aids_entity_id = finding_aids_entity_id
         self.finding_aids_entity = self._get_finding_aids_record(finding_aids_entity_id)
         self.hashids = Hashids(salt="osacontent", min_length=10)
@@ -30,9 +53,23 @@ class FindingAidsNewCatalogIndexer:
         self.doc = {}
 
     def get_solr_document(self):
+        """
+        Returns the currently built Solr document dictionary.
+        """
         return self.doc
 
     def index(self):
+        """
+        Indexes the record into Solr using pysolr.
+
+        Indexing is guarded by publication rules:
+            - the archival unit must have an ISAD record
+            - the ISAD record must be published
+
+        When allowed:
+            - builds the Solr document
+            - adds it to Solr (without committing)
+        """
         if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
             if self.finding_aids_entity.archival_unit.isad.published:
                 self.create_solr_document()
@@ -44,6 +81,14 @@ class FindingAidsNewCatalogIndexer:
             print("Finding Aids record doesn't exists. %s!" % self.finding_aids_entity.archival_reference_code)
 
     def index_with_requests(self):
+        """
+        Indexes the record into Solr using the requests API endpoint.
+
+        This is an alternative to pysolr.add(), and uses:
+            POST <solr_url>/update/json/docs/
+
+        Indexing is guarded by the same publication rules as `index()`.
+        """
         if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
             if self.finding_aids_entity.archival_unit.isad.published:
                 self.create_solr_document()
@@ -56,15 +101,30 @@ class FindingAidsNewCatalogIndexer:
                     print('Error with indexing %s: %s' % (self.finding_aids_entity.archival_reference_code, r.text))
 
     def commit(self):
+        """
+        Sends a commit request to Solr.
+
+        This is typically called after one or more `index()` calls to
+        make the updates visible.
+        """
         r = requests.post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
                 getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
             ))
         print(r.text)
 
     def delete(self):
+        """
+        Deletes the record from Solr by its Solr id and commits immediately.
+        """
         self.solr.delete(id=self._get_solr_id(), commit=True)
 
     def _get_finding_aids_record(self, finding_aids_entity_id):
+        """
+        Loads a FindingAidsEntity with related objects needed for indexing.
+
+        Uses select_related/prefetch_related to reduce query count when building
+        facets and search fields.
+        """
         qs = FindingAidsEntity.objects.filter(pk=finding_aids_entity_id)
         qs = qs.select_related('archival_unit')
         qs = qs.select_related('container')
@@ -80,10 +140,27 @@ class FindingAidsNewCatalogIndexer:
         return qs.get()
 
     def create_solr_document(self):
+        """
+        Builds the Solr document for the current record.
+
+        Steps:
+            1. Populate document fields
+            2. Remove duplicates in list-valued fields
+        """
         self._index_record()
         self._remove_duplicates()
 
     def _index_record(self):
+        """
+        Populates `self.doc` with all Solr fields for the record.
+
+        This method handles:
+            - id, guid, and reference codes
+            - confidentiality redaction of sensitive fields
+            - digital version fields and technical metadata enrichment
+            - facets and search fields (including language-aware fields)
+            - sort fields used by the Solr UI/query layer
+        """
         self.doc['id'] = self._get_solr_id()
         self.doc['ams_id'] = self.finding_aids_entity.id
         self.doc['call_number'] = self.finding_aids_entity.archival_reference_code
@@ -183,18 +260,36 @@ class FindingAidsNewCatalogIndexer:
         self.doc["title_sort"] = self.finding_aids_entity.title
 
     def _get_solr_id(self):
+        """
+        Returns the Solr document id.
+
+        Preference order:
+            1. catalog_id (stored on the entity)
+            2. hashids-encoded primary key
+        """
         if self.finding_aids_entity.catalog_id:
             return self.finding_aids_entity.catalog_id
         else:
             return self.hashids.encode(self.finding_aids_entity.id)
 
     def _get_description_level(self):
+        """
+        Converts the entity level code to a display label for Solr.
+        """
         if self.finding_aids_entity.level == 'F':
             return 'Folder'
         else:
             return 'Item'
 
     def _get_date_created_display(self):
+        """
+        Produces a human-readable date string for display.
+
+        Supports:
+            - single dates
+            - date ranges (from/to)
+            - approximate date spans ("ca.") when date_ca_span is non-zero
+        """
         if self.finding_aids_entity.date_to:
             if self.finding_aids_entity.date_from != self.finding_aids_entity.date_to:
                 if self.finding_aids_entity.date_ca_span != 0:
@@ -208,9 +303,22 @@ class FindingAidsNewCatalogIndexer:
             return str(self.finding_aids_entity.date_from)
 
     def _get_parent_unit(self):
+        """
+        Returns the parent archival unit title for display.
+        """
         return self.finding_aids_entity.archival_unit.title_full
 
     def _get_info(self):
+        """
+        Builds a compact info string for display.
+
+        Aggregates:
+            - genre terms
+            - language values (with usage when available)
+            - explicit typed dates
+            - fallback to main date_from/date_to when no typed dates exist
+            - duration (human-readable)
+        """
         values = []
 
         # Genre
@@ -245,9 +353,20 @@ class FindingAidsNewCatalogIndexer:
         return ', '.join(values)
 
     def _get_series_id(self):
+        """
+        Returns the archival unit id used as a series identifier in Solr.
+        """
         return self.finding_aids_entity.archival_unit.id
 
     def _get_digital_version_info(self):
+        """
+        Collects digital-version availability and identifier information.
+
+        Uses DigitalVersionIdentifierGenerator to determine:
+            - whether a digital version exists
+            - whether it is available online
+            - the identifier/barcode used in the catalog UI
+        """
         did_generator = DigitalVersionIdentifierGenerator(self.finding_aids_entity)
         val = {
             'digital_version_exists': did_generator.detect(),
@@ -257,6 +376,12 @@ class FindingAidsNewCatalogIndexer:
         return val
 
     def _get_digital_collection(self):
+        """
+        Determines the digital collection facet value.
+
+        Uses the first related DigitalVersion.digital_collection if available,
+        otherwise falls back to the fonds title.
+        """
         digital_version = DigitalVersion.objects.filter(finding_aids_entity=self.finding_aids_entity)\
             .values('digital_collection').first()
         if 'digital_collection' in digital_version:
@@ -265,6 +390,12 @@ class FindingAidsNewCatalogIndexer:
             return self.finding_aids_entity.archival_unit.get_fonds().title
 
     def _get_value_with_wikidata_id(self, obj):
+        """
+        Formats an authority value including a Wikidata id when present.
+
+        Output format:
+            "<label>#<wikidata_id>" or "<label>"
+        """
         wikipedia_id = getattr(obj, "wikidata_id")
         if wikipedia_id:
             return "%s#%s" % (str(obj), wikipedia_id)
@@ -272,6 +403,15 @@ class FindingAidsNewCatalogIndexer:
             return str(obj)
 
     def _get_subjects(self, wikidata=False):
+        """
+        Returns subject values for facets/search.
+
+        Includes:
+            - subject people
+            - subject corporations
+
+        When wikidata=True, values are emitted as "<label>#<wikidata_id>" when available.
+        """
         subjects = []
         # Subject people
         for person in self.finding_aids_entity.subject_person.all():
@@ -290,6 +430,13 @@ class FindingAidsNewCatalogIndexer:
         return subjects
 
     def _get_keywords(self):
+        """
+        Returns keyword values for facets/search.
+
+        Includes:
+            - free-text subjects (FindingAidsEntitySubject)
+            - controlled keywords (controlled_list.Keyword)
+        """
         keywords = []
         # Subjects
         for fa_subject in self.finding_aids_entity.findingaidsentitysubject_set.all():
@@ -301,6 +448,9 @@ class FindingAidsNewCatalogIndexer:
         return keywords
 
     def _get_duration(self):
+        """
+        Returns a human-readable duration string derived from entity.duration.
+        """
         duration_string = []
         if self.finding_aids_entity.duration:
             hours, remainder = divmod(self.finding_aids_entity.duration.seconds, 3600)
@@ -318,6 +468,12 @@ class FindingAidsNewCatalogIndexer:
         return ' '.join(duration_string)
 
     def _get_contributors(self, wikidata=False):
+        """
+        Returns contributor values for facets/search.
+
+        Contributors are derived from associated people and corporations.
+        When wikidata=True, emits values as "<label>#<wikidata_id>" when available.
+        """
         contributors = []
 
         # Associated person
@@ -336,6 +492,15 @@ class FindingAidsNewCatalogIndexer:
         return contributors
 
     def _get_geo(self, wikidata=False):
+        """
+        Returns geographic values for facets/search.
+
+        Includes:
+            - spatial coverage countries
+            - spatial coverage places
+
+        When wikidata=True, emits values as "<label>#<wikidata_id>" when available.
+        """
         geo = []
 
         # Spatial coverage country
@@ -354,6 +519,12 @@ class FindingAidsNewCatalogIndexer:
         return geo
 
     def _get_languages(self, wikidata=False):
+        """
+        Returns language values for facets/search.
+
+        Languages come from FindingAidsEntityLanguage links. When wikidata=True,
+        the linked language authority may include wikidata ids.
+        """
         languages = []
         for fa_language in self.finding_aids_entity.findingaidsentitylanguage_set.all():
             if wikidata:
@@ -362,8 +533,12 @@ class FindingAidsNewCatalogIndexer:
                 languages.append(str(fa_language.language))
         return languages
 
-
     def _get_date_created_facet(self):
+        """
+        Returns year facet values based on date_from/date_to.
+
+        If a date range is present, all years in the inclusive range are emitted.
+        """
         date = []
         if len(self.finding_aids_entity.date_from) == 0:
             return None
@@ -384,6 +559,9 @@ class FindingAidsNewCatalogIndexer:
             return date
 
     def _get_availability(self):
+        """
+        Returns the availability facet value based on digital version status.
+        """
         digital_version = self._get_digital_version_info()
         if digital_version['digital_version_exists'] and not digital_version['digital_version_online']:
             return 'Digitally Anywhere / With Registration'
@@ -394,11 +572,28 @@ class FindingAidsNewCatalogIndexer:
         return 'In the Research Room'
 
     def _get_identifiers(self):
+        """
+        Returns identifier values for identifier_search.
+
+        When a digital version exists, this returns the digital version identifier.
+        """
         digital_version = self._get_digital_version_info()
         if digital_version['digital_version_exists']:
             return digital_version['digital_version_barcode']
 
     def _get_search_field(self, ams_field, solr_field):
+        """
+        Populates localized search fields in Solr.
+
+        If an original locale is set:
+            - writes the English field from the base attribute
+            - writes the locale-specific field from the *_original attribute
+
+        If no original locale is set:
+            - attempts language detection (langdetect.detect)
+            - writes into <solr_field>_<locale> when locale is supported
+            - falls back to <solr_field>_general on detection failure/unsupported locale
+        """
         if self.finding_aids_entity.original_locale:
             locale = self.finding_aids_entity.original_locale.id.lower()
             self.doc['%s_en' % solr_field] = getattr(self.finding_aids_entity, ams_field)
@@ -414,6 +609,18 @@ class FindingAidsNewCatalogIndexer:
                 self.doc['%s_general' % solr_field] = getattr(self.finding_aids_entity, ams_field)
 
     def _get_digital_version_technical_metadata(self):
+        """
+        Fetches technical metadata for still images via IIIF.
+
+        For primary type "Still Image", this:
+            - constructs an IIIF image id from archival and container/folder identifiers
+            - requests <BASE_IMAGE_URI>/<image_id>/info.json
+            - returns the JSON response text when available
+
+        Returns:
+            - str containing info.json when successful
+            - None when not available or request fails
+        """
         if self.finding_aids_entity.primary_type.type == 'Still Image':
             iiif_url = (getattr(settings, 'BASE_IMAGE_URI', 'http://127.0.0.1:8182/iiif/2/'))
             archival_unit_ref_code = self.finding_aids_entity.archival_unit.reference_code\
@@ -434,6 +641,12 @@ class FindingAidsNewCatalogIndexer:
                 return None
 
     def _remove_duplicates(self):
+        """
+        Deduplicates list-valued fields in the Solr document.
+
+        Solr facets/search fields can be populated from multiple sources;
+        this ensures lists contain unique values only.
+        """
         for k, v in self.doc.items():
             if isinstance(v, list):
                 self.doc[k] = list(set(v))

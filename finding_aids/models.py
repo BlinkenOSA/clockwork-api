@@ -12,6 +12,24 @@ from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 
 class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
+    """
+    Core model representing a finding aids entity.
+
+    A finding aids entity's description level can be either:
+        - Level 1 (L1). The record can either represent a Folder or an Item record, but it is joined to
+          (and sequentialy created directly under) the container record.
+        - Level 2 (L2). The record can only represent an Item record. This selection allows you to define, under which
+          folder is the item record can be found.
+
+    A finding aids entity describes either:
+        - a folder-level unit, or
+        - an item-level unit
+
+    within an archival container. The model supports rich descriptive
+    metadata, controlled vocabularies, publication workflow, cloning,
+    and digital version tracking.
+    """
+
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, db_index=True)
     archival_unit = models.ForeignKey('archival_unit.ArchivalUnit', on_delete=models.PROTECT, db_index=True)
@@ -141,33 +159,59 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
 
     @property
     def available_online(self):
+        """
+        Returns True if any related digital version is available online.
+        """
         return self.digitalversion_set.filter(available_online=True).count() > 0
 
     @property
     def restricted(self):
+        """
+        Returns True if access rights are marked as restricted.
+        """
         return self.access_rights.statement == 'Restricted'
 
     def publish(self, user):
+        """
+        Publishes the finding aids entity.
+        """
         self.published = True
         self.user_published = user.username
         self.date_published = timezone.now()
         self.save()
 
     def unpublish(self):
+        """
+        Unpublishes the finding aids entity.
+        """
         self.published = False
         self.user_published = ""
         self.date_published = None
         self.save()
 
     def set_confidential(self):
+        """
+        Marks the entity as confidential.
+        """
         self.confidential = True
         self.save()
 
     def set_non_confidential(self):
+        """
+        Removes confidential status.
+        """
         self.confidential = False
         self.save()
 
     def set_reference_code(self):
+        """
+        Computes the archival reference code.
+
+        Resolution depends on:
+            - template status
+            - description level (L1 / L2)
+            - container, folder, and sequence numbers
+        """
         if self.is_template:
             self.archival_reference_code = "%s-TEMPLATE" % self.archival_unit.reference_code
         else:
@@ -182,6 +226,9 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
                                                                 self.sequence_no)
 
     def set_catalog_id(self):
+        """
+        Generates a stable, public-facing catalog identifier using Hashids.
+        """
         if not self.is_template:
             super(FindingAidsEntity, self).save()
             # Add hashids
@@ -189,6 +236,9 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
             self.catalog_id = hashids.encode(self.id)
 
     def set_duration(self):
+        """
+        Computes duration from start and end time fields when available.
+        """
         if getattr(self, 'time_end'):
             if getattr(self, 'time_start'):
                 self.duration = self.time_end - self.time_start
@@ -197,6 +247,16 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
                 self.duration = self.time_end
 
     def save(self, **kwargs):
+        """
+        Overrides save to keep derived fields consistent.
+
+        Ensures:
+            - date_created is set (legacy compatibility)
+            - archival_reference_code is updated
+            - digital version creation date is populated when applicable
+            - duration is computed
+            - catalog_id is generated for non-template entities
+        """
         if not self.date_created:
             self.date_created = datetime.datetime.now()
         self.set_reference_code()
@@ -209,6 +269,13 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
 
 
 class FindingAidsEntityAlternativeTitle(models.Model):
+    """
+    Stores an alternative title for a finding aids entity.
+
+    Alternative titles support variant naming, translations, or
+    cataloger-supplied titles distinct from the primary title.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
 
@@ -220,6 +287,13 @@ class FindingAidsEntityAlternativeTitle(models.Model):
 
 
 class FindingAidsEntityDate(models.Model):
+    """
+    Stores a typed date range for a finding aids entity.
+
+    Dates use ApproximateDateField to support imprecise values and are
+    classified by a controlled DateType.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     date_from = ApproximateDateField()
@@ -231,6 +305,13 @@ class FindingAidsEntityDate(models.Model):
 
 
 class FindingAidsEntityCreator(models.Model):
+    """
+    Stores a creator entry for a finding aids entity.
+
+    Creator records store a free-text creator name alongside a controlled
+    role value (e.g. Creator vs Collector).
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     creator = models.CharField(max_length=300)
@@ -242,6 +323,13 @@ class FindingAidsEntityCreator(models.Model):
 
 
 class FindingAidsEntityIdentifier(models.Model):
+    """
+    Stores an identifier for a finding aids entity.
+
+    Identifiers support typed values (e.g. legacy ids, external references)
+    using a controlled IdentifierType.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     identifier = models.CharField(max_length=50, blank=True, null=True)
@@ -252,6 +340,13 @@ class FindingAidsEntityIdentifier(models.Model):
 
 
 class FindingAidsEntityPlaceOfCreation(models.Model):
+    """
+    Stores a free-text place of creation for a finding aids entity.
+
+    This model captures a literal place string when a controlled place
+    authority record is not used or not available.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     place = models.CharField(max_length=200)
@@ -261,6 +356,13 @@ class FindingAidsEntityPlaceOfCreation(models.Model):
 
 
 class FindingAidsEntitySubject(models.Model):
+    """
+    Stores a free-text subject for a finding aids entity.
+
+    This model supports literal subject terms when controlled authority
+    subjects are not used or not available.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     subject = models.CharField(max_length=200)
@@ -270,6 +372,13 @@ class FindingAidsEntitySubject(models.Model):
 
 
 class FindingAidsEntityAssociatedPerson(models.Model):
+    """
+    Links a finding aids entity to an associated person authority record.
+
+    The association may include a controlled PersonRole describing how the
+    person relates to the described materials.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     associated_person = models.ForeignKey('authority.Person', on_delete=models.PROTECT)
@@ -280,6 +389,13 @@ class FindingAidsEntityAssociatedPerson(models.Model):
 
 
 class FindingAidsEntityAssociatedCorporation(models.Model):
+    """
+    Links a finding aids entity to an associated corporation authority record.
+
+    The association may include a controlled CorporationRole describing how
+    the corporation relates to the described materials.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     associated_corporation = models.ForeignKey('authority.Corporation', on_delete=models.PROTECT)
@@ -290,6 +406,13 @@ class FindingAidsEntityAssociatedCorporation(models.Model):
 
 
 class FindingAidsEntityAssociatedCountry(models.Model):
+    """
+    Links a finding aids entity to an associated country authority record.
+
+    The association may include a controlled GeoRole describing how the
+    location relates to the described materials.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     associated_country = models.ForeignKey('authority.Country', on_delete=models.PROTECT)
@@ -300,6 +423,13 @@ class FindingAidsEntityAssociatedCountry(models.Model):
 
 
 class FindingAidsEntityAssociatedPlace(models.Model):
+    """
+    Links a finding aids entity to an associated place authority record.
+
+    The association may include a controlled GeoRole describing how the
+    place relates to the described materials.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     associated_place = models.ForeignKey('authority.Place', on_delete=models.PROTECT)
@@ -310,6 +440,13 @@ class FindingAidsEntityAssociatedPlace(models.Model):
 
 
 class FindingAidsEntityLanguage(CloneMixin, models.Model):
+    """
+    Links a finding aids entity to a language authority record.
+
+    The link may include a controlled LanguageUsage describing the role of
+    the language (e.g. spoken, written).
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     language = models.ForeignKey('authority.Language', on_delete=models.PROTECT)
@@ -321,6 +458,12 @@ class FindingAidsEntityLanguage(CloneMixin, models.Model):
 
 
 class FindingAidsEntityExtent(models.Model):
+    """
+    Stores a typed extent value for a finding aids entity.
+
+    Extent values combine a numeric amount with a controlled ExtentUnit.
+    """
+
     id = models.AutoField(primary_key=True)
     fa_entity = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE)
     extent_number = models.IntegerField(blank=True, null=True)
@@ -331,6 +474,16 @@ class FindingAidsEntityExtent(models.Model):
 
 
 class FindingAidsEntityRelatedMaterial(models.Model):
+    """
+    Represents a bidirectional "related material" relationship between entities.
+
+    Each relationship is stored in two directions:
+        - source -> destination
+        - destination -> source
+
+    The save and delete methods enforce this symmetry automatically.
+    """
+
     id = models.AutoField(primary_key=True)
     source = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE, related_name='relationship_sources')
     destination = models.ForeignKey('FindingAidsEntity', on_delete=models.CASCADE, related_name='relationship_destinations')
@@ -338,6 +491,14 @@ class FindingAidsEntityRelatedMaterial(models.Model):
     relationship_destination = models.CharField(max_length=300, blank=True, null=True)
 
     def save(self, **kwargs):
+        """
+        Saves the relationship and ensures the reverse relationship exists.
+
+        The reverse record mirrors:
+            - source/destination swapped
+            - relationship labels swapped
+        """
+
         super(FindingAidsEntityRelatedMaterial, self).save()
         # Save the other side of the relationship
         related_material, created = FindingAidsEntityRelatedMaterial.objects.get_or_create(
@@ -349,6 +510,10 @@ class FindingAidsEntityRelatedMaterial(models.Model):
         related_material.save()
 
     def delete(self, using=None, keep_parents=False):
+        """
+        Deletes the relationship and removes the reverse relationship record.
+        """
+
         # Delete the other side of the relationship
         FindingAidsEntityRelatedMaterial.objects.filter(
             source=self.destination,

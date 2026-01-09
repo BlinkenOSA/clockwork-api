@@ -21,9 +21,38 @@ from isad.models import Isad
 
 
 class FindingAidsLabelDataView(APIView):
+    """
+    Generates and returns a label-printing PDF for all containers in a series.
+
+    The process is:
+        1. Resolve carrier type and archival unit (series)
+        2. Build a JSON data file containing one "label" record per container
+        3. Run JasperReports (pyreportjasper) using the carrier type's jrxml template
+        4. Return the resulting PDF as an inline FileResponse
+
+    Notes:
+        - This endpoint is public (AllowAny) to support printing workflows
+          where authentication may be handled elsewhere (e.g. intranet or kiosk).
+        - PDFs are created on disk under:
+            clockwork_api/labels/output/
+          and JSON work files under:
+            clockwork_api/labels/work/
+    """
+
     permission_classes = [AllowAny,]
 
     def get(self, request, *args, **kwargs):
+        """
+        Builds (or re-builds) the label PDF for a given series and carrier type.
+
+        URL kwargs:
+            series_id: ArchivalUnit id (series level in your routing)
+            carrier_type_id: CarrierType id used to select the Jasper jrxml template
+
+        Returns:
+            FileResponse: PDF inline when generation succeeded and the file exists
+            Response: 404 with a message if template is missing or PDF was not produced
+        """
         carrier_type = get_object_or_404(CarrierType, pk=kwargs['carrier_type_id'])
         archival_unit = get_object_or_404(ArchivalUnit, pk=kwargs['series_id'])
 
@@ -43,7 +72,26 @@ class FindingAidsLabelDataView(APIView):
         else:
             return Response('There are no jasper templates existing to this carrier type.', status=status.HTTP_404_NOT_FOUND)
 
-    def make_json(self, series_id):
+    def make_json(self, series_id: int):
+        """
+        Builds the JSON data file consumed by JasperReports for label generation.
+
+        For each container in the series, a "label" record is generated containing:
+            - fonds/subfonds/series identifiers (f/sf/s)
+            - container number (boxNo)
+            - fonds/subfonds/series titles
+            - first and last folder titles + formatted date ranges (when present)
+            - restriction text from the series ISAD access rights (when available)
+
+        Output:
+            Writes a JSON file to:
+                clockwork_api/labels/work/<reference_code_id>.json
+            with schema:
+                {"labels": [ ... ]}
+
+        Args:
+            series_id: ArchivalUnit primary key.
+        """
         json_array = []
 
         archival_unit = get_object_or_404(ArchivalUnit, pk=series_id)
@@ -88,6 +136,21 @@ class FindingAidsLabelDataView(APIView):
             json.dump({'labels': json_array}, outfile, indent=4)
 
     def _encode_date(self, date):
+        """
+        Formats an approximate/partial date for label display.
+
+        Behavior:
+            - If year/month/day exist: "d M, Y"
+            - If year/month exist: "M, Y"
+            - If only year exists: "Y"
+            - If date is empty string: returns placeholder "YYYY"
+
+        Args:
+            date: A date-like object with year/month/day attributes, or ''.
+
+        Returns:
+            str: formatted date string suitable for labels.
+        """
         if date != '':
             if date.year and date.month and date.day:
                 return dateformat.format(date, 'd M, Y')
@@ -99,6 +162,21 @@ class FindingAidsLabelDataView(APIView):
             return 'YYYY'
 
     def create_report(self, reference_code, jasper_file):
+        """
+        Produces a label PDF via JasperReports using the prepared JSON data file.
+
+        Inputs:
+            - JRXML template file from clockwork_api/labels/jasper/
+            - JSON data file from clockwork_api/labels/work/<reference_code>.json
+
+        Output:
+            Writes PDF to:
+                clockwork_api/labels/output/<reference_code>_<template_name>.pdf
+
+        Args:
+            reference_code: archival_unit.reference_code_id (used for filenames)
+            jasper_file: jrxml filename defined on the carrier type.
+        """
         output_file = os.path.join(settings.BASE_DIR, 'clockwork_api', 'labels', 'output', '%s_%s' % (reference_code, jasper_file.replace(".jrxml", "")))
 
         if jasper_file:
@@ -124,7 +202,29 @@ class FindingAidsLabelDataView(APIView):
 
 
 class FindingAidsCarrierTypeDataView(APIView):
+    """
+    Returns carrier type breakdown for containers within a given series.
+
+    This endpoint is used to drive label printing UI by showing:
+        - which carrier types exist in the series
+        - how many containers of each type exist
+        - whether a Jasper template exists for that carrier type
+    """
+
     def get(self, request, *args, **kwargs):
+        """
+        Aggregates containers by carrier type for a given series.
+
+        URL kwargs:
+            series_id: ArchivalUnit id
+
+        Returns:
+            Response[list[dict]] with:
+                - carrier_type: display label
+                - carrier_type_id: PK of the carrier type
+                - total: number of containers in that carrier type
+                - templateExists: whether carrier_type.jasper_file is set
+        """
         response = []
         archival_unit = get_object_or_404(ArchivalUnit, pk=kwargs['series_id'])
         containers = Container.objects.filter(archival_unit=archival_unit)\
