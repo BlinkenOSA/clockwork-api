@@ -30,30 +30,32 @@ class Command(BaseCommand):
 
         for archival_unit in archival_units:
             if Isad.objects.filter(archival_unit=archival_unit).exists():
-                self.archival_unit = archival_unit
+                if FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False).count() > 0:
+                    self.archival_unit = archival_unit
+                    self.folders_items = []
 
-                self.assemble_archival_unit_data('F')
-                self.assemble_archival_unit_data('SF')
-                self.assemble_archival_unit_data('S')
+                    self.assemble_archival_unit_data('F')
+                    self.assemble_archival_unit_data('SF')
+                    self.assemble_archival_unit_data('S')
 
-                self.assemble_finding_aids()
+                    self.assemble_finding_aids()
 
-                output = {
-                    'fonds': self.fonds_data,
-                    'subfonds': self.subfonds_data,
-                    'series': self.series_data,
-                    'finding_aids': self.folders_items
-                }
+                    output = {
+                        'fonds': self.fonds_data,
+                        'subfonds': self.subfonds_data,
+                        'series': self.series_data,
+                        'finding_aids': self.folders_items
+                    }
 
-                filename = f"HU OSA {self.archival_unit.fonds}-{self.archival_unit.subfonds}-{self.archival_unit.series}_discuss_data.json"
+                    filename = f"HU OSA {self.archival_unit.fonds}-{self.archival_unit.subfonds}-{self.archival_unit.series}_discuss_data.json"
 
-                json_file = os.path.join(
-                    os.getcwd(), 'finding_aids', 'management', 'commands', 'json', filename)
+                    json_file = os.path.join(
+                        os.getcwd(), 'finding_aids', 'management', 'commands', 'json', filename)
 
-                with open(json_file, 'w') as f:
-                    json.dump(output, f, indent=4)
+                    with open(json_file, 'w') as f:
+                        json.dump(output, f, indent=4)
 
-                print (f"Exported data: {filename}")
+                    print (f"Exported data: {filename}")
 
     def assemble_archival_unit_data(self, level):
         if level == 'F':
@@ -159,7 +161,7 @@ class Command(BaseCommand):
     def assemble_finding_aids(self):
         containers = Container.objects.filter(archival_unit=self.archival_unit).order_by('container_no')
         for container in containers.all():
-            fa_entities = FindingAidsEntity.objects.filter(container=container).order_by('folder_no', 'sequence_no')
+            fa_entities = FindingAidsEntity.objects.filter(container=container, is_template=False).order_by('folder_no', 'sequence_no')
             for fa_entity in fa_entities.all():
                 data = {
                     'orig_uuid': str(fa_entity.uuid),
