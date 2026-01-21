@@ -1,3 +1,13 @@
+"""
+URL configuration for dashboard statistics, logs, and analytics.
+
+These routes provide read-only endpoints used by frontend dashboard
+applications to display:
+    - statistics scoped to archival units
+    - recent activity logs
+    - time-series analytics data
+"""
+
 from django.urls import path
 
 from dashboard.views.analytics_views import AnalyticsActivityView, AnalyticsTotalView
@@ -8,10 +18,12 @@ from dashboard.views.statistics_views import LinearMeterView, PublishedItems, Ca
 app_name = 'mlr'
 
 urlpatterns = [
+    # Statistics endpoints (scoped by archival unit)
     path('stats/linear-meter/<int:archival_unit>/', LinearMeterView.as_view(), name='linear-meter'),
     path('stats/folders-items/<int:archival_unit>/', PublishedItems.as_view(), name='folders-items'),
     path('stats/carrier-types/<int:archival_unit>/', CarrierTypes.as_view(), name='carrier-types'),
 
+    # Activity log endpoints
     path('logs/accessions/', AccessionLog.as_view(), name='accession-log'),
     path('logs/archival_units/', ArchivalUnitLog.as_view(), name='archival-unit-log'),
     path('logs/isad-create/', IsadCreateLog.as_view(), name='isad-create-log'),
@@ -20,6 +32,7 @@ urlpatterns = [
     path('logs/finding-aids-update/', FindingAidsUpdateLog.as_view(), name='finding-aids-update-log'),
     path('logs/digitization/', DigitizationLog.as_view(), name='digitization-log'),
 
+    # Analytics endpoints (time-series data)
     path('analytics/activity/', AnalyticsActivityView.as_view(), name='analytics-activity-view'),
     path('analytics/totals/', AnalyticsTotalView.as_view(), name='analytics-totals-view'),
 ]

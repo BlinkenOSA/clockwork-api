@@ -21,7 +21,7 @@ class DonorSerializerTest(TestCase):
         serializer = DonorWriteSerializer(data=self.donor)
         serializer.is_valid()
         self.assertFalse(serializer.is_valid())
-        self.assertEqual(serializer.errors['non_field_errors'][0], "Name or Corporation Name is mandatory!")
+        self.assertEqual(serializer.errors['non_field_errors'][0], "First Name or Corporation Name is mandatory!")
 
     def test_donor_valid(self):
         self.donor['first_name'] = 'John'

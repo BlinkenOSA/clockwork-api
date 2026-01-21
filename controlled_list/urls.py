@@ -1,3 +1,13 @@
+"""
+URL configuration for controlled vocabulary endpoints.
+
+These routes expose CRUD and selection endpoints for all controlled list
+models used throughout the system. Each controlled list typically provides:
+    - a list endpoint for full administrative views
+    - a detail endpoint for retrieve/update/delete operations
+    - a select endpoint for lightweight lookup and UI selection widgets
+"""
+
 from django.urls import path
 
 from controlled_list.views.access_right_views import AccessRightList, AccessRightDetail, AccessRightSelectList
@@ -66,7 +76,7 @@ urlpatterns = [
     path('geo_roles/<int:pk>/', GeoRoleDetail.as_view(), name='geo_role-detail'),
     path('select/geo_roles/', GeoRoleSelectList.as_view(), name='geo_role-select-list'),
 
-    # Date Type URLs
+    # Identifier Type URLs
     path('identifier_types/', IdentifierTypeList.as_view(), name='identifier_type-list'),
     path('identifier_types/<int:pk>/', IdentifierTypeDetail.as_view(), name='identifier_type-detail'),
     path('select/identifier_types/', IdentifierTypeSelectList.as_view(), name='identifier_type-select-list'),
@@ -87,9 +97,9 @@ urlpatterns = [
     path('select/locales/', LocaleSelectList.as_view(), name='locale-select-list'),
 
     # Nationality URLs
-    path('nationalities/', NationalityList.as_view(), name='locale-list'),
-    path('nationalities/<int:pk>/', NationalityDetail.as_view(), name='locale-detail'),
-    path('select/nationalities/', NationalitySelectList.as_view(), name='locale-select-list'),
+    path('nationalities/', NationalityList.as_view(), name='nationality-list'),
+    path('nationalities/<int:pk>/', NationalityDetail.as_view(), name='nationality-detail'),
+    path('select/nationalities/', NationalitySelectList.as_view(), name='nationality-select-list'),
 
     # Person Role URLs
     path('person_roles/', PersonRoleList.as_view(), name='person_role-list'),

@@ -1,7 +1,6 @@
 from django.core.management import BaseCommand
 
 from archival_unit.models import ArchivalUnit
-from finding_aids.indexers.finding_aids_catalog_indexer import FindingAidsCatalogIndexer
 from finding_aids.indexers.finding_aids_new_catalog_indexer import FindingAidsNewCatalogIndexer
 from finding_aids.models import FindingAidsEntity
 

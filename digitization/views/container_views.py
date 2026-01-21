@@ -6,6 +6,37 @@ from digitization.serializers.container_serializers import DigitizationContainer
 
 
 class DigitizationContainerList(ListAPIView):
+    """
+    Lists containers for digitization workflows.
+
+    This endpoint is used by the Archival Management System to browse and filter
+    containers with barcodes, along with their digitization status.
+
+    Search behavior:
+        - Uses DRF SearchFilter
+        - Searches over:
+            - archival_unit__reference_code
+            - barcode
+            - findingaidsentity__title
+            - findingaidsentity__title_original
+
+    Ordering behavior:
+        - Supports DRF ordering by:
+            - barcode
+            - date_updated
+            - digital_version_exists
+            - digital_version_creation_date
+        - Provides custom ordering for:
+            - container_no (orders by archival unit hierarchy + container number)
+            - carrier_type (orders by carrier_type__type)
+
+    Filtering behavior:
+        - carrier_type: exact match
+        - digital_version_exists: 'yes' / 'no'
+        - digital_version_research_cloud: 'yes' / 'no'
+        - digital_version_online: 'yes' / 'no'
+    """
+
     filter_backends = (SearchFilter, OrderingFilter)
     ordering_fields = ('barcode', 'date_updated', 'digital_version_exists', 'digital_version_creation_date')
     search_fields = ('archival_unit__reference_code', 'barcode',
@@ -13,6 +44,24 @@ class DigitizationContainerList(ListAPIView):
     serializer_class = DigitizationContainerLogSerializer
 
     def get_queryset(self):
+        """
+        Builds a filtered and ordered queryset of digitization-relevant containers.
+
+        Base queryset:
+            - includes only containers with non-empty barcodes
+            - ordered by most recent digital version creation date
+
+        Custom ordering:
+            - ordering contains 'container_no' -> hierarchical ordering by fonds/subfonds/series + container_no
+            - ordering contains 'carrier_type' -> ordering by carrier_type__type
+
+        Query parameters:
+            - ordering
+            - carrier_type
+            - digital_version_exists ('yes'/'no')
+            - digital_version_research_cloud ('yes'/'no')
+            - digital_version_online ('yes'/'no')
+        """
         qs = Container.objects.filter(barcode__isnull=False).exclude(barcode="").order_by('-digital_version_creation_date')
 
         ordering = self.request.query_params.get('ordering', None)
@@ -55,5 +104,12 @@ class DigitizationContainerList(ListAPIView):
 
 
 class DigitizationContainerDetail(RetrieveAPIView):
+    """
+    Retrieves container digitization metadata for detail views.
+
+    This endpoint returns a container's parsed technical metadata using the
+    DigitizationContainerDataSerializer.
+    """
+
     queryset = Container.objects.all()
     serializer_class = DigitizationContainerDataSerializer

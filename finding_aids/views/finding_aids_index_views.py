@@ -3,7 +3,6 @@ from rest_framework import generics
 from rest_framework.response import Response
 
 from finding_aids.indexers.finding_aids_ams_indexer import FindingAidsAMSIndexer
-from finding_aids.indexers.finding_aids_catalog_indexer import FindingAidsCatalogIndexer
 from finding_aids.indexers.finding_aids_new_catalog_indexer import FindingAidsNewCatalogIndexer
 
 

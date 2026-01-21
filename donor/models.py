@@ -5,6 +5,17 @@ from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 
 class Donor(models.Model, DetectProtectedMixin):
+    """
+    Represents a donor entity.
+
+    A donor may be either:
+        - an individual person, or
+        - a corporate body
+
+    The model supports both representations and derives a canonical
+    display name automatically based on the available name fields.
+    """
+
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     old_id = models.IntegerField(blank=True, null=True)
@@ -37,10 +48,24 @@ class Donor(models.Model, DetectProtectedMixin):
     date_updated = models.DateTimeField(blank=True, null=True, auto_now=True)
 
     def save(self, *args, **kwargs):
+        """
+        Ensures the donor display name is set before saving.
+
+        The name is derived from either:
+            - personal name fields, or
+            - the corporation name
+        """
         self.set_name()
         super(Donor, self).save(*args, **kwargs)
 
     def set_name(self):
+        """
+        Computes the canonical donor name.
+
+        Resolution order:
+            1. Personal name (first + middle + last)
+            2. Corporate name
+        """
         if self.first_name:
             if self.middle_name:
                 self.name = "%s %s %s" % (self.first_name, self.middle_name, self.last_name)
@@ -50,6 +75,9 @@ class Donor(models.Model, DetectProtectedMixin):
             self.name = self.corporation_name
 
     def get_address(self):
+        """
+        Returns the full formatted postal address as a single string.
+        """
         return "%s %s, %s, %s" % (self.postal_code, self.country.country, self.city, self.address)
 
     class Meta:

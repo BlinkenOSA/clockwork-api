@@ -9,10 +9,33 @@ from drf_excel.renderers import XLSXRenderer
 
 
 class FindingAidsGridList(generics.ListAPIView):
+    """
+    Returns finding aids entities in a "grid" (spreadsheet-like) shape.
+
+    This endpoint is intended for frontends that display records in an
+    Excel-style editable table. It uses FindingAidsGridSerializer, which
+    exposes a curated subset of fields suitable for inline editing.
+
+    Queryset behavior:
+        - filters by archival unit (series_id)
+        - excludes templates
+        - orders records by container number, folder number, and sequence number
+          to match physical/intellectual arrangement.
+    """
+
     pagination_class = None
     serializer_class = FindingAidsGridSerializer
 
     def get_queryset(self):
+        """
+        Returns ordered entities for the given archival unit series.
+
+        URL kwargs:
+            series_id: archival_unit id used to filter entities
+
+        Returns:
+            QuerySet[FindingAidsEntity]: filtered and ordered, or empty if no series_id.
+        """
         series_id = self.kwargs.get('series_id', None)
         if series_id:
             return FindingAidsEntity.objects.filter(archival_unit_id=series_id, is_template=False)\
@@ -22,6 +45,23 @@ class FindingAidsGridList(generics.ListAPIView):
 
 
 class FindingAidsGridListExport(XLSXFileMixin, generics.ListAPIView):
+    """
+    Exports finding aids entities as an XLSX file for Excel-style workflows.
+
+    Uses drf-excel:
+        - XLSXFileMixin for file handling
+        - XLSXRenderer to render the response as a spreadsheet
+
+    Output:
+        - The spreadsheet columns and header styling are defined in `column_header`
+        - Row style defaults are defined in `body`
+
+    Queryset behavior matches FindingAidsGridList:
+        - filters by archival unit (series_id)
+        - excludes templates
+        - orders by container/folder/sequence
+    """
+
     pagination_class = None
     serializer_class = FindingAidsGridSerializer
     renderer_classes = [XLSXRenderer]
@@ -58,6 +98,16 @@ class FindingAidsGridListExport(XLSXFileMixin, generics.ListAPIView):
     }
 
     def get_filename(self, request, *args, **kwargs):
+        """
+        Determines the exported XLSX filename.
+
+        Preference order:
+            1. "<archival_unit.reference_code>.xlsx" if the archival unit exists
+            2. "export.xlsx" fallback when the archival unit cannot be loaded
+
+        Returns:
+            str: filename used by XLSXFileMixin.
+        """
         series_id = self.kwargs.get('series_id', None)
         try:
             archival_unit = ArchivalUnit.objects.get(id=series_id)
@@ -66,6 +116,15 @@ class FindingAidsGridListExport(XLSXFileMixin, generics.ListAPIView):
             return 'export.xlsx'
 
     def get_queryset(self):
+        """
+        Returns ordered entities for export for the given archival unit series.
+
+        URL kwargs:
+            series_id: archival_unit id used to filter entities
+
+        Returns:
+            QuerySet[FindingAidsEntity]: filtered and ordered, or empty if no series_id.
+        """
         series_id = self.kwargs.get('series_id', None)
         if series_id:
             return FindingAidsEntity.objects.filter(archival_unit_id=series_id, is_template=False) \

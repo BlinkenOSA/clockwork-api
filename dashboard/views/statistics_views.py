@@ -11,6 +11,20 @@ from finding_aids.models import FindingAidsEntity
 
 
 def get_containers(archival_unit):
+    """
+    Resolves a container queryset for a given archival unit scope.
+
+    Scope rules:
+        - archival_unit == 0: all containers in the system
+        - fonds-level unit (level == 'F'): containers belonging to the fonds
+        - subfonds-level unit (level == 'SF'): containers belonging to the subfonds
+        - otherwise: containers directly belonging to the archival unit
+
+    Returns:
+        dict with:
+            - containers: queryset of Container objects for the resolved scope
+            - archival_unit: the resolved ArchivalUnit instance, or 0 when global
+    """
     if archival_unit == 0:
         containers = Container.objects.all()
     else:
@@ -26,7 +40,31 @@ def get_containers(archival_unit):
 
 
 class LinearMeterView(APIView):
+    """
+    Computes linear-meter statistics for containers within an archival scope.
+
+    Linear meters are computed by summing carrier type widths and converting
+    from centimeters to meters.
+
+    Response fields:
+        - linear_meter: meters for the selected scope
+        - linear_meter_percentage: percent of the parent scope total
+        - linear_meter_all: meters for all containers in the system
+        - linear_meter_all_pecentage: percent of the global total
+
+    Percentages are returned as formatted strings with two decimals.
+    """
+
     def get(self, request, archival_unit):
+        """
+        Returns linear-meter metrics for the given archival unit scope.
+
+        The parent scope for percentage calculations is:
+            - global total when archival_unit == 0
+            - fonds total when the unit is fonds-level
+            - subfonds total when the unit is subfonds-level
+            - subfonds total when the unit is lower-level
+        """
         containers_dict = get_containers(archival_unit)
 
         containers = containers_dict['containers']
@@ -67,7 +105,19 @@ class LinearMeterView(APIView):
 
 
 class PublishedItems(APIView):
+    """
+    Computes publication statistics for finding-aid entities within an archival scope.
+
+    Response fields:
+        - total_items: total finding-aid entities associated with containers in scope
+        - published_items: count of published finding-aid entities
+        - published_items_percentage: percent published as a formatted string
+    """
+
     def get(self, request, archival_unit):
+        """
+        Returns published vs total finding-aid entity counts for the given scope.
+        """
         containers = get_containers(archival_unit)['containers']
         items = FindingAidsEntity.objects.filter(container__in=containers)
 
@@ -91,7 +141,23 @@ class PublishedItems(APIView):
 
 
 class CarrierTypes(APIView):
+    """
+    Returns a carrier type distribution for containers within an archival scope.
+
+    The response is a list of carrier types with associated container counts,
+    ordered by descending frequency.
+    """
+
     def get(self, request, archival_unit):
+        """
+        Aggregates container counts by carrier type for the given scope.
+
+        Response format:
+            [
+              {"type": "<carrier type label>", "total": <count>},
+              ...
+            ]
+        """
         data = []
 
         containers = get_containers(archival_unit)['containers']

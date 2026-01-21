@@ -15,12 +15,35 @@ from finding_aids.serializers.finding_aids_entity_serializers import FindingAids
 
 
 class FindingAidsTemplateListSerializer(serializers.ModelSerializer):
+    """
+    Compact serializer for listing available finding aids templates.
+
+    Templates are FindingAidsEntity records with `is_template=True` and are used
+    as reusable metadata blueprints when creating new entities.
+    """
+
     class Meta:
         model = FindingAidsEntity
         fields = ('id', 'template_name', 'is_removable')
 
 
 class FindingAidsTemplateWriteSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
+    """
+    Full write serializer for finding aids templates.
+
+    Templates are stored as FindingAidsEntity records (is_template=True) and
+    support nested metadata sections (dates, creators, languages, extents, etc.)
+    via drf-writable-nested.
+
+    Validation:
+        - enforces that date_from is not later than date_to when date_to is present
+
+    Notes:
+        - container is intentionally not included here; templates are not bound
+          to a specific physical container.
+        - date fields are optional for templates.
+    """
+
     archival_unit = serializers.PrimaryKeyRelatedField(queryset=ArchivalUnit.objects.all(), required=False)
     places_of_creation = FindingAidsEntityPlaceOfCreationSerializer(
         many=True, source='findingaidsentityplaceofcreation_set', required=False)
@@ -45,6 +68,11 @@ class FindingAidsTemplateWriteSerializer(UserDataSerializerMixin, WritableNested
     extents = FindingAidsEntityExtentSerializer(many=True, source='findingaidsentityextent_set', required=False)
 
     def validate(self, data):
+        """
+        Validates template date range consistency.
+
+        Ensures date_from is not greater than date_to when date_to is provided.
+        """
         date_from = data.get('date_from', None)
         date_to = data.get('date_to', None)
         if date_to:
