@@ -9,10 +9,27 @@ from isad.models import Isad
 
 class ISADAMSIndexer:
     """
-    Class to index ISAD(G) records to Solr for the AMS.
+    Indexer for publishing ISAD(G) records to the AMS Solr index.
+
+    This class is responsible for transforming an :class:`isad.models.Isad`
+    instance into a Solr document suitable for the AMS search core and either
+    indexing or removing that document.
+
+    The indexer:
+        - loads the ISAD record and related objects
+        - builds a Solr-compatible document
+        - handles add and delete operations against Solr
     """
 
     def __init__(self, isad_id):
+        """
+        Initializes the AMS indexer for a specific ISAD record.
+
+        Parameters
+        ----------
+        isad_id : int
+            Primary key of the ISAD record to be indexed.
+        """
         self.isad_id = isad_id
         self.isad = self._get_isad(isad_id)
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG", "catalog")
@@ -21,9 +38,23 @@ class ISADAMSIndexer:
         self.doc = {}
 
     def get_solr_document(self):
+        """
+        Returns the internally generated Solr document.
+
+        Returns
+        -------
+        dict
+            Solr document representing the ISAD record.
+        """
         return self.doc
 
     def index(self):
+        """
+        Indexes the ISAD record into the AMS Solr core.
+
+        Builds the Solr document and attempts to add it to Solr. Errors are
+        caught and logged to stdout.
+        """
         self.create_solr_document()
         try:
             self.solr.add([self.doc])
@@ -32,9 +63,25 @@ class ISADAMSIndexer:
             print('Error with Report No. %s! Error: %s' % (self.doc['id'], e))
 
     def delete(self):
+        """
+        Removes the ISAD record from the AMS Solr index.
+        """
         self.solr.delete(id=self.isad_id, commit=True)
 
     def _get_isad(self, isad_id):
+        """
+        Retrieves the ISAD record with related objects optimized for indexing.
+
+        Parameters
+        ----------
+        isad_id : int
+            Primary key of the ISAD record.
+
+        Returns
+        -------
+        isad.models.Isad
+            Fully populated ISAD instance.
+        """
         qs = Isad.objects.filter(pk=isad_id)
         qs = qs.select_related('archival_unit')
         qs = qs.select_related('original_locale')
@@ -44,11 +91,25 @@ class ISADAMSIndexer:
         return qs.get()
 
     def create_solr_document(self):
+        """
+        Builds the complete Solr document for the ISAD record.
+
+        This method orchestrates:
+            - field-level indexing
+            - optional JSON storage
+            - duplicate value cleanup
+        """
         self._index_record()
         self._store_json()
         self._remove_duplicates()
 
     def _index_record(self):
+        """
+        Populates Solr fields derived from the ISAD record.
+
+        This includes identity fields, display fields, and hierarchical
+        archival-unit-derived values.
+        """
         self.doc['id'] = self._get_solr_id()
         self.doc['ams_id'] = self.isad.id
 
@@ -66,6 +127,17 @@ class ISADAMSIndexer:
         self.doc['subfonds_name'] = self._get_subfonds_name()
 
     def _get_solr_id(self):
+        """
+        Computes the Solr document identifier.
+
+        The identifier is a Hashids-encoded value derived from the fonds,
+        subfonds, and series numbers of the archival unit.
+
+        Returns
+        -------
+        str
+            Stable Solr document identifier.
+        """
         hashids = Hashids(salt="osaarchives", min_length=8)
         return hashids.encode(
             self.isad.archival_unit.fonds * 1000000 +
@@ -74,6 +146,14 @@ class ISADAMSIndexer:
         )
 
     def _get_description_level(self):
+        """
+        Returns the human-readable description level.
+
+        Returns
+        -------
+        str
+            One of ``'Fonds'``, ``'Subfonds'``, or ``'Series'``.
+        """
         levels = {
             'F': 'Fonds',
             'SF': 'Subfonds',
@@ -82,6 +162,16 @@ class ISADAMSIndexer:
         return levels[self.isad.description_level]
 
     def _get_date_created_display(self):
+        """
+        Builds a display-friendly date range string.
+
+        Uses ``year_from`` and ``year_to`` when available.
+
+        Returns
+        -------
+        str
+            Date string suitable for display and indexing.
+        """
         if self.isad.year_from > 0:
             date = str(self.isad.year_from)
 
@@ -89,31 +179,3 @@ class ISADAMSIndexer:
                 if self.isad.year_from != self.isad.year_to:
                     date = date + " - " + str(self.isad.year_to)
         else:
-            date = ""
-        return date
-
-    def _get_creator(self):
-        creators = list(c.creator for c in self.isad.isadcreator_set.all())
-        if self.isad.isaar:
-            creators.append(self.isad.isaar.name)
-        return creators
-
-    def _get_fonds_name(self):
-        if self.isad.description_level == 'SF' or self.isad.description_level == 'S':
-            return self.isad.archival_unit.get_fonds().title_full
-        else:
-            return self.isad.archival_unit.title_full
-
-    def _get_subfonds_name(self):
-        if self.isad.description_level == 'SF' or self.isad.description_level == 'S':
-            return self.isad.archival_unit.get_subfonds().title_full
-        else:
-            return None
-
-    def _remove_duplicates(self):
-        for k, v in self.doc.items():
-            if isinstance(v, list):
-                self.doc[k] = list(set(v))
-
-    def _store_json(self):
-        pass
