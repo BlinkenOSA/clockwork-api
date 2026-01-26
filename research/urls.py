@@ -14,6 +14,18 @@ from research.views.restricted_requests_views import RestrictedRequestsList, Res
 
 app_name = 'research'
 
+"""
+URL configuration for the Research app.
+
+This module defines API endpoints for:
+    - researcher registration and management
+    - researcher degree and visit tracking
+    - research request creation and workflow management
+    - restricted request decision workflows
+    - auxiliary selection endpoints (countries, nationalities, series/containers)
+    - library MLR lookup for request workflows
+"""
+
 urlpatterns = [
     path('researcher', ResearcherList.as_view(), name='researcher-list'),
     path('researcher/<int:pk>/', ResearcherDetail.as_view(), name='researher-detail'),

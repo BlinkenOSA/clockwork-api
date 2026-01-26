@@ -11,6 +11,25 @@ from isaar.serializers import IsaarSelectSerializer, IsaarReadSerializer, IsaarW
 
 
 class IsaarList(AuditLogMixin, MethodSerializerMixin, generics.ListCreateAPIView):
+    """
+    Lists ISAAR records and supports creating new records.
+
+    GET
+        Returns a paginated list of ISAAR authority records using
+        :class:`isaar.serializers.IsaarListSerializer`.
+
+        Supports:
+            - full-text search on ``name``
+            - filtering by ``type`` and ``status``
+            - ordering by ``name``, ``type``, ``status``
+
+    POST
+        Creates a new ISAAR record using :class:`isaar.serializers.IsaarWriteSerializer`.
+
+        The write serializer supports nested writes for related names,
+        identifiers, and places.
+    """
+
     queryset = Isaar.objects.all()
     method_serializer_classes = {
         ('GET', ): IsaarListSerializer,
@@ -23,6 +42,21 @@ class IsaarList(AuditLogMixin, MethodSerializerMixin, generics.ListCreateAPIView
 
 
 class IsaarDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieves, updates, or deletes a single ISAAR record.
+
+    GET
+        Returns a full ISAAR record using :class:`isaar.serializers.IsaarReadSerializer`,
+        including nested read-only expansions for related names, identifiers, and places.
+
+    PUT/PATCH
+        Updates an ISAAR record using :class:`isaar.serializers.IsaarWriteSerializer`.
+        Nested updates are supported where configured by the write serializer.
+
+    DELETE
+        Deletes an ISAAR record.
+    """
+
     queryset = Isaar.objects.all()
     method_serializer_classes = {
         ('GET', ): IsaarReadSerializer,
@@ -31,6 +65,17 @@ class IsaarDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateD
 
 
 class IsaarSelectList(generics.ListAPIView):
+    """
+    Returns a non-paginated list of ISAAR records for selection UIs.
+
+    Intended for dropdowns/autocomplete. Uses :class:`isaar.serializers.IsaarSelectSerializer`
+    and disables pagination.
+
+    Supports:
+        - filtering by ``type``
+        - searching by ``name``
+    """
+
     serializer_class = IsaarSelectSerializer
     pagination_class = None
     filter_backends = (SearchFilter, DjangoFilterBackend)
@@ -40,6 +85,20 @@ class IsaarSelectList(generics.ListAPIView):
 
 
 class IsaarRelationshipSelectList(generics.ListAPIView):
+    """
+    Returns a non-paginated list of ISAAR relationship terms.
+
+    Intended for selection UIs when choosing a relationship qualifier for
+    :class:`isaar.models.IsaarOtherName`.
+
+    Notes
+    -----
+    The configured ``search_fields`` uses ``'theme'`` which does not correspond
+    to a field on :class:`isaar.models.IsaarRelationship` (which has
+    ``relationship``). If search is expected to work, this likely should be
+    updated to ``('relationship',)``.
+    """
+
     serializer_class = IsaarRelationshipSerializer
     pagination_class = None
     filter_backends = (SearchFilter,)
@@ -48,6 +107,20 @@ class IsaarRelationshipSelectList(generics.ListAPIView):
 
 
 class IsaarPlaceQualifierSelectList(generics.ListAPIView):
+    """
+    Returns a non-paginated list of ISAAR place qualifier terms.
+
+    Intended for selection UIs when choosing a qualifier for an ISAAR place
+    association.
+
+    Notes
+    -----
+    The configured ``search_fields`` uses ``'place'`` which does not correspond
+    to a field on :class:`isaar.models.IsaarPlaceQualifier` (which has
+    ``qualifier``). If search is expected to work, this likely should be updated
+    to ``('qualifier',)``.
+    """
+
     serializer_class = IsaarPlaceQualifierSerializer
     pagination_class = None
     filter_backends = (SearchFilter,)

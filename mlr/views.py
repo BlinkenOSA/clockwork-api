@@ -14,12 +14,50 @@ from mlr.serializers import MLRListSerializer, MLREntitySerializer
 
 
 class MLRList(generics.ListAPIView):
+    """
+    Lists Master Location Register (MLR) entries with query-parameter filtering.
+
+    This endpoint returns :class:`mlr.models.MLREntity` records serialized with
+    :class:`mlr.serializers.MLRListSerializer`.
+
+    Filtering
+    ---------
+    Filtering is implemented by overriding :meth:`filter_queryset` and supports:
+
+        - ``fonds``: archival unit PK; filters by fonds number (``series__fonds``)
+        - ``carrier_type``: carrier type PK
+        - ``building``: building PK (via related locations)
+        - ``module``: integer (via related locations)
+        - ``row``: integer (via related locations)
+        - ``section``: integer (via related locations)
+        - ``shelf``: integer (via related locations)
+
+    Notes
+    -----
+    ``search_fields`` is configured as ``('name',)`` but :class:`MLREntity` does
+    not define a ``name`` field. If search is expected to work, this likely
+    should be updated (e.g., to ``series__title`` or ``series__reference_code``).
+    """
+
     queryset = MLREntity.objects.all()
     serializer_class = MLRListSerializer
     filter_backends = (SearchFilter, DjangoFilterBackend)
     search_fields = ('name',)
 
     def filter_queryset(self, queryset):
+        """
+        Applies query-parameter filtering to the base queryset.
+
+        Parameters
+        ----------
+        queryset : django.db.models.QuerySet
+            Base queryset provided by the view.
+
+        Returns
+        -------
+        django.db.models.QuerySet
+            Filtered queryset.
+        """
         qs = queryset
 
         fonds = self.request.query_params.get('fonds', None)
@@ -55,12 +93,60 @@ class MLRList(generics.ListAPIView):
 
 
 class MLRDetail(AuditLogMixin, RetrieveUpdateAPIView):
+    """
+    Retrieves and updates a single Master Location Register (MLR) entry.
+
+    Uses :class:`mlr.serializers.MLREntitySerializer`, which supports nested
+    updates for related :class:`mlr.models.MLREntityLocation` records.
+
+    Notes
+    -----
+    The endpoint supports:
+        - GET: retrieve MLR entry
+        - PUT/PATCH: update MLR entry (including nested locations)
+    """
+
     queryset = MLREntity.objects.all()
     serializer_class = MLREntitySerializer
 
 
 class MLRExportCSV(APIView):
+    """
+    Exports Master Location Register (MLR) entries as a CSV file.
+
+    The exported CSV includes the following columns:
+        - ``series``: series reference code
+        - ``carrier``: carrier type label
+        - ``locations``: formatted location string (see :meth:`MLREntity.get_locations`)
+
+    Query Parameters
+    ---------------
+    fonds_id : int, optional
+        Archival unit PK used to filter by fonds. The export is restricted to
+        series-level units (``level='S'``) under the fonds.
+    module : int, optional
+        Filters by location module.
+    row : int, optional
+        Filters by location row.
+    section : int, optional
+        Filters by location section.
+    shelf : int, optional
+        Filters by location shelf.
+
+    Notes
+    -----
+    The current implementation filters ``row``, ``section``, and ``shelf`` using
+    ``locations__module`` (likely a copy/paste bug). If those filters are
+    intended to work, they likely should be:
+        - row -> ``locations__row``
+        - section -> ``locations__section``
+        - shelf -> ``locations__shelf``
+    """
+
     def get(self, request, *args, **kwargs):
+        """
+        Builds the filtered queryset and streams a CSV response.
+        """
         qs = MLREntity.objects.all().order_by('series__sort', 'carrier_type__type')
         file_name = 'mlr'
 
