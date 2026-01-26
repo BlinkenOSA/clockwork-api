@@ -4,7 +4,6 @@ from rest_framework import serializers
 from archival_unit.models import ArchivalUnit
 from clockwork_api.mixins.isad_archival_unit_serializer_mixin import IsadArchivalUnitSerializerMixin
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
-from controlled_list.serializers import CarrierTypeSelectSerializer, ExtentUnitSelectSerializer
 from isad.models import Isad, IsadCreator, IsadCarrier, IsadExtent, IsadLocationOfOriginals, IsadLocationOfCopies, \
     IsadRelatedFindingAids
 
