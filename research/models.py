@@ -9,6 +9,22 @@ from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 # Create your models here.
 class Researcher(models.Model, DetectProtectedMixin):
+    """
+    Core model representing a registered researcher.
+
+    A researcher record stores identity, contact, affiliation, and research
+    intent information used for registration, approval, and request management.
+    Each researcher is assigned a sequential ``card_number`` on first save.
+
+    Notes
+    -----
+    - ``email`` uses :class:`clockwork_api.fields.email_null_field.EmailNullField`
+      and is unique when provided.
+    - ``card_number`` is assigned by querying the current maximum value and
+      incrementing it. In high-concurrency scenarios, additional safeguards
+      (e.g., database-side sequence/locking) may be needed to avoid duplicates.
+    """
+
     id = models.AutoField(primary_key=True)
     card_number = models.IntegerField(blank=True, null=True)
     first_name = models.CharField(max_length=100)
@@ -59,6 +75,18 @@ class Researcher(models.Model, DetectProtectedMixin):
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     def get_next_card_number(self):
+        """
+        Returns the next available researcher card number.
+
+        The method finds the current highest ``card_number`` and returns the
+        next integer value. If no researcher exists with a card number, it
+        returns 1.
+
+        Returns
+        -------
+        int
+            Next card number.
+        """
         researcher = Researcher.objects.filter().order_by('-card_number').first()
         if researcher:
             return researcher.card_number + 1
@@ -67,9 +95,18 @@ class Researcher(models.Model, DetectProtectedMixin):
 
     @property
     def name(self):
+        """
+        Returns the researcher's display name in "Last, First" format.
+        """
         return "%s, %s" % (self.last_name, self.first_name)
 
     def save(self, **kwargs):
+        """
+        Overrides save to assign a card number when missing.
+
+        Ensures:
+            - ``card_number`` is set on first save using :meth:`get_next_card_number`.
+        """
         if not self.card_number:
             self.card_number = self.get_next_card_number()
         super(Researcher, self).save()
@@ -79,6 +116,10 @@ class Researcher(models.Model, DetectProtectedMixin):
 
 
 class ResearcherDegree(models.Model):
+    """
+    Controlled vocabulary for researcher degree values.
+    """
+
     id = models.AutoField(primary_key=True)
     degree = models.CharField(max_length=100, unique=True)
 
@@ -87,6 +128,13 @@ class ResearcherDegree(models.Model):
 
 
 class ResearcherVisit(models.Model):
+    """
+    Stores a check-in/check-out visit record for a researcher.
+
+    Visits are created on check-in (``check_in`` set automatically) and may be
+    completed by setting ``check_out``.
+    """
+
     id = models.AutoField(primary_key=True)
     researcher = models.ForeignKey('Researcher', on_delete=models.PROTECT)
     check_in = models.DateTimeField(auto_now_add=True)
@@ -97,6 +145,13 @@ class ResearcherVisit(models.Model):
 
 
 class Request(models.Model):
+    """
+    Represents a research request created by a researcher.
+
+    A request groups one or more :class:`RequestItem` entries and stores the
+    creation timestamp and an optional requested datetime.
+    """
+
     id = models.AutoField(primary_key=True)
     researcher = models.ForeignKey('Researcher', on_delete=models.PROTECT)
     created_date = models.DateTimeField(blank=True, auto_now_add=True)
@@ -107,6 +162,29 @@ class Request(models.Model):
 
 
 class RequestItem(models.Model):
+    """
+    Represents a single requested item within a research request.
+
+    Request items can originate from multiple systems (finding aids, library,
+    film library) and progress through a status workflow.
+
+    Queueing rules
+    --------------
+    The save logic enforces a simple per-researcher, per-origin limit:
+        - at most 10 items can be in status ``'2'`` (Pending) at a time
+        - items start in ``'1'`` (In Queue) and are promoted to ``'2'`` when a slot is free
+        - when an item is returned (status ``'4'``) or uploaded (status ``'9'``),
+          the next queued item is promoted to pending (if any)
+
+    Additional behavior
+    -------------------
+    - When status becomes Returned (``'4'``) or Uploaded (``'9'``), ``return_date`` is set if missing.
+    - When status becomes Reshelved (``'5'``), ``reshelve_date`` is set if missing.
+    - ``ordering`` is computed to support sorting:
+        - For finding aids items, uses ``archival_unit.sort`` + container number when available.
+        - Otherwise uses ``identifier``.
+    """
+
     id = models.AutoField(primary_key=True)
     request = models.ForeignKey('Request', on_delete=models.CASCADE)
     STATUS_VALUES = [('1', 'In Queue'), ('2', 'Pending'), ('3', 'Processed and prepared'),
@@ -124,6 +202,15 @@ class RequestItem(models.Model):
     ordering = models.CharField(max_length=50, blank=True, null=True)
 
     def save(self, **kwargs):
+        """
+        Overrides save to enforce queue rules and derive dates/order keys.
+
+        Behavior includes:
+            - promotion from queue to pending when fewer than 10 pending items exist
+            - promotion of the next queued item when an item is returned/uploaded
+            - auto-populating ``return_date`` and ``reshelve_date`` on status transitions
+            - computing ``ordering`` based on origin and container/identifier
+        """
         researcher = self.request.researcher
         requested_items_count = RequestItem.objects.filter(
             request__researcher=researcher,
@@ -172,6 +259,13 @@ class RequestItem(models.Model):
 
 
 class RequestItemRestriction(models.Model):
+    """
+    Stores restriction request data for a single requested item.
+
+    This model attaches a single restriction form to a :class:`RequestItem` via
+    a 1:1 relation and stores the submitted justification and acceptance flags.
+    """
+
     id = models.AutoField(primary_key=True)
     request_item = models.OneToOneField('RequestItem', on_delete=models.CASCADE, related_name='restriction')
 
@@ -190,6 +284,20 @@ class RequestItemRestriction(models.Model):
 
 
 class RequestItemPart(models.Model):
+    """
+    Links a request item to a finding aids entity at a more granular level.
+
+    This model supports partial access/decision workflows for restricted
+    materials by representing "parts" (e.g., items/pages/files) tied to a
+    :class:`finding_aids.FindingAidsEntity`.
+
+    Notes
+    -----
+    The ``status`` field appears intended to use :attr:`STATUS_CHOICES` defined
+    on this model, but currently references ``RequestItem.STATUS_VALUES`` in the
+    field definition.
+    """
+
     id = models.AutoField(primary_key=True)
     request_item = models.ForeignKey('RequestItem', on_delete=models.CASCADE)
     finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', on_delete=models.CASCADE)
