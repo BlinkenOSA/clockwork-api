@@ -179,3 +179,67 @@ class ISADAMSIndexer:
                 if self.isad.year_from != self.isad.year_to:
                     date = date + " - " + str(self.isad.year_to)
         else:
+            date = ""
+        return date
+
+    def _get_creator(self):
+        """
+        Returns a list of creators for the ISAD record.
+
+        Combines free-text ISAD creators with the linked ISAAR authority name
+        when present.
+
+        Returns
+        -------
+        list of str
+            Creator names.
+        """
+        creators = list(c.creator for c in self.isad.isadcreator_set.all())
+        if self.isad.isaar:
+            creators.append(self.isad.isaar.name)
+        return creators
+
+    def _get_fonds_name(self):
+        """
+        Returns the fonds-level title for indexing.
+
+        Returns
+        -------
+        str
+            Fonds title (full form).
+        """
+        if self.isad.description_level == 'SF' or self.isad.description_level == 'S':
+            return self.isad.archival_unit.get_fonds().title_full
+        else:
+            return self.isad.archival_unit.title_full
+
+    def _get_subfonds_name(self):
+        """
+        Returns the subfonds-level title for indexing when applicable.
+
+        Returns
+        -------
+        str or None
+            Subfonds title (full form) or None if not applicable.
+        """
+        if self.isad.description_level == 'SF' or self.isad.description_level == 'S':
+            return self.isad.archival_unit.get_subfonds().title_full
+        else:
+            return None
+
+    def _remove_duplicates(self):
+        """
+        Removes duplicate values from list-based Solr fields.
+        """
+        for k, v in self.doc.items():
+            if isinstance(v, list):
+                self.doc[k] = list(set(v))
+
+    def _store_json(self):
+        """
+        Stores the raw JSON representation of the record for debugging or reuse.
+
+        This method is currently a no-op and exists as a placeholder for future
+        extensions.
+        """
+        pass
