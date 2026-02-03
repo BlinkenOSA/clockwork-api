@@ -5,7 +5,29 @@ from rest_framework import serializers
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from container.models import Container
 from controlled_list.models import CarrierType
+from digitization.models import DigitalVersion, DigitalVersionPhysicalCopy
 from finding_aids.models import FindingAidsEntity
+
+class ContainerDigitalVersionPhysicalCopySerializer(serializers.ModelSerializer):
+    """
+    Serializer for physical copies of digital versions associated with a container.
+    """
+
+    class Meta:
+        model = DigitalVersionPhysicalCopy
+        fields = '__all__'
+
+
+class ContainerDigitalVersionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for digital versions associated with a container.
+    """
+
+    physical_copies = ContainerDigitalVersionPhysicalCopySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = DigitalVersion
+        fields = '__all__'
 
 
 class ContainerReadSerializer(serializers.ModelSerializer):
@@ -15,6 +37,8 @@ class ContainerReadSerializer(serializers.ModelSerializer):
     This serializer exposes all container fields for retrieval and internal
     read operations where full model state is needed.
     """
+
+    digital_versions = ContainerDigitalVersionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Container
@@ -54,6 +78,8 @@ class ContainerListSerializer(serializers.ModelSerializer):
     reference_code = serializers.SerializerMethodField(source='container_no')
     total_number = serializers.SerializerMethodField()
     total_published_number = serializers.SerializerMethodField()
+    digital_versions_masters = serializers.SerializerMethodField()
+    digital_versions_access_copies = serializers.SerializerMethodField()
 
     def get_total_number(self, obj):
         """
@@ -76,10 +102,22 @@ class ContainerListSerializer(serializers.ModelSerializer):
         """
         return "%s:%s" % (obj.archival_unit.reference_code, obj.container_no)
 
+    def get_digital_versions_masters(self, obj):
+        """
+        Returns the count of master digital versions associated with the container.
+        """
+        return DigitalVersion.objects.filter(container=obj, level='M').count()
+
+    def get_digital_versions_access_copies(self, obj):
+        """
+        Returns the count of access copy digital versions associated with the container.
+        """
+        return DigitalVersion.objects.filter(container=obj, level='A').count()
+
     class Meta:
         model = Container
         fields = ('id', 'reference_code', 'barcode', 'carrier_type', 'total_number', 'total_published_number',
-                  'is_removable')
+                  'is_removable', 'digital_versions_access_copies', 'digital_versions_masters')
 
 
 class ContainerSelectSerializer(serializers.ModelSerializer):

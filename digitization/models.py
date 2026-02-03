@@ -17,8 +17,20 @@ class DigitalVersion(models.Model):
     """
 
     id = models.AutoField(primary_key=True)
-    finding_aids_entity = models.ForeignKey('finding_aids.FindingAidsEntity', blank=True, null=True, on_delete=models.CASCADE)
-    container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.CASCADE)
+    finding_aids_entity = models.ForeignKey(
+        'finding_aids.FindingAidsEntity',
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='digital_versions'
+    )
+    container = models.ForeignKey(
+        'container.Container',
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='digital_versions'
+    )
 
     identifier = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     level = models.CharField(max_length=1, choices=(('M', 'Master'), ('A', 'Access Copy')), db_index=True, default='A')
@@ -50,7 +62,7 @@ class DigitalVersionPhysicalCopy(models.Model):
     """
 
     id = models.AutoField(primary_key=True)
-    digital_version = models.ForeignKey('DigitalVersion', on_delete=models.CASCADE)
+    digital_version = models.ForeignKey('DigitalVersion', on_delete=models.CASCADE, related_name='physical_copies')
     storage_unit = models.CharField(max_length=50, blank=True, null=True)
     storage_unit_label = models.CharField(max_length=50, blank=True, null=True)
 
