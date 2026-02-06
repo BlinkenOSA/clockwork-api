@@ -128,16 +128,27 @@ class ResearchRequestSerializer(serializers.Serializer):
         email = data.get('email', '')
         card_number = data.get('card_number', '0')
         try:
-            Researcher.objects.get(
+            researcher = Researcher.objects.get(
                 email=email,
                 card_number=card_number
             )
-            return data
-        except ObjectDoesNotExist:
+        except Researcher.DoesNotExist:
             raise serializers.ValidationError(
-                "The combination of the email and card number is not existing in our system. Are you sure, you've used "
-                "the correct data?"
+                "No account found with this email and card number."
             )
+
+        # Now we know the user exists
+        if not researcher.approved:
+            raise serializers.ValidationError(
+                "Your account has not been approved yet."
+            )
+
+        if not researcher.active:
+            raise serializers.ValidationError(
+                "Your account is inactive. Please contact support at archivum@ceu.edu."
+            )
+
+        return data
 
     def to_internal_value(self, values: dict) -> dict:
         """

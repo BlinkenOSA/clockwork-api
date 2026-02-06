@@ -4,7 +4,7 @@ coreapi==2.3.3
 coverage==7.6.1
 deepl==1.14.0
 dj-database-url==1.0.0
-Django==4.2.27
+Django==4.1.13
 django-clone==5.3.3
 django-cors-headers==3.13.0
 django-date-extensions==3.1.2
@@ -13,9 +13,9 @@ django-filter==22.1
 django-o365mail==1.1.0
 django-split-settings==1.2.0
 django-templated-mail==1.1.1
-djangorestframework==3.15.2
-djangorestframework-simplejwt==5.5.1
-djoser==2.3.0
+djangorestframework==3.14.0
+djangorestframework-simplejwt==4.7.2
+djoser==2.1.0
 drf-excel==2.3.0
 drf-pdf==0.2.0
 drf-writable-nested==0.7.0
