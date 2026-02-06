@@ -145,7 +145,7 @@ class ResearchRequestSerializer(serializers.Serializer):
 
         if not researcher.active:
             raise serializers.ValidationError(
-                "Your account is inactive. Please contact support."
+                "Your account is inactive. Please contact support at archivum@ceu.edu."
             )
 
         return data
