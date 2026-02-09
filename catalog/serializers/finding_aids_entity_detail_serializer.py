@@ -353,7 +353,7 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
         Indicates whether at least one digital version
         of the entity is available online.
         """
-        return obj.digitalversion_set.filter(available_online=True).count() > 0
+        return obj.digital_versions.filter(available_online=True).count() > 0
 
     def get_access_copies(self, obj):
         """
@@ -362,7 +362,7 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
         Only digital versions marked as access-level ('A')
         are included in the response.
         """
-        digital_versions = obj.digitalversion_set.filter(level='A')
+        digital_versions = obj.digital_versions.filter(level='A')
         serializer = DigitalVersionSerializer(instance=digital_versions, many=True)
         return serializer.data
 

@@ -69,7 +69,7 @@ class FindingAidsIIFPresentationV3View(APIView):
             )
 
             # Canvas generation per digital file
-            for digital_version in fa_entity.digitalversion_set.all().order_by('filename'):
+            for digital_version in fa_entity.digital_versions.all().order_by('filename'):
 
                 # Image identifier resolution
                 main_directory = "_".join(digital_version.identifier.split("_", 5)[:5])

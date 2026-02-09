@@ -50,6 +50,7 @@ class DigitalVersion(models.Model):
 
     class Meta:
         db_table = 'digital_versions'
+        ordering = ['level', 'identifier', 'filename']
 
 
 class DigitalVersionPhysicalCopy(models.Model):
@@ -68,3 +69,4 @@ class DigitalVersionPhysicalCopy(models.Model):
 
     class Meta:
         db_table = 'digital_version_physical_copies'
+        ordering = ['-storage_unit', 'storage_unit_label']

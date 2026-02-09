@@ -40,7 +40,7 @@ class DigitalVersionIdentifierGenerator:
         Returns:
             bool: True if a digital version is detected, otherwise False.
         """
-        if self.finding_aids_entity.digitalversion_set.count() > 0 or self.finding_aids_entity.digital_version_exists:
+        if self.finding_aids_entity.digital_versions.count() > 0 or self.finding_aids_entity.digital_version_exists:
             return True
         else:
             if self.finding_aids_entity.container.digital_version_exists:
@@ -90,7 +90,7 @@ class DigitalVersionIdentifierGenerator:
         barcode = ''
 
         # Entity-level digital versions or flags
-        if self.finding_aids_entity.digitalversion_set.count() > 0 or self.finding_aids_entity.digital_version_exists:
+        if self.finding_aids_entity.digital_versions.count() > 0 or self.finding_aids_entity.digital_version_exists:
             if self.finding_aids_entity.description_level == 'L1':
                 return "%s_%04d_%04d" % (
                     self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_").replace("-", "_"),

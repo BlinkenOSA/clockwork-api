@@ -162,7 +162,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         """
         Returns True if any related digital version is available online.
         """
-        return self.digitalversion_set.filter(available_online=True).count() > 0
+        return self.digital_versions.filter(available_online=True).count() > 0
 
     @property
     def restricted(self):

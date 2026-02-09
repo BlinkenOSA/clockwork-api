@@ -80,6 +80,7 @@ class ContainerListSerializer(serializers.ModelSerializer):
     total_published_number = serializers.SerializerMethodField()
     digital_versions_masters = serializers.SerializerMethodField()
     digital_versions_access_copies = serializers.SerializerMethodField()
+    digital_versions_in_finding_aids = serializers.SerializerMethodField()
 
     def get_total_number(self, obj):
         """
@@ -114,10 +115,17 @@ class ContainerListSerializer(serializers.ModelSerializer):
         """
         return DigitalVersion.objects.filter(container=obj, level='A').count()
 
+    def get_digital_versions_in_finding_aids(self, obj):
+        """
+        Returns the count of digital versions associated with finding-aid entities in the container.
+        """
+        return DigitalVersion.objects.filter(finding_aids_entity__container=obj).count()
+
     class Meta:
         model = Container
         fields = ('id', 'reference_code', 'barcode', 'carrier_type', 'total_number', 'total_published_number',
-                  'is_removable', 'digital_versions_access_copies', 'digital_versions_masters')
+                  'is_removable', 'digital_versions_access_copies', 'digital_versions_masters',
+                  'digital_versions_in_finding_aids')
 
 
 class ContainerSelectSerializer(serializers.ModelSerializer):
