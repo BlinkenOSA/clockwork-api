@@ -126,3 +126,5 @@ o365_token.txt
 finding_aids/management/commands/populate_hedervary.py
 finding_aids/management/commands/populate_hu_osa_300_85_41.py
 finding_aids/management/commands/json
+
+/digitization/management/commands/tapelogs
