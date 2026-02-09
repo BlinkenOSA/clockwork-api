@@ -6,6 +6,7 @@ from archival_unit.models import ArchivalUnit
 from clockwork_api.fields.approximate_date_serializer_field import ApproximateDateSerializerField
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from container.models import Container
+from digitization.models import DigitalVersion, DigitalVersionPhysicalCopy
 from finding_aids.models import FindingAidsEntity, FindingAidsEntityAlternativeTitle, FindingAidsEntityDate, \
     FindingAidsEntityCreator, FindingAidsEntityPlaceOfCreation, FindingAidsEntitySubject, \
     FindingAidsEntityAssociatedPerson, FindingAidsEntityAssociatedCorporation, FindingAidsEntityAssociatedCountry, \
@@ -180,10 +181,33 @@ class FindingAidsEntityListSerializer(serializers.ModelSerializer):
     are needed, plus published/confidential/removability flags for UI behavior.
     """
 
+    digital_versions_masters = serializers.SerializerMethodField()
+    digital_versions_access_copies = serializers.SerializerMethodField()
+    digital_versions_of_container = serializers.SerializerMethodField()
+
+    def get_digital_versions_masters(self, obj):
+        """
+        Returns the count of master digital versions associated with the finding aids record.
+        """
+        return DigitalVersion.objects.filter(finding_aids_entity=obj, level='M').count()
+
+    def get_digital_versions_access_copies(self, obj):
+        """
+        Returns the count of access copy digital versions associated with the finding aids record.
+        """
+        return DigitalVersion.objects.filter(finding_aids_entity=obj, level='A').count()
+
+    def get_digital_versions_of_container(self, obj):
+        """
+        Returns the count of digital versions associated with container entities of the finding aids record.
+        """
+        return DigitalVersion.objects.filter(container=obj.container).count()
+
     class Meta:
         model = FindingAidsEntity
         fields = ('id', 'archival_reference_code', 'title', 'level', 'date_from', 'date_to', 'catalog_id',
-                  'published', 'confidential', 'is_removable')
+                  'published', 'confidential', 'is_removable',
+                  'digital_versions_masters', 'digital_versions_access_copies', 'digital_versions_of_container')
 
 
 class FindingAidsEntityRelatedMaterialSerializer(serializers.ModelSerializer):
@@ -197,6 +221,28 @@ class FindingAidsEntityRelatedMaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = FindingAidsEntityRelatedMaterial
         exclude = ('source',)
+
+
+class FindingAidsDigitalVersionPhysicalCopySerializer(serializers.ModelSerializer):
+    """
+    Serializer for physical copies of digital versions associated with a finding aids record.
+    """
+
+    class Meta:
+        model = DigitalVersionPhysicalCopy
+        fields = '__all__'
+
+
+class FindingAidsDigitalVersionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for digital versions associated with a finding aids record.
+    """
+
+    physical_copies = FindingAidsDigitalVersionPhysicalCopySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = DigitalVersion
+        fields = '__all__'
 
 
 class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedModelSerializer):
@@ -242,6 +288,7 @@ class FindingAidsEntityReadSerializer(UserDataSerializerMixin, WritableNestedMod
     )
     archival_unit_title = serializers.SerializerMethodField()
     container_title = serializers.SerializerMethodField()
+    digital_versions = FindingAidsDigitalVersionSerializer(many=True, read_only=True)
     digital_version_exists_container = serializers.SerializerMethodField()
 
     def get_archival_unit_title(self, obj):
