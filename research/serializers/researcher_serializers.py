@@ -18,7 +18,7 @@ class ResearcherListSerializer(serializers.ModelSerializer):
     card_number = serializers.SerializerMethodField()
     date_created = serializers.SerializerMethodField()
     country = serializers.SlugRelatedField(slug_field='country', queryset=Country.objects.all())
-    citizenship = serializers.SlugRelatedField(slug_field='nationality', queryset=Nationality.objects.all())
+    # citizenship = serializers.SlugRelatedField(slug_field='nationality', queryset=Nationality.objects.all())
 
     def get_card_number(self, obj):
         """
@@ -40,7 +40,6 @@ class ResearcherListSerializer(serializers.ModelSerializer):
             'email',
             'card_number',
             'country',
-            'citizenship',
             'date_created',
             'active',
             'approved',

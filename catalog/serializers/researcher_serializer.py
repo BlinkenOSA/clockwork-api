@@ -23,4 +23,6 @@ class ResearcherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Researcher
-        fields = '__all__'
+        fields = ['last_name', 'first_name', 'middle_name', 'email', 'country', 'city_abroad', 'address_abroad',
+                  'address_house_number', 'occupation', 'department', 'degree', 'employer_or_school',
+                  'research_subject', 'captcha']
