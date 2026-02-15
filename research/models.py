@@ -34,12 +34,13 @@ class Researcher(models.Model, DetectProtectedMixin):
     address_abroad = models.CharField(max_length=200, blank=True, null=True)
     city_hungary = models.CharField(max_length=100, blank=True, null=True)
     city_abroad = models.CharField(max_length=100, blank=True, null=True)
+    house_number = models.CharField(max_length=10, blank=True, null=True)
     country = models.ForeignKey('authority.Country', on_delete=models.PROTECT, blank=True, null=True)
     citizenship = models.ForeignKey('controlled_list.Nationality', on_delete=models.PROTECT, blank=True, null=True)
-    id_number = models.CharField(max_length=50)
+    # id_number = models.CharField(max_length=50, blank=True, null=True)
     email = EmailNullField(max_length=100, unique=True, blank=True, null=True)
 
-    OCCUPATION_CHOICES = [('ceu', 'CEU'), ('other', 'Other')]
+    OCCUPATION_CHOICES = [('ceu', 'CEU'), ('other', 'Other'), ('ceu_student', 'CEU Student'), ('ceu_faculty', 'CEU Faculty')]
     occupation = models.CharField(max_length=20, choices=OCCUPATION_CHOICES, default='ceu')
     occupation_other = models.CharField(max_length=300, blank=True, null=True)
 
@@ -122,6 +123,7 @@ class ResearcherDegree(models.Model):
 
     id = models.AutoField(primary_key=True)
     degree = models.CharField(max_length=100, unique=True)
+    show_in_registration_form = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'research_researcher_degrees'

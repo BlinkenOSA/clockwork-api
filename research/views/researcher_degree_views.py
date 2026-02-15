@@ -69,4 +69,4 @@ class ResearcherDegreeSelectList(generics.ListAPIView):
     permission_classes = []
     filter_backends = (SearchFilter,)
     search_fields = ['degree']
-    queryset = ResearcherDegree.objects.all().order_by('degree')
+    queryset = ResearcherDegree.objects.filter(show_in_registration_form=True).order_by('degree')
