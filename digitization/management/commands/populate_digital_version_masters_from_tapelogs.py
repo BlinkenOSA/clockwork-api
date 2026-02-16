@@ -15,7 +15,7 @@ class Command(BaseCommand):
             help="Optional override path to tapelogs directory",
         )
         parser.add_argument(
-            "--dry-run",
+            "--dry_run",
             action="store_true",
             help="Parse files but do not create records",
         )
@@ -48,49 +48,51 @@ class Command(BaseCommand):
                 label_of_the_tape = file_path.stem
                 self.stdout.write(f"Processing: {file_path.name} (label={label_of_the_tape})")
 
-                for line_no, raw in enumerate(file_path.read_text(encoding="utf-8").splitlines(), start=1):
-                    barcode = raw.strip()
-                    if not barcode:
-                        skipped_empty += 1
-                        continue
+                with open(file_path, "r", encoding="utf-16") as f:
+                    for line_no, raw in enumerate(f, start=1):
+                        barcode = raw.strip()
 
-                    try:
-                        # "barcode as the id" => primary key lookup
-                        container = Container.objects.get(barcode=barcode)
-                    except Container.DoesNotExist:
-                        missing_containers += 1
-                        self.stdout.write(
-                            self.style.WARNING(
-                                f"[{file_path.name}:{line_no}] Container with id={barcode!r} does not exist; skipping."
+                        if not barcode or barcode == '\x00':
+                            skipped_empty += 1
+                            continue
+
+                        try:
+                            # "barcode as the id" => primary key lookup
+                            container = Container.objects.get(barcode=barcode)
+                        except Container.DoesNotExist:
+                            missing_containers += 1
+                            self.stdout.write(
+                                self.style.WARNING(
+                                    f"[{file_path.name}:{line_no}] Container with id={barcode!r} does not exist; skipping."
+                                )
                             )
+                            continue
+
+                        if dry_run:
+                            created += 1
+                            continue
+
+                        # If DigitalVersion has only barcode + storage:
+                        digital_version, dv_created = DigitalVersion.objects.get_or_create(
+                            container=container,
+                            level='M',
+                            identifier=barcode,
+                            filename=f"{barcode}.avi"
                         )
-                        continue
 
-                    if dry_run:
+                        DigitalVersionPhysicalCopy.objects.get_or_create(
+                            digital_version=digital_version,
+                            storage_unit='LTO-7',
+                            storage_unit_label=label_of_the_tape
+                        )
+
                         created += 1
-                        continue
-
-                    # If DigitalVersion has only barcode + storage:
-                    digital_version, created = DigitalVersion.objects.get_or_create(
-                        container=container,
-                        level='M',
-                        barcode=barcode,
-                        filename=f"{barcode}.avi"
-                    )
-
-                    DigitalVersionPhysicalCopy.objects.get_or_create(
-                        digital_version=digital_version,
-                        storage_unit='LTO-7',
-                        storage_unit_label=label_of_the_tape
-                    )
-
-                    created += 1
-                    msg = f"Processed {digital_version.identifier} on tape {label_of_the_tape}"
+                        print(f"Processed {digital_version.identifier} on tape {label_of_the_tape}")
                     # end for each line
                 # end for each file
 
-            if dry_run:
-                transaction.set_rollback(True)
+        if dry_run:
+            transaction.set_rollback(True)
 
         msg = f"Done. Would create {created} records." if dry_run else f"Done. Created {created} records."
         if missing_containers:

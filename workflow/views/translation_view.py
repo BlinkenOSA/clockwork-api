@@ -56,10 +56,12 @@ class GetTranslationToOriginal(APIView):
         auth_key = getattr(settings, 'DEEPL_AUTH_KEY', None)
         translator = deepl.Translator(auth_key)
 
+        target_lang = serializer.validated_data['original_locale']
+
         result = translator.translate_text(
             text=serializer.validated_data['english_text'],
             source_lang='EN',
-            target_lang=serializer.validated_data['original_locale']
+            target_lang=serializer.validated_data['original_locale'].id
         )
 
         return Response({'text': result.text}, status=HTTP_200_OK)
@@ -113,7 +115,7 @@ class GetTranslationToEnglish(APIView):
 
         result = translator.translate_text(
             text=serializer.validated_data['original_text'],
-            source_lang=serializer.validated_data['original_locale'],
+            source_lang=serializer.validated_data['original_locale'].id,
             target_lang='EN-US'
         )
 
