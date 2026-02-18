@@ -58,7 +58,7 @@ class GetFAEntityMetadataByItemID(RetrieveAPIView):
 
         if re.match(r'^HU_OSA_[0-9]+_[0-9]+_[0-9]*_[0-9]{4}_[0-9]{4}', item_id):
             # NOTE: Preserving original behavior; this replacement likely intends "HU_OSA_".
-            item_id = item_id.replace("HU OSA ", "")
+            item_id = item_id.replace("HU_OSA_", "")
             fonds, subfonds, rest, folder_no = item_id.split('-')
             series, container_no = rest.split('_')
 
