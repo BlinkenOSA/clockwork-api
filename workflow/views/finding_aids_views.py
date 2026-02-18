@@ -59,7 +59,7 @@ class GetFAEntityMetadataByItemID(RetrieveAPIView):
         if re.match(r'^HU_OSA_[0-9]+_[0-9]+_[0-9]*_[0-9]{4}_[0-9]{4}', item_id):
             # NOTE: Preserving original behavior; this replacement likely intends "HU_OSA_".
             item_id = item_id.replace("HU_OSA_", "")
-            fonds, subfonds, series, container_no, folder_no, rest = item_id.split('_')
+            fonds, subfonds, series, container_no, folder_no = item_id.split('_')
 
             fa_entity = get_object_or_404(
                 FindingAidsEntity,
