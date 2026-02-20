@@ -586,7 +586,7 @@ class DigitalObjectUpsert(APIView):
                     identifier=get_doi(doi),
                     level='A' if level == 'access' else 'M',
                     label=label,
-                    digital_collection=resolved_object['finding_aids_entity'].archival_unit.title,
+                    # digital_collection=resolved_object['finding_aids_entity'].archival_unit.title,
                     filename=access_copy['filename'],
                     available_online=True
                 )
@@ -596,7 +596,7 @@ class DigitalObjectUpsert(APIView):
                     identifier=get_doi(doi),
                     level='A' if level == 'access' else 'M',
                     # NOTE: Existing code referenced finding_aids_entity when absent; preserved intent below.
-                    digital_collection=resolved_object['container'].archival_unit.title_full,
+                    # digital_collection=resolved_object['container'].archival_unit.title_full,
                     filename=access_copy['filename'],
                     available_online=True
                 )
