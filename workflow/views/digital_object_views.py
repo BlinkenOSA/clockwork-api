@@ -669,7 +669,7 @@ class DigitalObjectRCUpsert(APIView):
         200: DigitalObjectUpsertResponseSerializer(),
         400: 'Invalid filename'
     })
-    def post(self, request, level, access_copy_file):
+    def post(self, request, access_copy_file):
         """
         Upserts a DigitalVersion record derived from the access copy filename.
 
