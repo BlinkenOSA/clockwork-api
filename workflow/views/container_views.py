@@ -132,7 +132,11 @@ class GetContainerMetadataByLegacyID(RetrieveAPIView):
         else:
             if re.match(r'^HU_OSA_[0-9]+_[0-9]+_[0-9]*_[0-9]{4}', legacy_id):
                 legacy_id = legacy_id.replace("HU_OSA_", "")
-                fonds, subfonds, series, container_no, rest = legacy_id.split('_')
+                chunks = legacy_id.split('_')
+                if len(chunks) > 4:
+                    fonds, subfonds, series, container_no, rest = chunks
+                else:
+                    fonds, subfonds, series, container_no = chunks
                 container = get_object_or_404(
                     Container,
                     archival_unit__fonds=int(fonds),
