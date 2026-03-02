@@ -41,8 +41,7 @@ class ResearcherListSerializer(serializers.ModelSerializer):
             'card_number',
             'country',
             'date_created',
-            'active',
-            'approved',
+            'status',
             'is_removable',
         )
 
