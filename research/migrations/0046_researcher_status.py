@@ -9,11 +9,11 @@ def set_researcher_status(apps, schema_editor):
     for researcher in Researcher.objects.all():
         # Adjust logic based on your description
         if getattr(researcher, "approved", False) and getattr(researcher, "active", False):
-            researcher.status = "approved"
-        elif not getattr(researcher, "active", True):
-            researcher.status = "suspended"
-        else:
             researcher.status = "new"
+        if getattr(researcher, "approved", True) and getattr(researcher, "active", True):
+            researcher.status = "approved"
+        if getattr(researcher, "approved", True) and getattr(researcher, "active", False):
+            researcher.status = "suspended"
 
         researcher.save(update_fields=["status"])
 

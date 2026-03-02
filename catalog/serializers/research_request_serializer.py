@@ -138,19 +138,14 @@ class ResearchRequestSerializer(serializers.Serializer):
             )
 
         # Now we know the user exists
-        if not researcher.approved:
+        if researcher.status == "new":
             raise serializers.ValidationError(
                 "Your account has not been approved yet."
             )
 
-        if not researcher.active:
+        if researcher.status == "suspended":
             raise serializers.ValidationError(
-                "Your account is inactive. Please contact support at archivum@ceu.edu."
-            )
-
-        if not researcher.approved:
-            raise serializers.ValidationError(
-                "Your account has not been approved yet."
+                "Your account has been suspended. Please contact support at archivum@ceu.edu."
             )
 
         return data

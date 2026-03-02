@@ -8,7 +8,6 @@ from rest_framework.views import APIView
 
 from authority.models import Country
 from authority.serializers import CountrySelectSerializer
-from clockwork_api.mailer.email_with_template import EmailWithTemplate
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from controlled_list.models import Nationality
 from controlled_list.serializers import NationalitySelectSerializer
@@ -60,7 +59,7 @@ class ResearcherList(MethodSerializerMixin, generics.ListCreateAPIView):
         Creates a researcher using ResearcherWriteSerializer.
 
     Features:
-        - Filtering by country, citizenship, active, approved
+        - Filtering by country, citizenship, status
         - Name search via ResearcherFilterClass
         - Ordering by identity and administrative fields
         - Dynamic serializer selection based on HTTP method
@@ -68,7 +67,7 @@ class ResearcherList(MethodSerializerMixin, generics.ListCreateAPIView):
 
     queryset = Researcher.objects.all().order_by('-date_created', 'last_name', 'first_name')
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filterset_fields = ['country', 'citizenship', 'active', 'approved']
+    filterset_fields = ['country', 'citizenship', 'status']
     filterset_class = ResearcherFilterClass
     ordering_fields = [
         'last_name',
@@ -116,7 +115,7 @@ class ResearcherSelectList(generics.ListAPIView):
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ResearcherFilterClass
-    queryset = Researcher.objects.filter(active=True, approved=True).order_by('last_name', 'first_name')
+    queryset = Researcher.objects.filter(status='approved').order_by('last_name', 'first_name')
 
 
 class ResearcherCountrySelectList(generics.ListAPIView):
@@ -204,7 +203,8 @@ class ResearcherActivate(APIView):
 
     PUT /researcher/<action>/<pk>/ where action is:
         - activate
-        - deactivate
+        - suspend
+        - reactivate
 
     The action toggles the researcher's ``active`` flag.
     """
@@ -225,56 +225,23 @@ class ResearcherActivate(APIView):
         researcher_id = self.kwargs.get('pk')
         researcher = get_object_or_404(Researcher, pk=researcher_id)
 
+        # Approve a new researcher registration
         if action == 'activate':
-            researcher.active = True
-            researcher.save()
-            return Response(status=status.HTTP_200_OK)
-        else:
-            researcher.active = False
-            researcher.save()
-            return Response(status=status.HTTP_200_OK)
+            if researcher.status == 'new':
+                researcher.status = 'approved'
+                researcher.save()
+                return Response(status=status.HTTP_200_OK)
 
+        # Suspend an approved researcher registration
+        if action == 'suspend':
+            if researcher.status == 'approved':
+                researcher.status = 'suspended'
+                researcher.save()
+                return Response(status=status.HTTP_200_OK)
 
-class ResearcherApprove(APIView):
-    """
-    Approves or disapproves a researcher.
-
-    PUT /researcher/<action>/<pk>/ where action is:
-        - approve
-        - disapprove
-
-    Side effects:
-        - On approval, sends an "account approved" email to the researcher.
-    """
-
-    def put(self, request, *args, **kwargs):
-        """
-        Applies the approval state change.
-
-        Args:
-            request: DRF request.
-            *args: Positional args passed by DRF.
-            **kwargs: Keyword args containing ``action`` and ``pk``.
-
-        Returns:
-            200 OK after updating the researcher.
-        """
-        action = self.kwargs.get('action')
-        researcher_id = self.kwargs.get('pk')
-        researcher = get_object_or_404(Researcher, pk=researcher_id)
-
-        if action == 'approve':
-            researcher.approved = True
-            researcher.save()
-
-            mail = EmailWithTemplate(
-                researcher=researcher,
-                context={'researcher': researcher}
-            )
-            mail.send_new_user_approved_user()
-
-            return Response(status=status.HTTP_200_OK)
-        else:
-            researcher.approved = False
-            researcher.save()
-            return Response(status=status.HTTP_200_OK)
+        # Reactivate a suspended researcher registration
+        if action == 'reactivate':
+            if researcher.status == 'suspended':
+                researcher.status = 'approved'
+                researcher.save()
+                return Response(status=status.HTTP_200_OK)

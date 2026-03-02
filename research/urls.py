@@ -4,7 +4,7 @@ from research.views.requests_views import RequestsList, RequestsListForPrint, \
     RequestSeriesSelect, RequestContainerSelect, RequestsCreate, RequestItemStatusStep, RequestItemRetrieveUpdate, \
     RequestLibraryMLR
 from research.views.researcher_views import ResearcherList, ResearcherDetail, ResearcherSelectList, \
-    ResearcherCountrySelectList, ResearcherNationalitySelectList, ResearcherActivate, ResearcherApprove, \
+    ResearcherCountrySelectList, ResearcherNationalitySelectList, ResearcherActivate, \
     ResearcherCountryActiveSelectList, ResearcherNationalityActiveSelectList
 from research.views.researcher_visit_views import ResearcherVisitsList, ResearcherVisitsCheckOut, \
     ResearcherVisitsCheckIn
@@ -60,10 +60,8 @@ urlpatterns = [
     path('country/select/', ResearcherCountrySelectList.as_view(), name='researcher-country-select-list'),
     path('nationality/select/', ResearcherNationalitySelectList.as_view(), name='researcher-nationality-select-list'),
 
-    re_path(r'researcher/(?P<action>["activate"|"deactivate"]+)/(?P<pk>[0-9]+)/$', ResearcherActivate.as_view(),
+    re_path(r'researcher/(?P<action>["activate"|"suspend"|"reactivate"]+)/(?P<pk>[0-9]+)/$', ResearcherActivate.as_view(),
             name='researcher-activate'),
-    re_path(r'researcher/(?P<action>["approve"|"disapprove"]+)/(?P<pk>[0-9]+)/$', ResearcherApprove.as_view(),
-            name='researcher-approve'),
 
     path('researcher/country-used/select/', ResearcherCountryActiveSelectList.as_view(),
          name='researcher-country-active-select-list'),
