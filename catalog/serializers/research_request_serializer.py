@@ -148,6 +148,11 @@ class ResearchRequestSerializer(serializers.Serializer):
                 "Your account is inactive. Please contact support at archivum@ceu.edu."
             )
 
+        if not researcher.approved:
+            raise serializers.ValidationError(
+                "Your account has not been approved yet."
+            )
+
         return data
 
     def to_internal_value(self, values: dict) -> dict:

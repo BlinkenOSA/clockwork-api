@@ -73,6 +73,13 @@ class Researcher(models.Model, DetectProtectedMixin):
     active = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
 
+    RESEARCHER_STATUS = [
+        ('new', 'New'),
+        ('approved', 'Approved'),
+        ('suspended', 'Suspended')
+    ]
+    status = models.CharField(max_length=10, blank=True, null=True, choices=RESEARCHER_STATUS, default='new')
+
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     def get_next_card_number(self):
