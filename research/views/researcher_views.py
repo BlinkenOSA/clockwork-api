@@ -29,6 +29,8 @@ class ResearcherFilterClass(filters.FilterSet):
     """
 
     search = filters.CharFilter(label='Search', method='filter_search')
+    status = filters.CharFilter(label='Status', method='filter_status')
+    country = filters.CharFilter(label='Country', method='filter_country')
 
     def filter_search(self, queryset, name, value):
         """
@@ -48,6 +50,11 @@ class ResearcherFilterClass(filters.FilterSet):
             Q(middle_name__icontains=value)
         )
 
+    def filter_status(self, queryset, name, value):
+        return queryset.filter(status=value)
+
+    def filter_country(self, queryset, name, value):
+        return queryset.filter(country__id=value)
 
 class ResearcherList(MethodSerializerMixin, generics.ListCreateAPIView):
     """
@@ -237,7 +244,7 @@ class ResearcherActivate(APIView):
                     context={'researcher': researcher}
                 )
                 mail.send_new_user_approved_user()
-                
+
                 return Response(status=status.HTTP_200_OK)
 
         # Suspend an approved researcher registration
