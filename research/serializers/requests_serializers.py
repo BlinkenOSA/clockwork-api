@@ -4,6 +4,7 @@ from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
 from container.models import Container
+from finding_aids.models import FindingAidsEntity
 from mlr.models import MLREntity
 from research.models import RequestItem, Request, RequestItemPart
 
@@ -131,9 +132,12 @@ class RequestListSerializer(serializers.ModelSerializer):
 
     def get_has_restricted_content(self, obj):
         """
-        Returns True if any linked parts are restricted.
+        Returns True if any Finding Aids entities in the requested container is restricted.
         """
-        return obj.requestitempart_set.filter(finding_aids_entity__access_rights__statement='Restricted').count() > 0
+        return FindingAidsEntity.objects.filter(
+            container=obj.container,
+            access_rights__statement='Restricted'
+        ).count() > 0
 
     def get_research_allowed(self, obj):
         """
