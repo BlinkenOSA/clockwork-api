@@ -9,7 +9,8 @@ The field:
     - validates it against hCaptcha servers
     - never stores the value
 """
-import requests
+from requests.exceptions import RequestException
+from clockwork_api.http import post
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -46,13 +47,19 @@ class HCaptchaField(serializers.Field):
         captcha_url = getattr(settings, 'HCAPTCHA_VERIFY_URL', None)
         sitekey = getattr(settings, 'HCAPTCHA_SITE_KEY', None)
 
+        if not captcha_url or not sitekey:
+            raise ValidationError('Captcha is misconfigured. Please try again later!')
+
         # Check the submitted captcha
         if data:
             data = {
                 'secret': sitekey,
                 'response': data
             }
-            r = requests.post(captcha_url, data=data)
+            try:
+                r = post(captcha_url, data=data)
+            except RequestException:
+                raise ValidationError('Error communicating with HCaptcha server!')
 
             if r.status_code == 200:
                 response = r.json()

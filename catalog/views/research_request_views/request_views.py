@@ -20,7 +20,7 @@ This endpoint is intentionally unauthenticated and protected via:
 
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from catalog.serializers.research_request_serializer import ResearchRequestSerializer
 from clockwork_api.mailer.email_with_template import EmailWithTemplate
@@ -76,12 +76,18 @@ class ResearcherRequestView(APIView):
         has_restricted_content = False
 
         # Serializer validation
-        if serializer.is_valid():
-            data = serializer.data
+        if serializer.is_valid(raise_exception=True):
+            data = serializer.validated_data
 
             # Researcher resolution
             # Researcher identity is resolved in the serializer and trusted here.
-            researcher = Researcher.objects.get(id=data['researcher'])
+            try:
+                researcher = Researcher.objects.get(id=data['researcher'])
+            except ObjectDoesNotExist:
+                return Response(
+                    {"researcher": "Researcher not found."},
+                    status=HTTP_400_BAD_REQUEST
+                )
 
             # Request creation
             # A researcher can only have one request per date.
@@ -95,16 +101,26 @@ class ResearcherRequestView(APIView):
             for item in items:
                 # Finding Aids Item
                 if item['origin'] == 'FA':
+                    try:
+                        container = Container.objects.get(id=item['container'])
+                    except ObjectDoesNotExist:
+                        return Response(
+                            {"container": "Invalid container for requested item."},
+                            status=HTTP_400_BAD_REQUEST
+                        )
                     request_item, created = RequestItem.objects.get_or_create(
                         request=request,
                         item_origin=item['origin'],
-                        container=Container.objects.get(id=item['container']),
+                        container=container,
                     )
 
                     try:
                         finding_aids_entity = FindingAidsEntity.objects.get(id=item['ams_id'])
                     except ObjectDoesNotExist:
-                        break
+                        return Response(
+                            {"ams_id": "AMS ID field invalid!"},
+                            status=HTTP_400_BAD_REQUEST
+                        )
 
                     request_item_part, created = RequestItemPart.objects.get_or_create(
                         request_item=request_item,
@@ -156,4 +172,4 @@ class ResearcherRequestView(APIView):
 
             return Response('ok', status=HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=404)
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

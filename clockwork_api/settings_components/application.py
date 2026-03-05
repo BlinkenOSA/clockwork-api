@@ -92,4 +92,6 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
+# Default timeout (seconds) for outbound HTTP requests made by the app.
+REQUESTS_TIMEOUT = 5
 

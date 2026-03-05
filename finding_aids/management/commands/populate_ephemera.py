@@ -6,7 +6,7 @@ from io import BytesIO, StringIO
 import unicodedata
 
 import pymarc as pymarc
-import requests
+from clockwork_api.http import get
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand
@@ -80,19 +80,19 @@ class Command(BaseCommand):
         ri_query = RI_QUERY % collection
         query = FEDORA_RISEARCH + '?type=tuples&lang=itql&format=json&query=' + urllib.parse.quote_plus(ri_query)
 
-        r = requests.get(query)
+        r = get(query)
         if r.ok:
             response = r.json()
             self.pids = list(map(lambda x: x['pid'], response['results']))
 
     def get_document(self):
-        r = requests.get("%s/objects/%s/datastreams/ITEM-LIB-EN/content" % (FEDORA_URL, self.current_pid))
+        r = get("%s/objects/%s/datastreams/ITEM-LIB-EN/content" % (FEDORA_URL, self.current_pid))
         r.encoding = 'UTF-8'
         if r.ok:
             self.xml = r.text
 
         if self.locale != 'EN':
-            r = requests.get("%s/objects/%s/datastreams/ITEM-LIB-%s/content" % (FEDORA_URL, self.current_pid, self.locale))
+            r = get("%s/objects/%s/datastreams/ITEM-LIB-%s/content" % (FEDORA_URL, self.current_pid, self.locale))
             r.encoding = 'UTF-8'
             if r.ok:
                 self.xml_hu = r.text
@@ -298,4 +298,3 @@ class Command(BaseCommand):
 
         fa_entity.save()
         print("Data migrated to: %s" % fa_entity.archival_reference_code)
-
