@@ -144,3 +144,13 @@ class ContainerSelectSerializerTest(TestCase):
         serializer = ContainerSelectSerializer(instance=container)
         data = serializer.data
         self.assertEqual(data['digital_version_duration'], '00:15:05')
+
+    def test_digital_version_duration_none_when_missing(self):
+        container = Container.objects.create(
+            archival_unit=self.series,
+            carrier_type=CarrierType.objects.get(pk=1),
+            container_no=2
+        )
+        serializer = ContainerSelectSerializer(instance=container)
+        data = serializer.data
+        self.assertIsNone(data['digital_version_duration'])
