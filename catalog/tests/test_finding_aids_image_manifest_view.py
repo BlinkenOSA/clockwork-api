@@ -18,9 +18,9 @@ class FindingAidsImageManifestViewTests(SimpleTestCase):
         fa_entity = SimpleNamespace(
             primary_type=SimpleNamespace(type="Still Image"),
             available_online=True,
-            archival_reference_code="HU OSA 300:2/7",
+            archival_reference_code="HU OSA 300-1-1:2/7",
             title="Photo",
-            archival_unit=SimpleNamespace(reference_code="HU OSA 300", title_full="Series title"),
+            archival_unit=SimpleNamespace(reference_code="HU OSA 300-1-1", title_full="Series title"),
             container=SimpleNamespace(container_no=2),
             folder_no=7,
         )
@@ -55,11 +55,11 @@ class FindingAidsImageManifestViewTests(SimpleTestCase):
         factory.set_base_image_uri.assert_called_once_with("https://images.example/iiif/2/")
         factory.set_iiif_image_info.assert_called_once_with(2.0, 2)
         factory.set_debug.assert_called_once_with("error")
-        factory.manifest.assert_called_once_with(label="HU OSA 300:2/7 Photo")
+        factory.manifest.assert_called_once_with(label="HU OSA 300-1-1:2/7 Photo")
 
         seq.canvas.assert_called_once_with(ident="Image", label="Image")
         canvas.set_image_annotation.assert_called_once_with(
-            "catalog%2FHU_OSA_300%2FHU_OSA_300_0002_0007.jpg",
+            "catalog%2FHU_OSA_300-1-1%2FHU_OSA_300-1-1_0002_0007.jpg",
             iiif=True,
         )
         manifest.toJSON.assert_called_once_with(top=True)
