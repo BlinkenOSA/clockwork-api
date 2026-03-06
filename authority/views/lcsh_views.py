@@ -1,7 +1,7 @@
 import json
 from typing import List, Dict, Any
 
-import requests
+from clockwork_api.http import Session
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -47,7 +47,7 @@ class LCSHMixin(object):
         if len(query) == 0 or len(request_type) == 0:
             return []
         else:
-            session = requests.Session()
+            session = Session()
             session.trust_env = False
 
             r = session.get('http://id.loc.gov/search/?q=%s&q=cs:%s&format=json' % (query, rt))

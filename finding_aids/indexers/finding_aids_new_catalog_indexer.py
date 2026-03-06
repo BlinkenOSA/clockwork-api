@@ -1,7 +1,7 @@
 import urllib
 
 import pysolr
-import requests
+from clockwork_api.http import get, post
 from django.conf import settings
 from hashids import Hashids
 from langdetect import detect, LangDetectException
@@ -92,7 +92,7 @@ class FindingAidsNewCatalogIndexer:
         if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
             if self.finding_aids_entity.archival_unit.isad.published:
                 self.create_solr_document()
-                r = requests.post("%s/update/json/docs/" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
+                r = post("%s/update/json/docs/" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
                     getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
                 ))
                 if r.status_code == 200:
@@ -107,7 +107,7 @@ class FindingAidsNewCatalogIndexer:
         This is typically called after one or more `index()` calls to
         make the updates visible.
         """
-        r = requests.post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
+        r = post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
                 getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
             ))
         print(r.text)
@@ -633,7 +633,7 @@ class FindingAidsNewCatalogIndexer:
             )
             image_id = 'catalog/%s/%s.jpg' % (archival_unit_ref_code, item_reference_code)
             image_id = urllib.parse.quote_plus(image_id)
-            r = requests.get("%s%s/info.json" % (iiif_url, image_id))
+            r = get("%s%s/info.json" % (iiif_url, image_id))
 
             if r.status_code == 200:
                 return r.text

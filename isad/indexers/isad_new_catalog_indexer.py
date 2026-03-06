@@ -1,5 +1,5 @@
 import pysolr
-import requests
+from clockwork_api.http import post
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
@@ -85,7 +85,7 @@ class ISADNewCatalogIndexer:
         """
         if self.isad.published:
             self.create_solr_document()
-            r = requests.post("%s/update/json/docs" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
+            r = post("%s/update/json/docs" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
                 getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
             ))
             if r.status_code == 200:
@@ -102,7 +102,7 @@ class ISADNewCatalogIndexer:
         This uses an explicit commit request to Solr. Some deployment setups may
         rely on auto-commit; others may require manual commits after batches.
         """
-        r = requests.post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
+        r = post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
                 getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
             ))
         print(r.text)

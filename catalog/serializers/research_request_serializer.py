@@ -69,7 +69,10 @@ class RequestItemSerializer(serializers.Serializer):
         ams_id = data.get('ams_id', None)
 
         if origin == 'FA':
-            finding_aids_entity = FindingAidsEntity.objects.get(id=ams_id)
+            try:
+                finding_aids_entity = FindingAidsEntity.objects.get(id=ams_id)
+            except FindingAidsEntity.DoesNotExist:
+                raise serializers.ValidationError({"ams_id": "AMS ID field invalid!"})
             data['container'] = finding_aids_entity.container.id
         else:
             data['container'] = None
@@ -160,13 +163,23 @@ class ResearchRequestSerializer(serializers.Serializer):
         card_number = data.get('card_number', '')
 
         if email != "":
-            data['researcher'] = Researcher.objects.get(
-                email=email,
-            ).id
+            try:
+                data['researcher'] = Researcher.objects.get(
+                    email=email,
+                ).id
+            except Researcher.DoesNotExist:
+                raise serializers.ValidationError(
+                    {"email": "The email address you entered is not existing in our system. Please register first!"}
+                )
 
         if card_number != "":
-            data['researcher'] = Researcher.objects.get(
-                card_number=card_number,
-            ).id
+            try:
+                data['researcher'] = Researcher.objects.get(
+                    card_number=card_number,
+                ).id
+            except Researcher.DoesNotExist:
+                raise serializers.ValidationError(
+                    {"card_number": "The card number you entered is not existing in our system. Please register first!"}
+                )
 
         return data

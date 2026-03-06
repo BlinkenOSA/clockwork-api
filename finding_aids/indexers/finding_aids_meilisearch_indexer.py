@@ -2,7 +2,7 @@ import urllib
 
 import meilisearch
 import pysolr
-import requests
+from clockwork_api.http import get
 from django.conf import settings
 from django.utils.html import strip_tags
 from hashids import Hashids
@@ -387,7 +387,7 @@ class FindingMeilisearchIndexer:
             )
             image_id = 'catalog/%s/%s.jpg' % (archival_unit_ref_code, item_reference_code)
             image_id = urllib.parse.quote_plus(image_id)
-            r = requests.get("%s%s/info.json" % (iiif_url, image_id))
+            r = get("%s%s/info.json" % (iiif_url, image_id))
 
             if r.status_code == 200:
                 return r.text
