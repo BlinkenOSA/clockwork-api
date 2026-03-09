@@ -7,6 +7,7 @@ from accounts.apps import AccountsConfig
 from accounts.models import UserProfile
 from accounts.serializers import CurrentUserSerializer
 from archival_unit.models import ArchivalUnit
+from archival_unit.tests.helpers import make_fonds
 
 
 class AccountsConfigTest(TestCase):
@@ -19,14 +20,7 @@ class UserProfileTests(TestCase):
     def test_assigned_archival_units_count_and_str(self):
         user = User.objects.create_user(username='alice', password='secret')
         profile = UserProfile.objects.create(user=user)
-
-        au = ArchivalUnit.objects.create(
-            fonds=1,
-            subfonds=0,
-            series=0,
-            level='F',
-            title='Test Fonds'
-        )
+        au = make_fonds()
         profile.allowed_archival_units.add(au)
 
         self.assertEqual(profile.assigned_archival_units(), 1)
