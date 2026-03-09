@@ -3,14 +3,15 @@ from rest_framework.reverse import reverse
 
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from controlled_list.models import AccessRight, CarrierType
+from controlled_list.tests.helpers import make_access_rights, make_carrier_types
 
 
 class ControlledListViewTests(TestViewsBaseClass):
     def setUp(self):
-        self.init()
-        AccessRight.objects.create(statement="Open")
-        AccessRight.objects.create(statement="Restricted")
-        CarrierType.objects.create(type="Archival Box", width=10)
+        super().setUp()
+        make_access_rights(statement="Open")
+        make_access_rights(statement="Restricted")
+        make_carrier_types(type="Archival Box", width=10)
 
     def test_access_rights_search(self):
         response = self.client.get(

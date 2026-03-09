@@ -1,4 +1,4 @@
-from controlled_list.models import ArchivalUnitTheme, CarrierType
+from controlled_list.models import AccessRight, ArchivalUnitTheme, CarrierType
 
 
 def make_archival_unit_themes(**kwargs):
@@ -7,6 +7,13 @@ def make_archival_unit_themes(**kwargs):
     }
     defaults.update(kwargs)
     return ArchivalUnitTheme.objects.create(**defaults)
+
+def make_access_rights(**kwargs):
+    defaults = {
+        "statement": "Open",
+    }
+    defaults.update(kwargs)
+    return AccessRight.objects.create(**defaults)
 
 def make_carrier_types(**kwargs):
     defaults = {
