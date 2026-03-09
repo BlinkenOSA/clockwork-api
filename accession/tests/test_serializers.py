@@ -1,16 +1,14 @@
 from django.test import TestCase
 
-from accession.models import AccessionMethod
 from accession.serializers import AccessionWriteSerializer
-from donor.models import Donor
+from accession.tests.helpers import make_accession_method
+from donor.tests.helpers import make_donor
 
 
 class AccessionWriteSerializerTests(TestCase):
-    fixtures = ['accession']
-
     def _base_payload(self):
-        method = AccessionMethod.objects.first()
-        donor = Donor.objects.first()
+        method = make_accession_method()
+        donor = make_donor()
         return {
             'title': 'Test accession',
             'transfer_date': '2020-01-01',
