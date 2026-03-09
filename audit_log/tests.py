@@ -34,7 +34,7 @@ class AuditLogSerializerTests(TestCase):
 
 class AuditLogViewTests(TestViewsBaseClass):
     def setUp(self):
-        self.init()
+        super().setUp()
         self.log1 = AuditLog.objects.create(
             user=self.user,
             action='CREATE',

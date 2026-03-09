@@ -12,7 +12,7 @@ class MLRViewsTests(TestViewsBaseClass):
     fixtures = ['carrier_types', 'buildings']
 
     def setUp(self):
-        self.init()
+        super().setUp()
         fonds = ArchivalUnit.objects.create(fonds=1101, level='F', title='Fonds')
         subfonds = ArchivalUnit.objects.create(
             fonds=1101,

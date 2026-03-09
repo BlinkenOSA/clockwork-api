@@ -13,7 +13,7 @@ class WorkflowViewsTests(TestViewsBaseClass):
     fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):
-        self.init()
+        super().setUp()
         api_group = Group.objects.create(name='Api')
         self.user.groups.add(api_group)
 

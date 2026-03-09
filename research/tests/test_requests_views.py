@@ -16,7 +16,7 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
     fixtures = ['carrier_types']
 
     def setUp(self):
-        self.init()
+        super().setUp()
         self.researcher = Researcher.objects.create(
             first_name='Ada',
             last_name='Lovelace',
@@ -92,7 +92,7 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
 
 class RequestLibraryMLRHelperTests(TestViewsBaseClass):
     def setUp(self):
-        self.init()
+        super().setUp()
         self.view = RequestLibraryMLR()
 
     def test_get_locations_defaults_to_general_collection(self):

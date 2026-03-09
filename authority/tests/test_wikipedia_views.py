@@ -7,7 +7,7 @@ class WikipediaTest(TestViewsBaseClass):
     """ Testing Wikipedia endpoint """
 
     def setUp(self):
-        self.init()
+        super().setUp()
 
     def test_get_query(self):
         response = self.client.get(reverse('authority-v1:wikipedia-list'), {'query': 'Lenin'})

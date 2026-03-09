@@ -9,7 +9,7 @@ class DonorViewTest(TestViewsBaseClass):
     fixtures = ['donor']
 
     def setUp(self):
-        self.init()
+        super().setUp()
         self.country = Country.objects.get(pk=46)
 
     def test_filter_class(self):

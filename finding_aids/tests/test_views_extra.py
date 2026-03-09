@@ -12,7 +12,7 @@ class FindingAidsExtraViewsTests(TestViewsBaseClass):
     fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):
-        self.init()
+        super().setUp()
         fonds = ArchivalUnit.objects.create(fonds=901, level='F', title='Fonds')
         subfonds = ArchivalUnit.objects.create(
             fonds=901,

@@ -29,7 +29,7 @@ class _FakePerson:
 
 class PersonSimilarityViewsTests(TestViewsBaseClass):
     def setUp(self):
-        self.init()
+        super().setUp()
 
     def test_person_similar_by_id_not_found(self):
         with patch(
