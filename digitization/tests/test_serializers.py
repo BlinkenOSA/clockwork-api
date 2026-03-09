@@ -1,8 +1,11 @@
 from django.test import TestCase
 
 from archival_unit.models import ArchivalUnit
+from archival_unit.tests.helpers import make_fonds, make_subfonds, make_series
 from container.models import Container
+from container.tests.helpers import make_container
 from controlled_list.models import CarrierType
+from controlled_list.tests.helpers import make_carrier_types
 from digitization.serializers.container_serializers import (
     DigitizationContainerLogSerializer,
     DigitizationContainerDataSerializer,
@@ -13,48 +16,34 @@ TECH_MD = '{"streams":[{"codec_type":"video","duration":"905.0"}]}'
 
 
 class DigitizationContainerSerializerTests(TestCase):
-    fixtures = ['carrier_types']
-
     def setUp(self):
-        fonds = ArchivalUnit.objects.create(fonds=700, level='F', title='Fonds')
-        subfonds = ArchivalUnit.objects.create(
-            fonds=700,
-            subfonds=1,
-            level='SF',
-            title='Subfonds',
-            parent=fonds,
-        )
-        self.series = ArchivalUnit.objects.create(
-            fonds=700,
-            subfonds=1,
-            series=1,
-            level='S',
-            title='Series',
-            parent=subfonds,
-        )
+        self.fonds = make_fonds()
+        self.subfonds = make_subfonds(self.fonds)
+        self.series = make_series(self.subfonds)
+        self.carrier_type = make_carrier_types(type='VHS')
 
     def test_log_serializer_duration_and_reference_code(self):
-        container = Container.objects.create(
-            archival_unit=self.series,
-            carrier_type=CarrierType.objects.first(),
+        container = make_container(
+            series=self.series,
+            carrier_type=self.carrier_type,
             barcode='HU_OSA_1',
             digital_version_technical_metadata=TECH_MD,
         )
 
         data = DigitizationContainerLogSerializer(container).data
-        self.assertEqual(data['container_no'], 'HU OSA 700-1-1:1')
+        self.assertEqual(data['container_no'], 'HU OSA 206-3-1:1')
         self.assertEqual(data['duration'], '00:15:05')
 
     def test_data_serializer_parses_json_or_false(self):
-        with_md = Container.objects.create(
-            archival_unit=self.series,
-            carrier_type=CarrierType.objects.first(),
+        with_md = make_container(
+            series=self.series,
+            carrier_type=self.carrier_type,
             barcode='HU_OSA_2',
             digital_version_technical_metadata=TECH_MD,
         )
-        without_md = Container.objects.create(
-            archival_unit=self.series,
-            carrier_type=CarrierType.objects.first(),
+        without_md = make_container(
+            series=self.series,
+            carrier_type=self.carrier_type,
             barcode='HU_OSA_3',
         )
 

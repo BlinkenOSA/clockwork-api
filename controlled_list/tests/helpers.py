@@ -1,4 +1,4 @@
-from controlled_list.models import AccessRight, ArchivalUnitTheme, CarrierType
+from controlled_list.models import AccessRight, ArchivalUnitTheme, CarrierType, PrimaryType
 
 
 def make_archival_unit_themes(**kwargs):
@@ -10,7 +10,7 @@ def make_archival_unit_themes(**kwargs):
 
 def make_access_rights(**kwargs):
     defaults = {
-        "statement": "Open",
+        "statement": "Not Restricted",
     }
     defaults.update(kwargs)
     return AccessRight.objects.create(**defaults)
@@ -25,6 +25,13 @@ def make_carrier_types(**kwargs):
     }
     defaults.update(kwargs)
     return CarrierType.objects.create(**defaults)
+
+def make_primary_types(**kwargs):
+    defaults = {
+        "type": "Moving Image",
+    }
+    defaults.update(kwargs)
+    return PrimaryType.objects.create(**defaults)
 
 def get_tech_md():
     return '''{
