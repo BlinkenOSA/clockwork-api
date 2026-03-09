@@ -1,36 +1,15 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from archival_unit.models import ArchivalUnit
+from archival_unit.tests.helpers import make_fonds, make_subfonds, make_series
 
 
 class ArchivalUnitTest(TestCase):
     """ Test module for ArchivalUnit model """
-
     def setUp(self):
-        self.fonds = ArchivalUnit.objects.create(
-            fonds=206,
-            level='F',
-            title='Records of the Open Society Archives at Central European University'
-        )
-        self.subfonds = ArchivalUnit.objects.create(
-            fonds=206,
-            subfonds=3,
-            level='SF',
-            title='Public Events',
-            parent=self.fonds
-        )
-        self.series = ArchivalUnit.objects.create(
-            fonds=206,
-            subfonds=3,
-            series=1,
-            level='S',
-            title='Audiovisual Recordings of Public Events',
-            parent=self.subfonds
-        )
-        self.user = User.objects.create_superuser(username='testuser',
-                                                  email='testuser@eqar.eu',
-                                                  password='testpassword')
-        self.user.save()
+        self.fonds = make_fonds()
+        self.subfonds = make_subfonds(fonds=self.fonds)
+        self.series = make_series(subfonds=self.subfonds)
 
     def test_get_fonds(self):
         self.assertEqual(self.fonds.get_fonds().id, self.fonds.id)
