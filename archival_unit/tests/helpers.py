@@ -1,5 +1,4 @@
 from archival_unit.models import ArchivalUnit
-from controlled_list.models import Locale
 
 
 def make_fonds(**kwargs):
@@ -26,7 +25,6 @@ def make_fonds(**kwargs):
     return ArchivalUnit.objects.create(**defaults)
 
 def make_subfonds(fonds, **kwargs):
-    locale = Locale.objects.create(pk='HU', locale_name='Hungarian')
     defaults = {
         "uuid": "87a764d5-1583-4563-b68b-91df00ad9af6",
         "parent": fonds,
@@ -37,7 +35,6 @@ def make_subfonds(fonds, **kwargs):
         "title": "Public Events",
         "title_full": "HU OSA 206-3 Records of the Open Society Archives at Central European University: Public Events",
         "title_original": "Konferenciák és egyéb rendezvények",
-        "original_locale": locale,
         "reference_code": "HU OSA 206-3",
         "reference_code_id": "hu_osa_206-3",
         "level": "SF",
