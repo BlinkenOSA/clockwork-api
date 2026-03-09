@@ -3,41 +3,22 @@ from unittest.mock import Mock, patch
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from archival_unit.models import ArchivalUnit
+from archival_unit.tests.helpers import make_fonds, make_subfonds, make_series
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
-from container.models import Container
-from controlled_list.models import CarrierType
+from container.tests.helpers import make_container
+from controlled_list.tests.helpers import make_carrier_types
 
 
 class DashboardStatisticsViewsTests(TestViewsBaseClass):
-    fixtures = ['carrier_types']
-
     def setUp(self):
-        self.init()
-        self.fonds = ArchivalUnit.objects.create(
-            fonds=400,
-            level='F',
-            title='Test Fonds'
-        )
-        self.subfonds = ArchivalUnit.objects.create(
-            fonds=400,
-            subfonds=1,
-            level='SF',
-            title='Test Subfonds',
-            parent=self.fonds
-        )
-        self.series = ArchivalUnit.objects.create(
-            fonds=400,
-            subfonds=1,
-            series=1,
-            level='S',
-            title='Test Series',
-            parent=self.subfonds
-        )
+        super().setUp()
+        self.fonds = make_fonds()
+        self.subfonds = make_subfonds(self.fonds)
+        self.series = make_series(self.subfonds)
 
-        self.carrier_type = CarrierType.objects.first()
-        Container.objects.create(archival_unit=self.series, carrier_type=self.carrier_type)
-        Container.objects.create(archival_unit=self.series, carrier_type=self.carrier_type)
+        self.carrier_type = make_carrier_types()
+        make_container(series=self.series, carrier_type=self.carrier_type)
+        make_container(series=self.series, carrier_type=self.carrier_type)
 
     def test_linear_meter_endpoint_returns_dataset(self):
         response = self.client.get(

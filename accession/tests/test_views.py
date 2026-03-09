@@ -1,19 +1,28 @@
 from rest_framework.reverse import reverse
 
-from accession.tests.helpers import make_accession
+from accession.tests.helpers import make_accession, make_accession_method
+from archival_unit.tests.helpers import make_fonds
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from django.utils import timezone
 from django_date_extensions.fields import ApproximateDate
 
 from accession.models import Accession, AccessionMethod
 from donor.models import Donor
+from donor.tests.helpers import make_donor
 
 
 class AccessionViewTest(TestViewsBaseClass):
     """ Testing Accession endpoints """
     @classmethod
     def setUpTestData(cls):
-        cls.accession = make_accession()
+        cls.fonds = make_fonds()
+        cls.method = make_accession_method()
+        cls.donor = make_donor()
+        cls.accession = make_accession(
+            fonds=cls.fonds,
+            method=cls.method,
+            donor=cls.donor
+        )
 
     def test_filter_class(self):
         response = self.client.get(reverse('accession-v1:accession-list'), {'search': 'test'})

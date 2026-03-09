@@ -1,18 +1,19 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from accession.models import Accession, AccessionMethod
-from archival_unit.models import ArchivalUnit
+from accession.tests.helpers import make_accession_method, make_accession
+from archival_unit.tests.helpers import make_fonds, make_subfonds, make_series
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from container.models import Container
+from container.tests.helpers import make_container
 from controlled_list.models import CarrierType
-from donor.models import Donor
-from authority.models import Country
+from controlled_list.tests.helpers import make_carrier_types
+from donor.tests.helpers import make_donor
 
 
 class DashboardAnalyticsViewTests(TestViewsBaseClass):
     def setUp(self):
-        self.init()
+        super().setUp()
 
     def test_activity_analytics_shape(self):
         response = self.client.get(reverse("dashboard-v1:analytics-activity-view"))
@@ -29,58 +30,29 @@ class DashboardAnalyticsViewTests(TestViewsBaseClass):
 
 class DashboardLogViewTests(TestViewsBaseClass):
     def setUp(self):
-        self.init()
-        self.fonds = ArchivalUnit.objects.create(
-            fonds=200,
-            level='F',
-            title='Dashboard Fonds'
-        )
-        self.subfonds = ArchivalUnit.objects.create(
-            fonds=200,
-            subfonds=1,
-            level='SF',
-            title='Dashboard Subfonds',
-            parent=self.fonds
-        )
-        self.series = ArchivalUnit.objects.create(
-            fonds=200,
-            subfonds=1,
-            series=1,
-            level='S',
-            title='Dashboard Series',
-            parent=self.subfonds
-        )
-        self.method = AccessionMethod.objects.create(method='Donation')
-        self.country = Country.objects.create(alpha3='USA', country='United States')
-        self.donor = Donor.objects.create(
-            first_name='Ada',
-            last_name='Lovelace',
-            postal_code='12345',
-            country=self.country,
-            city='NYC',
-            address='1 Main St'
+        super().setUp()
+        self.fonds = make_fonds()
+        self.subfonds = make_subfonds(self.fonds)
+        self.series = make_series(self.subfonds)
+        self.carrier_type = make_carrier_types()
+        self.container = make_container(self.series, self.carrier_type)
+
+        self.method = make_accession_method()
+        self.donor = make_donor()
+
+        self.accession = make_accession(
+            fonds=self.fonds,
+            method=self.method,
+            donor=self.donor
         )
 
     def test_accession_log_endpoint(self):
-        Accession.objects.create(
-            title='Test Accession',
-            transfer_date='2020-01-01',
-            method=self.method,
-            donor=self.donor,
-            archival_unit=self.fonds
-        )
         response = self.client.get(reverse("dashboard-v1:accession-log"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
     def test_digitization_log_endpoint(self):
-        carrier = CarrierType.objects.create(type='Box', width=10)
-        Container.objects.create(
-            archival_unit=self.series,
-            carrier_type=carrier,
-            container_no=1,
-            digital_version_exists=True
-        )
+        make_container(self.series, self.carrier_type, digital_version_exists=True)
         response = self.client.get(reverse("dashboard-v1:digitization-log"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)

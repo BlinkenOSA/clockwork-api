@@ -1,62 +1,39 @@
 from django.test import TestCase
 
 from accession.models import Accession, AccessionMethod
+from accession.tests.helpers import make_accession_method, make_accession
 from archival_unit.models import ArchivalUnit
+from archival_unit.tests.helpers import make_fonds, make_subfonds, make_series
+from container.tests.helpers import make_container
+from controlled_list.tests.helpers import make_carrier_types
 from dashboard.serializers.log_serializers import (
     AccessionLogSerializer,
     ArchivalUnitLogSerializer,
     DigitizationLogSerializer,
 )
-from donor.models import Donor
-from authority.models import Country
-from container.models import Container
-from controlled_list.models import CarrierType
+from donor.tests.helpers import make_donor
 
 
 class DashboardLogSerializerTests(TestCase):
     def setUp(self):
-        self.fonds = ArchivalUnit.objects.create(
-            fonds=100,
-            level='F',
-            title='Test Fonds'
-        )
-        self.subfonds = ArchivalUnit.objects.create(
-            fonds=100,
-            subfonds=1,
-            level='SF',
-            title='Test Subfonds',
-            parent=self.fonds
-        )
-        self.series = ArchivalUnit.objects.create(
-            fonds=100,
-            subfonds=1,
-            series=1,
-            level='S',
-            title='Test Series',
-            parent=self.subfonds
-        )
+        self.fonds = make_fonds()
+        self.subfonds = make_subfonds(self.fonds)
+        self.series = make_series(self.subfonds)
+        self.carrier_type = make_carrier_types()
+        self.container = make_container(self.series, self.carrier_type)
 
-        self.method = AccessionMethod.objects.create(method='Donation')
-        self.country = Country.objects.create(alpha3='USA', country='United States')
-        self.donor = Donor.objects.create(
-            first_name='Ada',
-            last_name='Lovelace',
-            postal_code='12345',
-            country=self.country,
-            city='NYC',
-            address='1 Main St'
+        self.method = make_accession_method()
+        self.donor = make_donor()
+
+        self.accession = make_accession(
+            fonds=self.fonds,
+            method=self.method,
+            donor=self.donor
         )
 
     def test_accession_log_serializer(self):
-        accession = Accession.objects.create(
-            title='Test Accession',
-            transfer_date='2020-01-01',
-            method=self.method,
-            donor=self.donor,
-            archival_unit=self.fonds
-        )
-        data = AccessionLogSerializer(accession).data
-        self.assertEqual(data['id'], accession.id)
+        data = AccessionLogSerializer(self.accession).data
+        self.assertEqual(data['id'], self.accession.id)
         self.assertEqual(data['archival_unit']['id'], self.fonds.id)
 
     def test_archival_unit_log_serializer(self):
@@ -65,11 +42,5 @@ class DashboardLogSerializerTests(TestCase):
         self.assertEqual(data['reference_code'], self.series.reference_code)
 
     def test_digitization_log_serializer(self):
-        carrier = CarrierType.objects.create(type='Box', width=10)
-        container = Container.objects.create(
-            archival_unit=self.series,
-            carrier_type=carrier,
-            container_no=1
-        )
-        data = DigitizationLogSerializer(container).data
+        data = DigitizationLogSerializer(self.container).data
         self.assertEqual(data['container_no'], f"{self.series.reference_code}:1")
