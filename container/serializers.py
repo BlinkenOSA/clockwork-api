@@ -107,13 +107,13 @@ class ContainerListSerializer(serializers.ModelSerializer):
         """
         Returns the count of master digital versions associated with the container.
         """
-        return DigitalVersion.objects.filter(container=obj, level='M').count()
+        return DigitalVersion.objects.filter(container=obj, finding_aids_entity__isnull=True, level='M').count()
 
     def get_digital_versions_access_copies(self, obj):
         """
         Returns the count of access copy digital versions associated with the container.
         """
-        return DigitalVersion.objects.filter(container=obj, level='A').count()
+        return DigitalVersion.objects.filter(container=obj, finding_aids_entity__isnull=True, level='A').count()
 
     def get_digital_versions_in_finding_aids(self, obj):
         """
