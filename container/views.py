@@ -7,7 +7,7 @@ from archival_unit.models import ArchivalUnit
 from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from container.models import Container
-from container.serializers import ContainerReadSerializer, ContainerWriteSerializer, ContainerSelectSerializer, \
+from container.serializers import ContainerReadSerializer, ContainerWriteSerializer, \
     ContainerListSerializer
 from finding_aids.models import FindingAidsEntity
 
