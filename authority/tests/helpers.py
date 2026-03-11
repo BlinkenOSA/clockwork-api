@@ -1,4 +1,4 @@
-from authority.models import Country
+from authority.models import Country, Genre
 from authority.models import Language
 
 
@@ -19,3 +19,10 @@ def make_language(**kwargs):
     }
     defaults.update(kwargs)
     return Language.objects.create(**defaults)
+
+def make_genre(**kwargs):
+    defaults = {
+        "genre": "Feature Film",
+    }
+    defaults.update(kwargs)
+    return Genre.objects.create(**defaults)
