@@ -80,7 +80,7 @@ class DigitizationContainerLogSerializer(serializers.ModelSerializer):
         model = DigitalVersion
         fields = ('id', 'barcode', 'archival_unit_id', 'container_no', 'duration', 'carrier_type',
                   'available_online', 'available_research_cloud', 'research_cloud_path', 'creation_date',
-                  'technical_metadata')
+                  'technical_metadata', 'level')
 
 
 class DigitizationContainerDataSerializer(serializers.ModelSerializer):

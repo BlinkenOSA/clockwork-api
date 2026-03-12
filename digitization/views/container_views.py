@@ -39,7 +39,7 @@ class DigitizationContainerList(ListAPIView):
     """
 
     filter_backends = (SearchFilter, OrderingFilter)
-    ordering_fields = ('creation_date')
+    ordering_fields = ('creation_date',)
     search_fields = ('container__archival_unit__reference_code', 'container__barcode')
     serializer_class = DigitizationContainerLogSerializer
 
@@ -65,13 +65,13 @@ class DigitizationContainerList(ListAPIView):
         qs = DigitalVersion.objects.filter(
             container__isnull=False,
             finding_aids_entity__isnull=True,
-            level='A'
         ).order_by(
             '-creation_date',
             'container__archival_unit__fonds',
             'container__archival_unit__subfonds',
             'container__archival_unit__series',
-            'container__container_no'
+            'container__container_no',
+            '-level'
         )
 
         ordering = self.request.query_params.get('ordering', None)
@@ -98,13 +98,17 @@ class DigitizationContainerList(ListAPIView):
         if carrier_type:
             qs = qs.filter(container__carrier_type=carrier_type)
 
-        digital_version_online = self.request.query_params.get('digital_version_online', None)
+        level = self.request.query_params.get('level', None)
+        if level:
+            qs = qs.filter(level=level)
+
+        digital_version_online = self.request.query_params.get('available_online', None)
         if digital_version_online == 'yes':
             qs = qs.filter(available_online=True)
         if digital_version_online == 'no':
             qs = qs.filter(available_online=False)
 
-        digital_version_research_cloud = self.request.query_params.get('digital_version_research_cloud', None)
+        digital_version_research_cloud = self.request.query_params.get('available_research_cloud', None)
         if digital_version_research_cloud == 'yes':
             qs = qs.filter(available_research_cloud=True)
         if digital_version_research_cloud == 'no':
