@@ -147,6 +147,14 @@ class DigitalObjectInfoResponseSerializer(serializers.Serializer):
     archival_unit = ArchivalUnitWrapperSerializer()
 
 
+class DigitalObjectUpsertRequestSerializer(serializers.Serializer):
+    technical_metadata = serializers.IntegerField(
+        label='Technical Metadata',
+        help_text='Extracted technical metadata',
+        required=False
+    )
+
+
 class DigitalObjectUpsertResponseSerializer(serializers.Serializer):
     """
     Serializer for digital object upsert responses.
@@ -163,8 +171,20 @@ class DigitalObjectUpsertResponseSerializer(serializers.Serializer):
         required=False
     )
 
+    action = serializers.CharField(
+        label='Action',
+        help_text='Shows if the Digital Version Object was created or updated',
+        required=False
+    )
+
+    identifier = serializers.CharField(
+        label='Digital Object Identifier',
+        help_text='Digital Object Identifier',
+        required=False
+    )
+
     filename = serializers.CharField(
         label='Filename',
-        help_text='Name of the uploaded access copy file',
+        help_text='Name of the uploaded file',
         required=False
     )

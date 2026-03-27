@@ -13,9 +13,9 @@ from workflow.permission import APIGroupPermission
 from workflow.serializers.container_serializers import ContainerDigitizedSerializer
 
 
-class GetSetDigitizedContainer(AuditLogMixin, RetrieveUpdateAPIView):
+class GetDigitizedContainer(AuditLogMixin, RetrieveAPIView):
     """
-    Retrieves or updates digitization metadata for a container (by barcode).
+    Retrieves digitization metadata for a container (by barcode).
 
     This endpoint is designed for long-term preservation workflow scripts.
 
@@ -25,11 +25,6 @@ class GetSetDigitizedContainer(AuditLogMixin, RetrieveUpdateAPIView):
     Authentication / Authorization:
         - BearerAuthentication or SessionAuthentication
         - Restricted to users in the ``Api`` group via APIGroupPermission
-
-    Side effects on update:
-        - After updating the container, all related finding aids entities
-          pointing to the container are saved to trigger their own save logic
-          (e.g. derived fields, signals, or downstream synchronization).
     """
 
     swagger_schema = None
@@ -38,21 +33,6 @@ class GetSetDigitizedContainer(AuditLogMixin, RetrieveUpdateAPIView):
     lookup_field = 'barcode'
     authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
-
-    def perform_update(self, serializer):
-        """
-        Persists the container update and refreshes related finding aids entities.
-
-        Args:
-            serializer: The bound serializer instance.
-
-        Notes:
-            This intentionally re-saves all FindingAidsEntity records referencing
-            the updated container to keep dependent/derived state consistent.
-        """
-        instance = serializer.save()
-        for fa_entity in FindingAidsEntity.objects.filter(container=instance).all():
-            fa_entity.save()
 
 
 class GetContainerMetadata(ListAPIView):
