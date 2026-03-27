@@ -43,6 +43,7 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
             'barcode',
             'carrier_type',
             'container_no',
+            'digital_versions',
             'digital_version_exists',
             'digital_version_research_cloud',
             'digital_version_research_cloud_path',
