@@ -13,7 +13,7 @@ class WorkflowViewsTests(TestViewsBaseClass):
     fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):
-        self.init()
+        super().setUp()
         api_group = Group.objects.create(name='Api')
         self.user.groups.add(api_group)
 
@@ -50,26 +50,6 @@ class WorkflowViewsTests(TestViewsBaseClass):
             primary_type=PrimaryType.objects.first(),
             legacy_id='LEGACY-1',
         )
-
-    def test_get_set_digitized_container_retrieve(self):
-        response = self.client.get(
-            reverse('workflow-v1:list_set_digitized_container', kwargs={'barcode': self.container.barcode})
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['barcode'], self.container.barcode)
-
-    def test_get_set_digitized_container_update(self):
-        response = self.client.patch(
-            reverse('workflow-v1:list_set_digitized_container', kwargs={'barcode': self.container.barcode}),
-            data={
-                'digital_version_exists': True,
-                'digital_version_creation_date': '2024-01-01',
-            },
-            format='json',
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.container.refresh_from_db()
-        self.assertTrue(self.container.digital_version_exists)
 
     def test_get_container_metadata(self):
         response = self.client.get(

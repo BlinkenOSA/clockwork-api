@@ -11,7 +11,7 @@ from isad.models import Isad
 
 class IsadExtraViewsTests(TestViewsBaseClass):
     def setUp(self):
-        self.init()
+        super().setUp()
         self.fonds = ArchivalUnit.objects.create(fonds=1001, level='F', title='Fonds')
         self.subfonds = ArchivalUnit.objects.create(
             fonds=1001,

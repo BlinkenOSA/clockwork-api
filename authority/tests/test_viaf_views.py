@@ -9,7 +9,7 @@ class VIAFTest(TestViewsBaseClass):
     """ Testing VIAF endpoint """
 
     def setUp(self):
-        self.init()
+        super().setUp()
 
     # @skip("Wait for VIAF service to be available")
     def test_get_empty_result(self):

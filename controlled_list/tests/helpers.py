@@ -1,11 +1,40 @@
-from django.test import TestCase
+from controlled_list.models import AccessRight, ArchivalUnitTheme, CarrierType, PrimaryType
 
-from archival_unit.models import ArchivalUnit
-from container.models import Container
-from container.serializers import ContainerSelectSerializer
-from controlled_list.models import CarrierType
 
-tech_md = '''{
+def make_archival_unit_themes(**kwargs):
+    defaults = {
+        "theme": "Human Rights",
+    }
+    defaults.update(kwargs)
+    return ArchivalUnitTheme.objects.create(**defaults)
+
+def make_access_rights(**kwargs):
+    defaults = {
+        "statement": "Not Restricted",
+    }
+    defaults.update(kwargs)
+    return AccessRight.objects.create(**defaults)
+
+def make_carrier_types(**kwargs):
+    defaults = {
+        "type": "Archival boxes",
+        "type_original_language": "levéltári doboz",
+        "width": 125,
+        "height": 265,
+        "depth": 320,
+    }
+    defaults.update(kwargs)
+    return CarrierType.objects.create(**defaults)
+
+def make_primary_types(**kwargs):
+    defaults = {
+        "type": "Moving Image",
+    }
+    defaults.update(kwargs)
+    return PrimaryType.objects.create(**defaults)
+
+def get_tech_md():
+    return '''{
     "streams": [
         {
             "index": 0,
@@ -96,61 +125,3 @@ tech_md = '''{
         "probe_score": 100
     }
 }'''
-
-
-class ContainerSelectSerializerTest(TestCase):
-    fixtures = ['carrier_types']
-
-    """ Test module for ContainerSelectSerializer """
-    def setUp(self):
-        self.fonds = ArchivalUnit.objects.create(
-            fonds=206,
-            level='F',
-            title='Records of the Open Society Archives at Central European University'
-        )
-        self.subfonds = ArchivalUnit.objects.create(
-            fonds=206,
-            subfonds=3,
-            level='SF',
-            title='Public Events',
-            parent=self.fonds
-        )
-        self.series = ArchivalUnit.objects.create(
-            fonds=206,
-            subfonds=3,
-            series=1,
-            level='S',
-            title='Audiovisual Recordings of Public Events',
-            parent=self.subfonds
-        )
-
-    def test_reference_code(self):
-        container = Container.objects.create(
-            archival_unit=self.series,
-            carrier_type=CarrierType.objects.get(pk=1),
-            container_no=1
-        )
-        serializer = ContainerSelectSerializer(instance=container)
-        data = serializer.data
-        self.assertEqual(data['reference_code'], 'HU OSA 206-3-1:1')
-
-    def test_digital_version_duration(self):
-        container = Container.objects.create(
-            archival_unit=self.series,
-            carrier_type=CarrierType.objects.get(pk=1),
-            container_no=1,
-            digital_version_technical_metadata=tech_md
-        )
-        serializer = ContainerSelectSerializer(instance=container)
-        data = serializer.data
-        self.assertEqual(data['digital_version_duration'], '00:15:05')
-
-    def test_digital_version_duration_none_when_missing(self):
-        container = Container.objects.create(
-            archival_unit=self.series,
-            carrier_type=CarrierType.objects.get(pk=1),
-            container_no=2
-        )
-        serializer = ContainerSelectSerializer(instance=container)
-        data = serializer.data
-        self.assertIsNone(data['digital_version_duration'])

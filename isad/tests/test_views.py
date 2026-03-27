@@ -9,7 +9,7 @@ class IsadPublishTest(TestViewsBaseClass):
     """ Testing ISAD publishing endpoints"""
 
     def setUp(self):
-        self.init()
+        super().setUp()
         self.fonds = ArchivalUnit.objects.create(
             fonds=206,
             level='F',

@@ -7,7 +7,7 @@ from isaar.models import Isaar, IsaarRelationship, IsaarPlaceQualifier
 
 class IsaarViewsTest(TestViewsBaseClass):
     def setUp(self):
-        self.init()
+        super().setUp()
         self.isaar_a = Isaar.objects.create(
             name='Alpha Org',
             type='C',

@@ -4,66 +4,36 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from archival_unit.models import ArchivalUnit
-from container.models import Container
-from controlled_list.models import CarrierType
+from archival_unit.tests.helpers import make_fonds, make_subfonds, make_series
+from container.tests.helpers import make_container
+from controlled_list.tests.helpers import make_carrier_types
 from dashboard.serializers.log_serializers import DigitizationLogSerializer
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 
 
 class DigitizationLogSerializerTests(TestCase):
-    fixtures = ['carrier_types']
+    def setUp(self):
+        self.fonds = make_fonds()
+        self.subfonds = make_subfonds(self.fonds)
+        self.series = make_series(self.subfonds)
+        self.carrier_type = make_carrier_types()
+        self.container = make_container(self.series, self.carrier_type)
 
     def test_container_no_format(self):
-        fonds = ArchivalUnit.objects.create(fonds=500, level='F', title='Fonds')
-        subfonds = ArchivalUnit.objects.create(
-            fonds=500,
-            subfonds=1,
-            level='SF',
-            title='Subfonds',
-            parent=fonds,
-        )
-        series = ArchivalUnit.objects.create(
-            fonds=500,
-            subfonds=1,
-            series=1,
-            level='S',
-            title='Series',
-            parent=subfonds,
-        )
-        container = Container.objects.create(
-            archival_unit=series,
-            carrier_type=CarrierType.objects.first(),
-        )
-
-        data = DigitizationLogSerializer(container).data
-        self.assertEqual(data['container_no'], 'HU OSA 500-1-1:1')
+        data = DigitizationLogSerializer(self.container).data
+        self.assertEqual(data['container_no'], 'HU OSA 206-3-1:1')
 
 
 class DashboardLogViewsTests(TestViewsBaseClass):
-    fixtures = ['carrier_types']
-
     def setUp(self):
-        self.init()
-        fonds = ArchivalUnit.objects.create(fonds=600, level='F', title='Fonds')
-        subfonds = ArchivalUnit.objects.create(
-            fonds=600,
-            subfonds=1,
-            level='SF',
-            title='Subfonds',
-            parent=fonds,
-        )
-        series = ArchivalUnit.objects.create(
-            fonds=600,
-            subfonds=1,
-            series=1,
-            level='S',
-            title='Series',
-            parent=subfonds,
-        )
-        Container.objects.create(
-            archival_unit=series,
-            carrier_type=CarrierType.objects.first(),
+        super().setUp()
+        self.fonds = make_fonds()
+        self.subfonds = make_subfonds(self.fonds)
+        self.series = make_series(self.subfonds)
+        self.carrier_type = make_carrier_types()
+        self.container = make_container(
+            series=self.series,
+            carrier_type=self.carrier_type,
             digital_version_exists=True,
             digital_version_creation_date=datetime.date.today(),
         )

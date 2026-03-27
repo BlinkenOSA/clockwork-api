@@ -7,9 +7,6 @@ from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 
 
 class DashboardAnalyticsViewsTests(TestViewsBaseClass):
-    def setUp(self):
-        self.init()
-
     def test_activity_endpoint_returns_monthly_rows(self):
         with patch('dashboard.views.analytics_views.Accession.objects.filter') as accession_filter, \
              patch('dashboard.views.analytics_views.Isad.objects.filter') as isad_filter, \
