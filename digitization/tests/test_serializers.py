@@ -9,9 +9,7 @@ from digitization.serializers.container_serializers import (
     DigitizationContainerLogSerializer,
     DigitizationContainerDataSerializer,
 )
-
-
-TECH_MD = '{"streams":[{"codec_type":"video","duration":"905.0"}]}'
+from digitization.tests.helpers import make_digital_version_container, get_tech_md
 
 
 class DigitizationContainerSerializerTests(TestCase):
@@ -20,36 +18,28 @@ class DigitizationContainerSerializerTests(TestCase):
         self.subfonds = make_subfonds(self.fonds)
         self.series = make_series(self.subfonds)
         self.carrier_type = make_carrier_types(type='VHS')
-
-    @skip
-    def test_log_serializer_duration_and_reference_code(self):
-        container = make_container(
+        self.container = make_container(
             series=self.series,
             carrier_type=self.carrier_type,
-            barcode='HU_OSA_1',
-            digital_version_technical_metadata=TECH_MD,
+        )
+        self.digital_version = make_digital_version_container(
+            container=self.container,
+            level='M',
+            technical_metadata=get_tech_md(),
         )
 
-        data = DigitizationContainerLogSerializer(container).data
+    def test_log_serializer_duration_and_reference_code(self):
+        data = DigitizationContainerLogSerializer(self.digital_version).data
         self.assertEqual(data['container_no'], 'HU OSA 206-3-1:1')
         self.assertEqual(data['duration'], '00:15:05')
 
-    @skip
     def test_data_serializer_parses_json_or_false(self):
-        with_md = make_container(
-            series=self.series,
-            carrier_type=self.carrier_type,
-            barcode='HU_OSA_2',
-            digital_version_technical_metadata=TECH_MD,
-        )
-        without_md = make_container(
-            series=self.series,
-            carrier_type=self.carrier_type,
-            barcode='HU_OSA_3',
+        digital_version = make_digital_version_container(
+            container=self.container,
         )
 
-        parsed = DigitizationContainerDataSerializer(with_md).data
-        empty = DigitizationContainerDataSerializer(without_md).data
+        parsed = DigitizationContainerDataSerializer(self.digital_version).data
+        empty = DigitizationContainerDataSerializer(digital_version).data
 
-        self.assertEqual(parsed['digital_version_technical_metadata']['streams'][0]['codec_type'], 'video')
-        self.assertFalse(empty['digital_version_technical_metadata'])
+        self.assertEqual(parsed['technical_metadata']['streams'][0]['codec_type'], 'video')
+        self.assertFalse(empty['technical_metadata'])

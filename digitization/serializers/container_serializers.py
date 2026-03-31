@@ -57,7 +57,7 @@ class DigitizationContainerLogSerializer(serializers.ModelSerializer):
             tech_md = json.loads(tech_md)
             for stream in tech_md['streams']:
                 if (stream.get('codec_type') == 'video' and stream.get('duration')) or \
-                    (stream.get('codec_type') == 'audio' and stream.get('duration')):
+                   (stream.get('codec_type') == 'audio' and stream.get('duration')):
                     seconds = float(stream.get('duration'))
                     total_seconds = datetime.timedelta(seconds=seconds).total_seconds()
                     hours, remainder = divmod(total_seconds, 60 * 60)
