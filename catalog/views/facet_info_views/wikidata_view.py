@@ -15,7 +15,8 @@ This endpoint is used for contextual enrichment, not authority control.
 
 import json
 
-import requests
+from clockwork_api.http import get
+from requests.exceptions import RequestException
 from rest_framework.response import Response
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.views import APIView
@@ -113,11 +114,18 @@ class WikidataView(APIView):
                                     'iiprop': 'url',
                                     'format': 'json'
                                 }
-                                r = requests.get(commons_api, params=params)
-                                if r.status_code == 200:
+                                try:
+                                    r = get(commons_api, params=params)
+                                except RequestException:
+                                    r = None
+
+                                if r and r.status_code == 200:
                                     j = r.json()
-                                    first_key = list(j['query']['pages'].keys())[0]
-                                    keys_dict[ACCEPTED_KEYS[ak]] = j['query']['pages'][first_key]['imageinfo'][0]['url']
+                                    pages = j.get('query', {}).get('pages', {})
+                                    first_key = next(iter(pages), None)
+                                    imageinfo = pages.get(first_key, {}).get('imageinfo', []) if first_key else []
+                                    if imageinfo:
+                                        keys_dict[ACCEPTED_KEYS[ak]] = imageinfo[0].get('url')
 
                         # Coordinates
                         elif ak == 'P625':
@@ -153,11 +161,18 @@ class WikidataView(APIView):
                                 'rvprop': 'content',
                                 'format': 'json'
                             }
-                            r = requests.get(commons_api, params=params)
-                            if r.status_code == 200:
+                            try:
+                                r = get(commons_api, params=params)
+                            except RequestException:
+                                r = None
+
+                            if r and r.status_code == 200:
                                 j = r.json()
-                                first_key = list(j['query']['pages'].keys())[0]
-                                keys_dict['geojson'] = json.loads(j['query']['pages'][first_key]['revisions'][0]['*'])
+                                pages = j.get('query', {}).get('pages', {})
+                                first_key = next(iter(pages), None)
+                                revisions = pages.get(first_key, {}).get('revisions', []) if first_key else []
+                                if revisions and '*' in revisions[0]:
+                                    keys_dict['geojson'] = json.loads(revisions[0]['*'])
 
                         else:
                             data_id = v['mainsnak']['datavalue']['value']['id']

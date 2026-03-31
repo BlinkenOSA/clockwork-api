@@ -2,7 +2,7 @@ import csv
 import os
 import urllib
 
-import requests
+from clockwork_api.http import get
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.management import BaseCommand
 from lxml import etree
@@ -120,13 +120,13 @@ class Command(BaseCommand):
         ri_query = RI_QUERY + collection
         query = FEDORA_RISEARCH + '?type=tuples&lang=itql&format=json&query=' + urllib.parse.quote_plus(ri_query)
 
-        r = requests.get(query)
+        r = get(query)
         if r.ok:
             response = r.json()
             self.pids = list(map(lambda x: x['pid'], response['results']))
 
     def get_document(self, pid):
-        r = requests.get("%s/objects/%s/datastreams/ITEM-ARC-EN/content" % (FEDORA_URL, pid))
+        r = get("%s/objects/%s/datastreams/ITEM-ARC-EN/content" % (FEDORA_URL, pid))
         r.encoding = 'UTF-8'
         if r.ok:
             self.current_xml = r.text

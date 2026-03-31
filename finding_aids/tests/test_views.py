@@ -10,7 +10,7 @@ class FindingAidsPublishTest(TestViewsBaseClass):
     fixtures = ['carrier_types', 'primary_types', 'access_rights', 'archival_unit_themes', 'finding_aids']
 
     def setUp(self):
-        self.init()
+        super().setUp()
         self.user.save()
         self.container_id = 5675
         self.series_id = 908

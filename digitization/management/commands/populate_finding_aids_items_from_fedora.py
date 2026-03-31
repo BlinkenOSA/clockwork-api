@@ -2,7 +2,7 @@ import csv
 import os
 from datetime import datetime, timedelta
 
-import requests
+from clockwork_api.http import get
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand, CommandError
@@ -76,13 +76,13 @@ class Command(BaseCommand):
                 pass
 
     def get_document(self):
-        r = requests.get("%s/objects/%s/datastreams/ITEM-ARC-EN/content" % (FEDORA_URL, self.pid))
+        r = get("%s/objects/%s/datastreams/ITEM-ARC-EN/content" % (FEDORA_URL, self.pid))
         r.encoding = 'UTF-8'
         if r.ok:
             self.xml = r.text
 
         if self.locale != 'EN':
-            r = requests.get("%s/objects/%s/datastreams/ITEM-ARC-%s/content" % (FEDORA_URL, self.pid, self.locale))
+            r = get("%s/objects/%s/datastreams/ITEM-ARC-%s/content" % (FEDORA_URL, self.pid, self.locale))
             r.encoding = 'UTF-8'
             if r.ok:
                 self.xml_2nd_lang = r.text

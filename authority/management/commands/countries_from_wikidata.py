@@ -1,7 +1,7 @@
 import json
 
 from django.core.management import BaseCommand
-import requests
+from clockwork_api.http import Session
 
 from authority.models import Country
 
@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for country in Country.objects.all():
             if not country.wikidata_id:
-                session = requests.Session()
+                session = Session()
                 session.trust_env = False
 
                 r = session.get(

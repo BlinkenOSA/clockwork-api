@@ -3,7 +3,7 @@ import os
 from io import StringIO
 
 import pymarc
-import requests
+from clockwork_api.http import get
 from django.conf import settings
 from django.core.management import BaseCommand
 from setuptools.dist import sequence
@@ -74,13 +74,13 @@ class Command(BaseCommand):
                 self.create_finding_aids_entity()
 
     def get_document(self):
-        r = requests.get("%s/objects/%s/datastreams/ITEM-LIB-EN/content" % (FEDORA_URL, self.current_pid))
+        r = get("%s/objects/%s/datastreams/ITEM-LIB-EN/content" % (FEDORA_URL, self.current_pid))
         r.encoding = 'UTF-8'
         if r.ok:
             self.xml = r.text
 
         if self.locale != 'EN':
-            r = requests.get("%s/objects/%s/datastreams/ITEM-LIB-%s/content" % (FEDORA_URL, self.current_pid, self.locale))
+            r = get("%s/objects/%s/datastreams/ITEM-LIB-%s/content" % (FEDORA_URL, self.current_pid, self.locale))
             r.encoding = 'UTF-8'
             if r.ok:
                 self.xml_pl = r.text

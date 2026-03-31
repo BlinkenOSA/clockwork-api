@@ -67,7 +67,10 @@ class AllowedArchivalUnitPermission(permissions.BasePermission):
                 if 'container_id' in view.kwargs:
                     container_id = view.kwargs['container_id']
 
-                    container = Container.objects.get(id=container_id)
+                    try:
+                        container = Container.objects.get(id=container_id)
+                    except Container.DoesNotExist:
+                        return False
 
                     return user.user_profile.allowed_archival_units.filter(
                         id=container.archival_unit.id

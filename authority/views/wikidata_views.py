@@ -1,7 +1,7 @@
 import json
 from typing import List, Dict, Any
 
-import requests
+from clockwork_api.http import Session
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -33,7 +33,7 @@ class WikidataMixin(object):
         if len(query) == 0:
             return []
         else:
-            session = requests.Session()
+            session = Session()
             session.trust_env = False
 
             r = session.get(

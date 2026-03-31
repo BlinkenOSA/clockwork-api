@@ -107,13 +107,13 @@ class ContainerListSerializer(serializers.ModelSerializer):
         """
         Returns the count of master digital versions associated with the container.
         """
-        return DigitalVersion.objects.filter(container=obj, level='M').count()
+        return DigitalVersion.objects.filter(container=obj, finding_aids_entity__isnull=True, level='M').count()
 
     def get_digital_versions_access_copies(self, obj):
         """
         Returns the count of access copy digital versions associated with the container.
         """
-        return DigitalVersion.objects.filter(container=obj, level='A').count()
+        return DigitalVersion.objects.filter(container=obj, finding_aids_entity__isnull=True, level='A').count()
 
     def get_digital_versions_in_finding_aids(self, obj):
         """
@@ -126,57 +126,3 @@ class ContainerListSerializer(serializers.ModelSerializer):
         fields = ('id', 'reference_code', 'barcode', 'carrier_type', 'total_number', 'total_published_number',
                   'is_removable', 'digital_versions_access_copies', 'digital_versions_masters',
                   'digital_versions_in_finding_aids')
-
-
-class ContainerSelectSerializer(serializers.ModelSerializer):
-    """
-    Selection serializer for containers.
-
-    Designed for UI selection widgets and lightweight references, including:
-        - a reference code formatted for selection contexts
-        - a derived digital version duration parsed from technical metadata
-
-    Duration is only returned when video stream metadata is available.
-    """
-
-    carrier_type = serializers.SlugRelatedField(slug_field='type', queryset=CarrierType.objects.all())
-    reference_code = serializers.SerializerMethodField(source='container_no')
-    digital_version_duration = serializers.SerializerMethodField(source='digital_version_technical_metadata')
-
-    def get_reference_code(self, obj):
-        """
-        Builds the container reference code used in selection contexts.
-
-        Format:
-            <archival_unit.reference_code>:<container_no>
-        """
-        return "%s:%s" % (obj.archival_unit.reference_code, obj.container_no)
-
-    def get_digital_version_duration(self, obj):
-        """
-        Extracts a HH:MM:SS duration from the container's technical metadata.
-
-        The duration is derived by:
-            1. Parsing digital_version_technical_metadata as JSON
-            2. Finding the first stream with codec_type == 'video'
-            3. Converting the stream duration (seconds) to HH:MM:SS
-
-        Returns None when:
-            - no technical metadata is present
-            - no video stream duration is available
-            - the metadata cannot be interpreted as expected
-        """
-        if obj.digital_version_technical_metadata:
-            tech_md = json.loads(obj.digital_version_technical_metadata)
-            for stream in tech_md['streams']:
-                if stream.get('codec_type') == 'video':
-                    seconds = float(stream.get('duration'))
-                    total_seconds = datetime.timedelta(seconds=seconds).total_seconds()
-                    hours, remainder = divmod(total_seconds, 60 * 60)
-                    minutes, seconds = divmod(remainder, 60)
-                    return "%02d:%02d:%02d" % (hours, minutes, seconds)
-
-    class Meta:
-        model = Container
-        fields = ('id', 'reference_code', 'digital_version_creation_date',
-                  'digital_version_duration', 'barcode', 'carrier_type')

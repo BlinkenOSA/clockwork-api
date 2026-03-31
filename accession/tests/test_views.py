@@ -1,16 +1,31 @@
 from rest_framework.reverse import reverse
+
+from accession.tests.helpers import make_accession, make_accession_method
+from archival_unit.tests.helpers import make_fonds
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
+from django.utils import timezone
+from django_date_extensions.fields import ApproximateDate
+
+from accession.models import Accession, AccessionMethod
+from donor.models import Donor
+from donor.tests.helpers import make_donor
 
 
 class AccessionViewTest(TestViewsBaseClass):
     """ Testing Accession endpoints """
-    fixtures = ['accession']
-
-    def setUp(self):
-        self.init()
+    @classmethod
+    def setUpTestData(cls):
+        cls.fonds = make_fonds()
+        cls.method = make_accession_method()
+        cls.donor = make_donor()
+        cls.accession = make_accession(
+            fonds=cls.fonds,
+            method=cls.method,
+            donor=cls.donor
+        )
 
     def test_filter_class(self):
-        response = self.client.get(reverse('accession-v1:accession-list'), {'search': 'research institute'})
+        response = self.client.get(reverse('accession-v1:accession-list'), {'search': 'test'})
         self.assertEqual(response.data['count'], 1)
 
     def test_filter_year(self):
@@ -22,7 +37,7 @@ class AccessionViewTest(TestViewsBaseClass):
         self.assertEqual(response.data['count'], 0)
 
     def test_filter_fonds(self):
-        response = self.client.get(reverse('accession-v1:accession-list'), {'fonds': '300'})
+        response = self.client.get(reverse('accession-v1:accession-list'), {'fonds': '206'})
         self.assertEqual(response.data['count'], 1)
 
     def test_fonds_not_exists(self):
@@ -32,3 +47,9 @@ class AccessionViewTest(TestViewsBaseClass):
     def test_fonds_not_a_number(self):
         response = self.client.get(reverse('accession-v1:accession-list'), {'fonds': 'abc'})
         self.assertEqual(response.data['count'], 0)
+
+    def test_precreate_seq_increments_for_current_year(self):
+        response = self.client.get(reverse('accession-v1:accession-pre-create'))
+        self.assertEqual(response.status_code, 200)
+        year = timezone.now().year
+        self.assertEqual(response.data['seq'], f"{year}/002")

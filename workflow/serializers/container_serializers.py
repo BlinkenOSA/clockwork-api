@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from container.models import Container
 from workflow.serializers.archival_unit_serializer import ArchivalUnitSerializer
+from workflow.serializers.digital_version_serializers import DigitalVersionSerializer
 
 
 class ContainerDigitizedSerializer(serializers.ModelSerializer):
@@ -22,6 +23,7 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
     container_no = serializers.IntegerField(read_only=True)
     carrier_type = serializers.SerializerMethodField()
     archival_unit = ArchivalUnitSerializer(read_only=True)
+    digital_versions = DigitalVersionSerializer(read_only=True)
 
     def get_carrier_type(self, obj):
         """
@@ -41,6 +43,7 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
             'barcode',
             'carrier_type',
             'container_no',
+            'digital_versions',
             'digital_version_exists',
             'digital_version_research_cloud',
             'digital_version_research_cloud_path',

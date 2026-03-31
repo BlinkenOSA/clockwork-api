@@ -1,7 +1,8 @@
 import datetime
 import json
 
-import requests
+from clockwork_api.http import get
+from requests.exceptions import RequestException
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
 from requests.auth import HTTPBasicAuth
@@ -364,15 +365,21 @@ class RequestLibraryMLR(APIView):
         """
         koha_id = self.kwargs['koha_id']
         hashids = Hashids(salt="osalibrary", min_length=8)
-        solr_id = hashids.encode(int(koha_id))
+        try:
+            solr_id = hashids.encode(int(koha_id))
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         solr_core = getattr(settings, "SOLR_CORE_CATALOG_NEW", "catalog")
         solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), solr_core)
 
-        r = requests.get(
-            url="%s/select?q=id:%s" % (solr_url, solr_id),
-            auth=HTTPBasicAuth(getattr(settings, 'SOLR_USERNAME'), getattr(settings, 'SOLR_PASSWORD'))
-        )
+        try:
+            r = get(
+                url="%s/select?q=id:%s" % (solr_url, solr_id),
+                auth=HTTPBasicAuth(getattr(settings, 'SOLR_USERNAME'), getattr(settings, 'SOLR_PASSWORD'))
+            )
+        except RequestException:
+            return Response(status=status.HTTP_502_BAD_GATEWAY)
         if r.status_code == 200:
             response = r.json()
             if response['response']['numFound'] > 0:

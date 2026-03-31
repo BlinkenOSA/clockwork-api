@@ -17,7 +17,7 @@ from finding_aids.models import FindingAidsEntity
 from workflow.permission import APIGroupPermission
 from workflow.serializers.digital_object_serializers import (
     DigitalObjectInfoResponseSerializer,
-    DigitalObjectUpsertResponseSerializer,
+    DigitalObjectUpsertResponseSerializer, DigitalObjectUpsertRequestSerializer,
 )
 
 
@@ -429,32 +429,12 @@ def resolve_archival_unit_or_container(doi):
     }
 
 
-def get_research_cloud_path(access_copy_file):
-    path = ""
-    parts = access_copy_file.split("_")
+def get_research_cloud_path(file_name, archival_unit):
+    fonds = archival_unit.get_fonds().reference_code
+    subfonds = archival_unit.get_subfonds().reference_code
+    series = archival_unit.reference_code
 
-    # HU_OSA_11112222
-    if len(parts) == 3:
-        pass
-
-    # HU_OSA_386_1_1_0001
-    elif len(parts) == 6:
-        if parts[3] == '0':
-            path = f"HU OSA {parts[2]}/HU OSA {parts[2]}-0-{parts[4]}/"
-        else:
-            path = f"HU OSA {parts[2]}/HU OSA {parts[2]}-{parts[3]}/HU OSA {parts[2]}-{parts[3]}-{parts[4]}/"
-
-    # HU_OSA_386_1_1_0001_0001
-    elif len(parts) == 7:
-        if parts[3] == '0':
-            path = f"HU OSA {parts[2]}/HU OSA {parts[2]}-0-{parts[4]}/"
-        else:
-            path = f"HU OSA {parts[2]}/HU OSA {parts[2]}-{parts[3]}/HU OSA {parts[2]}-{parts[3]}-{parts[4]}/"
-
-    else:
-        pass
-
-    return f'{path}{access_copy_file}'
+    return f'{fonds}/{subfonds}/{series}/{file_name}'
 
 
 class DigitalObjectInfo(APIView):
@@ -476,7 +456,7 @@ class DigitalObjectInfo(APIView):
     authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
 
-    @swagger_auto_schema(responses={
+    @swagger_auto_schema(operation_id='digital_version_info', responses={
         200: DigitalObjectInfoResponseSerializer(),
         400: 'Invalid filename'
     })
@@ -512,20 +492,20 @@ class DigitalObjectInfo(APIView):
                     'level': resolved_object['level'],
                     'archival_unit': {
                         'fonds': {
-                            'reference_number': archival_unit.parent.parent.reference_code,
-                            'title': archival_unit.parent.parent.title,
+                            'reference_number': archival_unit.get_fonds().reference_code,
+                            'title': archival_unit.get_fonds().title,
                             'catalog_id': (
                                 f"https://catalog.archivum.org/catalog/"
-                                f"{archival_unit.parent.parent.isad.catalog_id}"
-                            ) if hasattr(archival_unit.parent.parent, "isad") else "",
+                                f"{archival_unit.get_fonds().isad.catalog_id}"
+                            ) if hasattr(archival_unit.get_fonds(), "isad") else "",
                         },
                         'subfonds': {
-                            'reference_number': archival_unit.parent.reference_code,
-                            'title': archival_unit.parent.title,
+                            'reference_number': archival_unit.get_subfonds().reference_code,
+                            'title': archival_unit.get_subfonds().title,
                             'catalog_id': (
                                 f"https://catalog.archivum.org/catalog/"
-                                f"{archival_unit.parent.isad.catalog_id}"
-                            ) if hasattr(archival_unit.parent, "isad") else "",
+                                f"{archival_unit.get_subfonds().isad.catalog_id}"
+                            ) if hasattr(archival_unit.get_subfonds(), "isad") else "",
                         },
                         'series': {
                             'reference_number': archival_unit.reference_code,
@@ -559,154 +539,90 @@ class DigitalObjectInfo(APIView):
 
 class DigitalObjectUpsert(APIView):
     """
-    Creates or updates a DigitalVersion record for a given access copy filename.
-
-    POST accepts:
-        - level: 'access' or 'master' (maps to DigitalVersion.level 'A' or 'M')
-        - access_copy_file: access copy filename including extension
+    Creates or updates a DigitalVersion record for a given filename, based on the URL.
+    It can be either registering a master file, or an access copy uploaded to the catalog or to the Research Cloud.
 
     The endpoint:
-        - validates filename pattern
-        - resolves archival unit/container/finding aids entity
-        - computes a normalized identifier and optional label
-        - upserts a DigitalVersion record marked as available online
-        - publishes the linked finding aids entity (if present)
+    - validates filename pattern
+    - resolves archival unit/container/finding aids entity
+    - computes a normalized identifier and optional label
+    - upserts a DigitalVersion record marked as available online
+    - publishes the linked finding aids entity (if present)
 
     Authentication / Authorization:
-        - BearerAuthentication or SessionAuthentication
-        - Restricted to users in the ``Api`` group via APIGroupPermission
+    - BearerAuthentication or SessionAuthentication
+    - Restricted to users in the ``Api`` group via APIGroupPermission
     """
+    type = None
 
     authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
 
-    @swagger_auto_schema(responses={
-        200: DigitalObjectUpsertResponseSerializer(),
-        400: 'Invalid filename'
-    })
-    def post(self, request, level, access_copy_file):
-        """
-        Upserts a DigitalVersion record derived from the access copy filename.
+    @staticmethod
+    def _transfer_av_filename(file_name):
+        doi, _, extension = file_name.rpartition(".")
+        if extension == '.mp4':
+            return file_name.replace('.mp4', '.m3u8')
+        return file_name
 
-        Args:
-            request: DRF request.
-            level: Either 'access' or 'master'.
-            access_copy_file: Filename including extension.
+    @swagger_auto_schema(
+        operation_id='digital_version_upsert',
+        operation_description="Creates or updates a DigitalVersion object based on the submitted file name.",
+        request_body=DigitalObjectUpsertRequestSerializer(required=False),
+        responses={
+            200: DigitalObjectUpsertResponseSerializer(),
+            400: 'Invalid filename'
+        }
+    )
+    def post(self, request, file_name, *args, **kwargs):
+        upsert_type = self.type
+        technical_metadata = request.data.get('technical_metadata', None)
 
-        Returns:
-            200 OK with the created/updated DigitalVersion id and filename,
-            or 400 BAD REQUEST on invalid filename.
-        """
-        if matches_any_pattern(access_copy_file):
-            doi, _, extension = access_copy_file.rpartition(".")
+        if matches_any_pattern(file_name):
+            doi, _, extension = file_name.rpartition(".")
             resolved_object = resolve_archival_unit_or_container(doi)
 
-            primary_type = (
-                resolved_object['finding_aids_entity'].primary_type.type
-                if resolved_object['finding_aids_entity'] else 'Moving Image'
+            lookup_fields = {
+                'available_online': False,
+                'available_research_cloud': False,
+                'filename': file_name
+            }
+
+            updates = {
+                'technical_metadata': technical_metadata
+            }
+
+            # If we are talking about master file
+            if upsert_type == 'master':
+                lookup_fields['level'] = 'M'
+            # If we are talking about an access file upload to the research cloud
+            elif upsert_type == 'access-rc':
+                lookup_fields['level'] = 'A'
+                lookup_fields['available_research_cloud'] = True
+                updates['research_cloud_path'] = get_research_cloud_path(file_name, resolved_object['archival_unit'])
+            # If we are talking about an access file upload to the catalog
+            else:
+                lookup_fields['level'] = 'A'
+                lookup_fields['available_online'] = True
+                lookup_fields['filename'] = self._transfer_av_filename(file_name)
+
+            # If the resolved object is a Finding Aids Entity
+            if resolved_object['finding_aids_entity']:
+                lookup_fields['finding_aids_entity'] = resolved_object['finding_aids_entity']
+            else:
+                lookup_fields['container'] = resolved_object['container']
+
+            dv, created = DigitalVersion.objects.update_or_create(
+                **lookup_fields,
+                defaults=updates
             )
-            access_copy = get_access_copy_actions(doi, primary_type)
-            label = get_label(doi)
-
-            if resolved_object['finding_aids_entity']:
-                dv, created = DigitalVersion.objects.get_or_create(
-                    finding_aids_entity=resolved_object['finding_aids_entity'],
-                    identifier=get_doi(doi),
-                    level='A' if level == 'access' else 'M',
-                    label=label,
-                    # digital_collection=resolved_object['finding_aids_entity'].archival_unit.title,
-                    filename=access_copy['filename'],
-                    available_online=True
-                )
-            else:
-                dv, created = DigitalVersion.objects.get_or_create(
-                    container=resolved_object['container'],
-                    identifier=get_doi(doi),
-                    level='A' if level == 'access' else 'M',
-                    # NOTE: Existing code referenced finding_aids_entity when absent; preserved intent below.
-                    # digital_collection=resolved_object['container'].archival_unit.title_full,
-                    filename=access_copy['filename'],
-                    available_online=True
-                )
-
-            # Publish the linked finding aids entity when present.
-            if dv.finding_aids_entity_id:
-                dv.finding_aids_entity.published = True
-                dv.finding_aids_entity.save()
 
             return Response({
                 'digital_version_id': dv.id,
+                'action': 'created' if created else 'updated',
+                'identifier': dv.identifier,
                 'filename': dv.filename,
             }, status=200)
 
-        return Response({'error': 'Invalid filename'}, status=400)
-
-
-class DigitalObjectRCUpsert(APIView):
-    """
-    Creates or updates a DigitalVersion record for a research cloud access copy filename.
-
-    POST accepts:
-        - access_copy_file: access copy filename including extension
-
-    The endpoint:
-        - validates filename pattern
-        - resolves archival unit/container/finding aids entity
-        - computes a normalized identifier and optional label
-        - inserts the research cloud path
-        - upserts a DigitalVersion record marked as available in research cloud
-        - publishes the linked finding aids entity (if present)
-
-    Authentication / Authorization:
-        - BearerAuthentication or SessionAuthentication
-        - Restricted to users in the ``Api`` group via APIGroupPermission
-    """
-
-    authentication_classes = [BearerAuthentication, SessionAuthentication]
-    permission_classes = (APIGroupPermission, )
-
-    @swagger_auto_schema(responses={
-        200: DigitalObjectUpsertResponseSerializer(),
-        400: 'Invalid filename'
-    })
-    def post(self, request, access_copy_file):
-        """
-        Upserts a DigitalVersion record derived from the access copy filename.
-
-        Args:
-            request: DRF request.
-            access_copy_file: Filename including extension.
-
-        Returns:
-            200 OK with the created/updated DigitalVersion id and filename,
-            or 400 BAD REQUEST on invalid filename.
-        """
-        if matches_any_pattern(access_copy_file):
-            doi, _, extension = access_copy_file.rpartition(".")
-            resolved_object = resolve_archival_unit_or_container(doi)
-
-            if resolved_object['finding_aids_entity']:
-                dv, created = DigitalVersion.objects.get_or_create(
-                    finding_aids_entity=resolved_object['finding_aids_entity'],
-                    identifier=doi,
-                    level='A',
-                    filename=access_copy_file,
-                    available_research_cloud=True,
-                    research_cloud_path=get_research_cloud_path(access_copy_file)
-                )
-            else:
-                dv, created = DigitalVersion.objects.get_or_create(
-                    container=resolved_object['container'],
-                    identifier=doi,
-                    level='A',
-                    filename=access_copy_file,
-                    available_research_cloud=True,
-                    research_cloud_path=get_research_cloud_path(access_copy_file)
-                )
-
-            return Response({
-                'digital_version_id': dv.id,
-                'filename': dv.filename,
-            }, status=200)
-
-        return Response({'error': 'Invalid filename'}, status=400)
+        else:
+            return Response({'error': 'Invalid filename'}, status=400)

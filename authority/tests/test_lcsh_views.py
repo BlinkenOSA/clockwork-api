@@ -7,7 +7,7 @@ class LCSHTest(TestViewsBaseClass):
     """ Testing LCSH endpoint """
 
     def setUp(self):
-        self.init()
+        super().setUp()
 
     def test_get_empty_result(self):
         response = self.client.get(reverse('authority-v1:lcsh-list'), {'query': ''})
