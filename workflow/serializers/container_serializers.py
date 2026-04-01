@@ -44,10 +44,5 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
             'carrier_type',
             'container_no',
             'digital_versions',
-            'digital_version_exists',
-            'digital_version_research_cloud',
-            'digital_version_research_cloud_path',
-            'digital_version_technical_metadata',
-            'digital_version_creation_date',
             'archival_unit',
         ]

@@ -1,5 +1,6 @@
 import re
 
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, get_object_or_404, RetrieveAPIView
@@ -13,6 +14,10 @@ from workflow.permission import APIGroupPermission
 from workflow.serializers.container_serializers import ContainerDigitizedSerializer
 
 
+@swagger_auto_schema(
+    operation_id='get_digitized_container',
+    operation_description="Retrieves digitization metadata for a container (by barcode).",
+)
 class GetDigitizedContainer(AuditLogMixin, RetrieveAPIView):
     """
     Retrieves digitization metadata for a container (by barcode).
@@ -27,14 +32,16 @@ class GetDigitizedContainer(AuditLogMixin, RetrieveAPIView):
         - Restricted to users in the ``Api`` group via APIGroupPermission
     """
 
-    swagger_schema = None
     queryset = Container.objects.all()
     serializer_class = ContainerDigitizedSerializer
     lookup_field = 'barcode'
     authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
 
-
+@swagger_auto_schema(
+    operation_id='get_container_metadata',
+    operation_description="Returns finding underlying finding aids metadata for a container (by barcode).",
+)
 class GetContainerMetadata(ListAPIView):
     """
     Returns finding aids metadata for a container (by barcode).
@@ -47,7 +54,6 @@ class GetContainerMetadata(ListAPIView):
         - Restricted to users in the ``Api`` group via APIGroupPermission
     """
 
-    swagger_schema = None
     serializer_class = FindingAidsEntityReadSerializer
     lookup_field = 'barcode'
     authentication_classes = [BearerAuthentication, SessionAuthentication]
