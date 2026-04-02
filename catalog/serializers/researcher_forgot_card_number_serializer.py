@@ -13,7 +13,7 @@ No database interaction occurs in this serializer.
 
 from rest_framework import serializers
 
-from catalog.serializer_fields.recaptcha_field import ReCaptchaField
+from catalog.serializer_fields.hcaptcha_field import HCaptchaField
 
 
 class ResearcherForgotCardNumberSerializer(serializers.Serializer):
@@ -30,7 +30,7 @@ class ResearcherForgotCardNumberSerializer(serializers.Serializer):
 
     email = serializers.EmailField(required=True)
     email_confirm = serializers.EmailField(required=True)
-    captcha = ReCaptchaField(required=True)
+    captcha = HCaptchaField(required=True)
 
     def validate(self, data):
         """
