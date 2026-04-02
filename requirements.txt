@@ -26,6 +26,7 @@ iiif-prezi3==1.2.1
 langdetect==1.0.9
 lxml==4.9.2
 Markdown==3.4.1
+meilisearch==0.40.0
 mysqlclient==2.2.7
 O365==2.0.27
 Office365-REST-Python-Client==2.4.0
