@@ -80,10 +80,9 @@ class ISADMeilisearchIndexer:
         -----
         This method indexes only if the record is published.
         """
-        if self.isad.published:
-            self._index_record()
-            self._remove_duplicates()
-            self.meilisearch_index.add_documents([self.doc])
+        self._index_record()
+        self._remove_duplicates()
+        self.meilisearch_index.add_documents([self.doc])
 
     def delete(self):
         """
@@ -99,19 +98,15 @@ class ISADMeilisearchIndexer:
         concatenated text fields used for full-text search.
         """
         self.doc['id'] = self._get_meilisearch_id()
-        self.doc['ams_id'] = self.isad.archival_unit.id
-        self.doc['call_number'] = self.isad.reference_code
+        self.doc['ams_id'] = f"isad-{self.isad.id}"
+        self.doc['archival_unit_id'] = f"{self.isad.archival_unit.id}"
+        self.doc['reference_code'] = self.isad.reference_code
 
         # Display field
         self.doc['title'] = self.isad.title
-        self.doc['record_origin'] = "Archives"
-        self.doc['primary_type'] = "Archival Unit"
+        self.doc['record_type'] = "ISAD(G)"
         self.doc['description_level'] = self._get_description_level()
-        self.doc['date_created'] = self._get_date_created_display()
-        self.doc['year_created'] = self._get_date_created_facet()
         self.doc['creator'] = self._get_creator()
-        self.doc['parent_unit'] = self._get_parent_unit()
-        self.doc['archival_unit_theme'] = list(map(lambda t: t.theme, self.isad.archival_unit.theme.all()))
 
         # Title fields
         if self.isad.archival_unit.title_original:
@@ -173,47 +168,6 @@ class ISADMeilisearchIndexer:
             return self.isad.archival_unit.get_subfonds().title_full
         return None
 
-    def _get_date_created_display(self):
-        """
-        Builds a display-friendly date range string.
-
-        Uses ``year_from`` and ``year_to`` when available.
-
-        Returns
-        -------
-        str
-            Date string suitable for display and indexing.
-        """
-        if self.isad.year_from > 0:
-            date = str(self.isad.year_from)
-
-            if self.isad.year_to:
-                if self.isad.year_from != self.isad.year_to:
-                    date = date + " - " + str(self.isad.year_to)
-        else:
-            date = ""
-        return date
-
-    def _get_date_created_facet(self):
-        """
-        Builds the year facet values for the record.
-
-        Returns
-        -------
-        list
-            List of years covered by the record. If a year range exists, all
-            years in the range are included.
-        """
-        date = []
-
-        if self.isad.year_to:
-            for year in range(self.isad.year_from, self.isad.year_to + 1):
-                date.append(year)
-        else:
-            date.append(str(self.isad.year_from))
-
-        return date
-
     def _get_creator(self):
         """
         Returns a list of creators for the ISAD record.
@@ -230,38 +184,6 @@ class ISADMeilisearchIndexer:
         if self.isad.isaar:
             creators.append(self.isad.isaar.name)
         return creators
-
-    def _get_fonds_name(self):
-        """
-        Returns the fonds-level title for indexing.
-
-        Returns
-        -------
-        str
-            Fonds title (full form).
-        """
-        if self.isad.description_level == 'SF' or self.isad.description_level == 'S':
-            return self.isad.archival_unit.get_fonds().title_full
-        else:
-            return self.isad.archival_unit.title_full
-
-    def _get_subfonds_name(self):
-        """
-        Returns the subfonds label for indexing when applicable.
-
-        Returns
-        -------
-        str or None
-            Subfonds reference code and title when applicable, otherwise None.
-        """
-        if self.isad.description_level == 'SF' or self.isad.description_level == 'S':
-            sf = self.isad.archival_unit.get_subfonds()
-            if sf.subfonds != 0:
-                return "%s %s" % (sf.reference_code, sf.title)
-            else:
-                return None
-        else:
-            return None
 
     def _get_contents_summary_search_values(self, locale):
         """
