@@ -14,6 +14,7 @@ from dashboard.views.analytics_views import AnalyticsActivityView, AnalyticsTota
 from dashboard.views.log_views import AccessionLog, ArchivalUnitLog, IsadCreateLog, IsadUpdateLog, FindingAidsCreateLog, \
     FindingAidsUpdateLog, DigitizationLog
 from dashboard.views.statistics_views import LinearMeterView, PublishedItems, CarrierTypes
+from dashboard.views.search_views import DashboardSearchView
 
 app_name = 'mlr'
 
@@ -31,6 +32,9 @@ urlpatterns = [
     path('logs/finding-aids-create/', FindingAidsCreateLog.as_view(), name='finding-aids-create-log'),
     path('logs/finding-aids-update/', FindingAidsUpdateLog.as_view(), name='finding-aids-update-log'),
     path('logs/digitization/', DigitizationLog.as_view(), name='digitization-log'),
+
+    # Search endpoint
+    path('search/', DashboardSearchView.as_view(), name='search'),
 
     # Analytics endpoints (time-series data)
     path('analytics/activity/', AnalyticsActivityView.as_view(), name='analytics-activity-view'),
