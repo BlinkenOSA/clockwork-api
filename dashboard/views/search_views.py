@@ -35,6 +35,7 @@ class DashboardSearchView(APIView):
         limit = self._get_int_query_param(request, 'limit', self.DEFAULT_LIMIT)
         offset = self._get_int_query_param(request, 'offset', 0)
         record_types = self._get_record_types(request)
+        allowed_archival_unit_ids = self._get_allowed_archival_unit_ids(request)
 
         if query == '':
             return Response({
@@ -50,7 +51,7 @@ class DashboardSearchView(APIView):
             'offset': offset
         }
 
-        search_filter = self._build_filter(record_types)
+        search_filter = self._build_filter(record_types, allowed_archival_unit_ids)
         if search_filter:
             search_payload['filter'] = search_filter
 
@@ -113,12 +114,35 @@ class DashboardSearchView(APIView):
 
         return record_types
 
-    def _build_filter(self, record_types):
-        if not record_types:
+    def _get_allowed_archival_unit_ids(self, request):
+        user_profile = getattr(request.user, 'user_profile', None)
+        if not user_profile:
+            return []
+
+        return list(user_profile.allowed_archival_units.values_list('id', flat=True))
+
+    def _build_filter(self, record_types, allowed_archival_unit_ids):
+        filters = []
+
+        if record_types:
+            # Meilisearch filter syntax expects: record_type IN ["a", "b"]
+            filters.append('record_type IN %s' % json.dumps(record_types))
+
+        if allowed_archival_unit_ids:
+            allowed_ids = json.dumps(allowed_archival_unit_ids)
+            filters.append(
+                '('
+                'archival_unit_id IN {ids} OR '
+                'series_id IN {ids} OR '
+                '(record_type = "isad" AND ams_id IN {ids}) OR '
+                '(record_type = "archival_unit" AND ams_id IN {ids})'
+                ')'.format(ids=allowed_ids)
+            )
+
+        if not filters:
             return None
 
-        # Meilisearch filter syntax expects: record_type IN ["a", "b"]
-        return 'record_type IN %s' % json.dumps(record_types)
+        return ' AND '.join(filters)
 
     def _normalize_hit(self, hit):
         return {
