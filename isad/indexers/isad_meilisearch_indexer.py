@@ -41,7 +41,7 @@ class ISADMeilisearchIndexer:
 
         self.meilisearch_url = getattr(settings, "MEILISEARCH_URL", "")
         self.meilisearch_api_key = getattr(settings, "MEILISEARCH_API_KEY", "")
-        self.meilisearch_index = getattr(settings, "MEILISEARCH_INDEX", "meilisearch")
+        self.meilisearch_index = getattr(settings, "MEILISEARCH_INDEX", "ams")
 
         self.client = meilisearch.Client(self.meilisearch_url, self.meilisearch_api_key)
         self.meilisearch_index = self.client.index(self.meilisearch_index)
