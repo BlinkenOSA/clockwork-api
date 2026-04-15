@@ -20,14 +20,8 @@ class Command(BaseCommand):
             for archival_unit in ArchivalUnit.objects.all():
                 for fa in FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False).iterator():
                     indexer = FindingMeilisearchIndexer(fa.id)
-                    if fa.published:
-                        print("Indexing: %s" % fa.archival_reference_code)
-                        indexer.index()
-                        pass
-                    else:
-                        indexer.delete()
-                time.sleep(2)
-
+                    print("Indexing: %s" % fa.archival_reference_code)
+                    indexer.index()
         else:
             archival_unit = ArchivalUnit.objects.get(fonds=options['fonds'],
                                                      subfonds=options['subfonds'],
@@ -35,8 +29,5 @@ class Command(BaseCommand):
             finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False)
             for fa in finding_aids_entities.iterator():
                 indexer = FindingMeilisearchIndexer(fa.id)
-                if fa.published:
-                    print("Indexing: %s" % fa.archival_reference_code)
-                    indexer.index()
-                else:
-                    indexer.delete()
+                print("Indexing: %s" % fa.archival_reference_code)
+                indexer.index()

@@ -41,7 +41,7 @@ class ISADMeilisearchIndexer:
 
         self.meilisearch_url = getattr(settings, "MEILISEARCH_URL", "")
         self.meilisearch_api_key = getattr(settings, "MEILISEARCH_API_KEY", "")
-        self.meilisearch_index = getattr(settings, "MEILISEARCH_INDEX", "meilisearch")
+        self.meilisearch_index = getattr(settings, "MEILISEARCH_INDEX", "ams")
 
         self.client = meilisearch.Client(self.meilisearch_url, self.meilisearch_api_key)
         self.meilisearch_index = self.client.index(self.meilisearch_index)
@@ -101,6 +101,7 @@ class ISADMeilisearchIndexer:
         self.doc['ams_id'] = f"isad-{self.isad.id}"
         self.doc['archival_unit_id'] = f"{self.isad.archival_unit.id}"
         self.doc['reference_code'] = self.isad.reference_code
+        self.doc['published'] = self.isad.published
 
         # Display field
         self.doc['title'] = self.isad.title
