@@ -13,6 +13,7 @@ class DashboardSearchViewTests(TestViewsBaseClass):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 0)
+        self.assertEqual(response.data['facets'], {})
         self.assertEqual(response.data['results'], [])
 
     @patch('dashboard.views.search_views.meilisearch.Client')
@@ -20,6 +21,9 @@ class DashboardSearchViewTests(TestViewsBaseClass):
         fake_index = Mock()
         fake_index.search.return_value = {
             'estimatedTotalHits': 2,
+            'facetDistribution': {
+                'record_type': {'isad': 1, 'finding_aids_entity': 1}
+            },
             'hits': [
                 {
                     'id': 'isad_1',
@@ -51,9 +55,10 @@ class DashboardSearchViewTests(TestViewsBaseClass):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['facets']['record_type']['isad'], 1)
         self.assertEqual(len(response.data['results']), 2)
         self.assertEqual(response.data['results'][0]['record_type'], 'isad')
-        self.assertEqual(response.data['results'][1]['record_type'], 'finding_aids_entity')
+        self.assertEqual(response.data['results'][1]['guid'], 'osa:abc')
 
         fake_client.index.assert_called_once()
         fake_index.search.assert_called_once_with(
@@ -61,6 +66,12 @@ class DashboardSearchViewTests(TestViewsBaseClass):
             {
                 'limit': 10,
                 'offset': 5,
+                'facets': ['series_reference_code', 'record_type', 'description_level'],
+                'attributesToCrop': ['contents_summary', 'contents_summary_original'],
+                'cropLength': 20,
+                'attributesToHighlight': ['*'],
+                'highlightPreTag': '<mark>',
+                'highlightPostTag': '</mark>',
                 'filter': 'record_type IN ["isad", "finding_aids_entity"]'
             }
         )
@@ -100,12 +111,13 @@ class DashboardSearchViewTests(TestViewsBaseClass):
             {
                 'limit': 20,
                 'offset': 0,
-                'filter': (
-                    f'(archival_unit_id IN [{allowed_series.id}] OR '
-                    f'series_id IN [{allowed_series.id}] OR '
-                    f'(record_type = "isad" AND ams_id IN [{allowed_series.id}]) OR '
-                    f'(record_type = "archival_unit" AND ams_id IN [{allowed_series.id}]))'
-                )
+                'facets': ['series_reference_code', 'record_type', 'description_level'],
+                'attributesToCrop': ['contents_summary', 'contents_summary_original'],
+                'cropLength': 20,
+                'attributesToHighlight': ['*'],
+                'highlightPreTag': '<mark>',
+                'highlightPostTag': '</mark>',
+                'filter': f'archival_unit_id IN [{allowed_series.id}]'
             }
         )
         self.assertNotIn(str(other_series.id), fake_index.search.call_args.args[1]['filter'])
@@ -138,13 +150,13 @@ class DashboardSearchViewTests(TestViewsBaseClass):
             {
                 'limit': 20,
                 'offset': 0,
-                'filter': (
-                    'record_type IN ["isad"] AND '
-                    f'(archival_unit_id IN [{allowed_series.id}] OR '
-                    f'series_id IN [{allowed_series.id}] OR '
-                    f'(record_type = "isad" AND ams_id IN [{allowed_series.id}]) OR '
-                    f'(record_type = "archival_unit" AND ams_id IN [{allowed_series.id}]))'
-                )
+                'facets': ['series_reference_code', 'record_type', 'description_level'],
+                'attributesToCrop': ['contents_summary', 'contents_summary_original'],
+                'cropLength': 20,
+                'attributesToHighlight': ['*'],
+                'highlightPreTag': '<mark>',
+                'highlightPostTag': '</mark>',
+                'filter': f'record_type IN ["isad"] AND archival_unit_id IN [{allowed_series.id}]'
             }
         )
 
@@ -158,3 +170,139 @@ class DashboardSearchViewTests(TestViewsBaseClass):
 
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
         self.assertEqual(response.data['detail'], 'Search service unavailable.')
+
+    @patch('dashboard.views.search_views.meilisearch.Client')
+    def test_search_can_return_highlighted_hits(self, client_class):
+        fake_index = Mock()
+        fake_index.search.return_value = {
+            'estimatedTotalHits': 1,
+            'hits': [
+                {
+                    'id': 'isad_1',
+                    'title': 'Open Society Archives Fonds',
+                    '_formatted': {
+                        'title': 'Open <mark>Society</mark> Archives Fonds'
+                    }
+                }
+            ]
+        }
+
+        fake_client = Mock()
+        fake_client.index.return_value = fake_index
+        client_class.return_value = fake_client
+
+        response = self.client.get(
+            reverse('dashboard-v1:search'),
+            {'q': 'society', 'highlight': 'true', 'highlight_fields': 'title'}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data['highlight'])
+        self.assertEqual(
+            response.data['results'][0]['highlights']['title'],
+            'Open <mark>Society</mark> Archives Fonds'
+        )
+
+        fake_index.search.assert_called_once_with(
+            'society',
+            {
+                'limit': 20,
+                'offset': 0,
+                'facets': ['series_reference_code', 'record_type', 'description_level'],
+                'attributesToCrop': ['contents_summary', 'contents_summary_original'],
+                'cropLength': 20,
+                'attributesToHighlight': ['title'],
+                'highlightPreTag': '<mark>',
+                'highlightPostTag': '</mark>',
+            }
+        )
+
+    @patch('dashboard.views.search_views.meilisearch.Client')
+    def test_search_returns_requested_facet_fields(self, client_class):
+        fake_index = Mock()
+        fake_index.search.return_value = {
+            'estimatedTotalHits': 1,
+            'facetDistribution': {
+                'series_reference_code': {'HU OSA 300-1-1': 4},
+                'record_type': {'finding_aids_entity': 4},
+                'description_level': {'Folder': 3, 'Item': 1},
+            },
+            'hits': [{'id': 'fa_1', 'title': 'Folder 1'}]
+        }
+
+        fake_client = Mock()
+        fake_client.index.return_value = fake_index
+        client_class.return_value = fake_client
+
+        response = self.client.get(reverse('dashboard-v1:search'), {'q': 'folder'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('series_reference_code', response.data['facets'])
+        self.assertIn('record_type', response.data['facets'])
+        self.assertIn('description_level', response.data['facets'])
+
+    @patch('dashboard.views.search_views.meilisearch.Client')
+    def test_search_treats_extra_query_params_as_facet_filters(self, client_class):
+        fake_index = Mock()
+        fake_index.search.return_value = {
+            'estimatedTotalHits': 0,
+            'hits': []
+        }
+
+        fake_client = Mock()
+        fake_client.index.return_value = fake_index
+        client_class.return_value = fake_client
+
+        response = self.client.get(
+            reverse('dashboard-v1:search'),
+            {'q': 'folder', 'description_level': 'Folder'}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        fake_index.search.assert_called_once_with(
+            'folder',
+            {
+                'limit': 20,
+                'offset': 0,
+                'facets': ['series_reference_code', 'record_type', 'description_level'],
+                'attributesToCrop': ['contents_summary', 'contents_summary_original'],
+                'cropLength': 20,
+                'attributesToHighlight': ['*'],
+                'highlightPreTag': '<mark>',
+                'highlightPostTag': '</mark>',
+                'filter': 'description_level = "Folder"'
+            }
+        )
+
+    @patch('dashboard.views.search_views.meilisearch.Client')
+    def test_search_supports_multi_value_dynamic_facet_filters(self, client_class):
+        fake_index = Mock()
+        fake_index.search.return_value = {
+            'estimatedTotalHits': 0,
+            'hits': []
+        }
+
+        fake_client = Mock()
+        fake_client.index.return_value = fake_index
+        client_class.return_value = fake_client
+
+        response = self.client.get(
+            reverse('dashboard-v1:search'),
+            {'q': 'folder', 'description_level': 'Folder,Item'}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        fake_index.search.assert_called_once_with(
+            'folder',
+            {
+                'limit': 20,
+                'offset': 0,
+                'facets': ['series_reference_code', 'record_type', 'description_level'],
+                'attributesToCrop': ['contents_summary', 'contents_summary_original'],
+                'cropLength': 20,
+                'attributesToHighlight': ['*'],
+                'highlightPreTag': '<mark>',
+                'highlightPostTag': '</mark>',
+                'filter': 'description_level IN ["Folder", "Item"]'
+            }
+        )
