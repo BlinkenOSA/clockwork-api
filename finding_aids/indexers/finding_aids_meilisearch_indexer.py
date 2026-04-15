@@ -34,15 +34,12 @@ class FindingMeilisearchIndexer:
         self.doc = {}
 
     def index(self):
-        if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
-            self._index_record()
-            self._remove_duplicates()
-            try:
-                self.meilisearch_index.add_documents([self.doc])
-            except Exception as e:
-                print('Error with Report No. %s! Error: %s' % (self.doc['id'], e))
-        else:
-            print("ISAD(G) record doesn't exists. %s!" % self.finding_aids_entity.archival_reference_code)
+        self._index_record()
+        self._remove_duplicates()
+        try:
+            self.meilisearch_index.add_documents([self.doc])
+        except Exception as e:
+            print('Error with Finding Aids Report %s! Error: %s' % (self.doc['id'], e))
 
     def delete(self):
         self.meilisearch_index.delete_document(document_id=self._get_meilisearch_id())
