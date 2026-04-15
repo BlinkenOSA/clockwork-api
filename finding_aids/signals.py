@@ -1,8 +1,14 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
+from hashids import Hashids
 
 from finding_aids.models import FindingAidsEntity
-from finding_aids.tasks import index_catalog_finding_aids_entity, index_catalog_finding_aids_entity_remove
+from finding_aids.tasks import (
+    index_catalog_finding_aids_entity,
+    index_catalog_finding_aids_entity_remove,
+    index_meilisearch_finding_aids_entity,
+    index_meilisearch_finding_aids_entity_remove,
+)
 
 
 @receiver(post_save, sender=FindingAidsEntity)
@@ -21,6 +27,10 @@ def update_finding_aids_index(sender, instance, **kwargs):
     else:
         index_catalog_finding_aids_entity_remove.delay(finding_aids_entity_id=instance.id)
 
+    # Internal AMS search index should always contain saved records,
+    # regardless of publication status.
+    index_meilisearch_finding_aids_entity.delay(finding_aids_entity_id=instance.id)
+
 
 @receiver(pre_delete, sender=FindingAidsEntity)
 def remove_finding_aids_index(sender, instance, **kwargs):
@@ -31,3 +41,4 @@ def remove_finding_aids_index(sender, instance, **kwargs):
     directly rather than unpublished first.
     """
     index_catalog_finding_aids_entity_remove.delay(finding_aids_entity_id=instance.id)
+    index_meilisearch_finding_aids_entity_remove.delay(finding_aids_entity_id=instance.id)
