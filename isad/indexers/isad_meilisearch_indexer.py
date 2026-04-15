@@ -101,6 +101,7 @@ class ISADMeilisearchIndexer:
         self.doc['ams_id'] = f"isad-{self.isad.id}"
         self.doc['archival_unit_id'] = f"{self.isad.archival_unit.id}"
         self.doc['reference_code'] = self.isad.reference_code
+        self.doc['published'] = self.isad.published
 
         # Display field
         self.doc['title'] = self.isad.title

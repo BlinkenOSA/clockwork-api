@@ -1,6 +1,9 @@
 # Create your tasks here
+import meilisearch
 from celery import shared_task
+from django.conf import settings
 
+from isad.indexers.isad_meilisearch_indexer import ISADMeilisearchIndexer
 from isad.indexers.isad_new_catalog_indexer import ISADNewCatalogIndexer
 
 
@@ -53,4 +56,26 @@ def index_catalog_isad_record_remove(isad_id):
     slow index operations out of the synchronous application flow.
     """
     indexer = ISADNewCatalogIndexer(isad_id)
+    indexer.delete()
+
+
+@shared_task
+def index_meilisearch_isad_record(isad_id):
+    """
+    Indexes an ISAD record in Meilisearch.
+    """
+    indexer = ISADMeilisearchIndexer(isad_id)
+    if not indexer.isad:
+        return
+    indexer.index()
+
+
+@shared_task
+def index_meilisearch_isad_record_remove(isad_id):
+    """
+    Removes an ISAD record from Meilisearch.
+    """
+    indexer = ISADMeilisearchIndexer(isad_id)
+    if not indexer.isad:
+        return
     indexer.delete()

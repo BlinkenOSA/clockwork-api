@@ -1,8 +1,14 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
+from hashids import Hashids
 
 from isad.models import Isad
-from isad.tasks import index_catalog_isad_record, index_catalog_isad_record_remove
+from isad.tasks import (
+    index_catalog_isad_record,
+    index_catalog_isad_record_remove,
+    index_meilisearch_isad_record,
+    index_meilisearch_isad_record_remove,
+)
 
 
 @receiver(post_save, sender=Isad)
@@ -31,6 +37,10 @@ def update_isad_index(sender, instance, **kwargs):
     else:
         index_catalog_isad_record_remove.delay(isad_id=instance.id)
 
+    # Internal AMS search index should always contain saved records,
+    # regardless of publication status.
+    index_meilisearch_isad_record.delay(isad_id=instance.id)
+
 
 @receiver(pre_delete, sender=Isad)
 def remove_isad_index(sender, instance, **kwargs):
@@ -46,3 +56,4 @@ def remove_isad_index(sender, instance, **kwargs):
     The removal is executed asynchronously via a background task.
     """
     index_catalog_isad_record_remove.delay(isad_id=instance.id)
+    index_meilisearch_isad_record_remove.delay(isad_id=instance.id)
