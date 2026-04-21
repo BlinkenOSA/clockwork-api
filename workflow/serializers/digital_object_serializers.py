@@ -150,7 +150,7 @@ class DigitalObjectInfoResponseSerializer(serializers.Serializer):
 class DigitalObjectUpsertRequestSerializer(serializers.Serializer):
     technical_metadata = serializers.IntegerField(
         label='Technical Metadata',
-        help_text='Extracted technical metadata',
+        help_text='Extracted technical metadata, only required for master files.',
         required=False
     )
 

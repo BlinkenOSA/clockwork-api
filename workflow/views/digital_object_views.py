@@ -585,6 +585,7 @@ class DigitalObjectUpsert(APIView):
             lookup_fields = {
                 'available_online': False,
                 'available_research_cloud': False,
+                'identifier': doi,
                 'filename': file_name
             }
 
