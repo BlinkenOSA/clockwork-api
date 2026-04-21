@@ -34,6 +34,7 @@ class Command(BaseCommand):
             )
             digital_version.filename = "%s.%s" % (identifier, "avi")
             digital_version.creation_date = container.digital_version_creation_date
+            digital_version.technical_metadata = container.digital_version_technical_metadata
             digital_version.available_online = False
             digital_version.available_research_cloud = False
             digital_version.save()
@@ -50,7 +51,6 @@ class Command(BaseCommand):
             )
             digital_version.filename = "%s.%s" % (identifier, "mp4")
             digital_version.creation_date = container.digital_version_creation_date
-            digital_version.technical_metadata = container.digital_version_technical_metadata
             digital_version.available_online = container.digital_version_online
             digital_version.available_research_cloud = container.digital_version_research_cloud
             digital_version.research_cloud_path = container.digital_version_research_cloud_path
