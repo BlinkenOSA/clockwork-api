@@ -19,7 +19,7 @@ from workflow.serializers.digital_object_serializers import (
     DigitalObjectInfoResponseSerializer,
     DigitalObjectUpsertResponseSerializer, DigitalObjectUpsertRequestSerializer,
 )
-
+from finding_aids.tasks import index_catalog_finding_aids_entity
 
 def matches_any_pattern(s):
     """
@@ -617,6 +617,9 @@ class DigitalObjectUpsert(APIView):
                 **lookup_fields,
                 defaults=updates
             )
+
+            if dv.finding_aids_entity:
+                index_catalog_finding_aids_entity.delay(dv.finding_aids_entity.id)
 
             return Response({
                 'digital_version_id': dv.id,
