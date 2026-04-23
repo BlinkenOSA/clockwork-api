@@ -149,6 +149,8 @@ class RestrictedRequestAction(APIView):
             elif action == 'reject':
                 request_item_part.status = 'rejected'
                 decision = 'Access denied'
+                request_item_part.request_item.status = '4'
+                request_item_part.request_item.save()
             elif action == 'lift':
                 request_item_part.status = 'lifted'
                 decision = 'Access granted'
