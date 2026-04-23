@@ -2,11 +2,11 @@ import os
 import json
 
 from django.core.management import BaseCommand
+from django.db.models import Count, Q, Prefetch
 
 from archival_unit.models import ArchivalUnit
-from container.models import Container
-from finding_aids.models import FindingAidsEntity
-from isad.models import Isad
+from finding_aids.models import FindingAidsEntity, FindingAidsEntityAssociatedPerson, \
+    FindingAidsEntityAssociatedCorporation
 
 
 class Command(BaseCommand):
@@ -26,11 +26,23 @@ class Command(BaseCommand):
         self.folders_items = []
 
     def handle(self, *args, **options):
-        archival_units = ArchivalUnit.objects.filter(fonds=options['fonds'], subfonds=options['subfonds'], level='S').order_by('sort')
+        archival_units = ArchivalUnit.objects.filter(
+            fonds=options['fonds'],
+            subfonds=options['subfonds'],
+            level='S'
+        ).annotate(
+            fa_non_template_count=Count('findingaidsentity', filter=Q(findingaidsentity__is_template=False), distinct=True)
+        ).select_related(
+            'isad',
+            'parent',
+            'parent__isad',
+            'parent__parent',
+            'parent__parent__isad'
+        ).order_by('sort')
 
         for archival_unit in archival_units:
-            if Isad.objects.filter(archival_unit=archival_unit).exists():
-                if FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False).count() > 0:
+            if getattr(archival_unit, 'isad', None):
+                if archival_unit.fa_non_template_count > 0:
                     self.archival_unit = archival_unit
                     self.folders_items = []
 
@@ -159,62 +171,106 @@ class Command(BaseCommand):
             self.series_data = data
 
     def assemble_finding_aids(self):
-        containers = Container.objects.filter(archival_unit=self.archival_unit).order_by('container_no')
-        for container in containers.all():
-            fa_entities = FindingAidsEntity.objects.filter(container=container, is_template=False).order_by('folder_no', 'sequence_no')
-            for fa_entity in fa_entities.all():
-                data = {
-                    'orig_uuid': str(fa_entity.uuid),
-                    'dataset_type': 'DOC',
-                    'title_en': fa_entity.title,
-                    'description': fa_entity.contents_summary,
-                    'orig_uri': f"https://catalog.archivum.org/catalog/{fa_entity.catalog_id}",
-                    'start_date': str(fa_entity.date_from),
-                    'end_date': str(fa_entity.date_to),
-                    'archival_id': fa_entity.archival_reference_code,
-                    'created_at': fa_entity.date_created.isoformat(),
-                    'updated_at': fa_entity.date_updated.isoformat() if fa_entity.date_updated else None,
-                    'data_source': 'Blinken OSA Archivum'
-                }
+        fa_entities = FindingAidsEntity.objects.filter(
+            archival_unit=self.archival_unit,
+            is_template=False
+        ).select_related(
+            'container'
+        ).prefetch_related(
+            Prefetch('subject_person', to_attr='prefetched_subject_person'),
+            Prefetch('subject_corporation', to_attr='prefetched_subject_corporation'),
+            Prefetch(
+                'findingaidsentityassociatedperson_set',
+                queryset=FindingAidsEntityAssociatedPerson.objects.select_related('associated_person'),
+                to_attr='prefetched_associated_people'
+            ),
+            Prefetch(
+                'findingaidsentityassociatedcorporation_set',
+                queryset=FindingAidsEntityAssociatedCorporation.objects.select_related('associated_corporation'),
+                to_attr='prefetched_associated_corporations'
+            )
+        ).order_by('container__container_no', 'folder_no', 'sequence_no')
 
-                notes = []
-                # Note - Physical description
-                if fa_entity.physical_description:
-                    notes.append({
-                        'note_type': {'name': 'Physical Description'},
-                        'text': fa_entity.physical_description
-                    })
+        people_ids = set()
+        corporation_ids = set()
+        for fa_entity in fa_entities:
+            for person in getattr(fa_entity, 'prefetched_subject_person', []):
+                people_ids.add(person.id)
+            for corporation in getattr(fa_entity, 'prefetched_subject_corporation', []):
+                corporation_ids.add(corporation.id)
+            for associated in getattr(fa_entity, 'prefetched_associated_people', []):
+                if associated.associated_person_id:
+                    people_ids.add(associated.associated_person_id)
+            for associated in getattr(fa_entity, 'prefetched_associated_corporations', []):
+                if associated.associated_corporation_id:
+                    corporation_ids.add(associated.associated_corporation_id)
 
-                # Note - Physical condition
-                if fa_entity.physical_condition:
-                    notes.append({
-                        'note_type': {'name': 'Physical Condition'},
-                        'text': fa_entity.physical_condition
-                    })
+        from authority.models import Person, Corporation
+        people_map = {
+            p.id: p for p in Person.objects.filter(id__in=people_ids).prefetch_related('personotherformat_set__language')
+        }
+        corporations_map = {
+            c.id: c for c in Corporation.objects.filter(id__in=corporation_ids).prefetch_related(
+                'corporationotherformat_set__language'
+            )
+        }
 
-                # Note - Note information
-                if fa_entity.note:
-                    notes.append({
-                        'note_type': {'name': 'Note'},
-                        'text': fa_entity.note
-                    })
-                data['notes'] = notes
+        for fa_entity in fa_entities:
+            data = {
+                'orig_uuid': str(fa_entity.uuid),
+                'dataset_type': 'DOC',
+                'title_en': fa_entity.title,
+                'description': fa_entity.contents_summary,
+                'orig_uri': f"https://catalog.archivum.org/catalog/{fa_entity.catalog_id}",
+                'start_date': str(fa_entity.date_from),
+                'end_date': str(fa_entity.date_to),
+                'archival_id': fa_entity.archival_reference_code,
+                'created_at': fa_entity.date_created.isoformat(),
+                'updated_at': fa_entity.date_updated.isoformat() if fa_entity.date_updated else None,
+                'data_source': 'Blinken OSA Archivum'
+            }
 
-                people = []
-                for person in fa_entity.subject_person.all():
-                    people.append(self.create_person_record(person))
+            notes = []
+            if fa_entity.physical_description:
+                notes.append({
+                    'note_type': {'name': 'Physical Description'},
+                    'text': fa_entity.physical_description
+                })
+            if fa_entity.physical_condition:
+                notes.append({
+                    'note_type': {'name': 'Physical Condition'},
+                    'text': fa_entity.physical_condition
+                })
+            if fa_entity.note:
+                notes.append({
+                    'note_type': {'name': 'Note'},
+                    'text': fa_entity.note
+                })
+            data['notes'] = notes
 
-                for corporation in fa_entity.subject_corporation.all():
-                    people.append(self.create_corporation_record(corporation))
+            people = []
+            for person in getattr(fa_entity, 'prefetched_subject_person', []):
+                cached_person = people_map.get(person.id)
+                if cached_person:
+                    people.append(self.create_person_record(cached_person))
 
-                for person in fa_entity.findingaidsentityassociatedperson_set.all():
-                    people.append(self.create_person_record(person.associated_person))
+            for corporation in getattr(fa_entity, 'prefetched_subject_corporation', []):
+                cached_corporation = corporations_map.get(corporation.id)
+                if cached_corporation:
+                    people.append(self.create_corporation_record(cached_corporation))
 
-                for corporation in fa_entity.findingaidsentityassociatedcorporation_set.all():
-                    people.append(self.create_corporation_record(corporation.associated_corporation))
-                data['people'] = people
+            for associated in getattr(fa_entity, 'prefetched_associated_people', []):
+                cached_person = people_map.get(associated.associated_person_id)
+                if cached_person:
+                    people.append(self.create_person_record(cached_person))
 
-                self.folders_items.append(data)
+            for associated in getattr(fa_entity, 'prefetched_associated_corporations', []):
+                cached_corporation = corporations_map.get(associated.associated_corporation_id)
+                if cached_corporation:
+                    people.append(self.create_corporation_record(cached_corporation))
+
+            data['people'] = people
+            self.folders_items.append(data)
 
     def create_person_record(self, person):
         data = {
@@ -261,26 +317,20 @@ class Command(BaseCommand):
         return data
 
     def get_access_rights(self, obj):
-        fa_entity_count = 0
-        restricted_count = 0
-
+        base_filter = Q(is_template=False)
         if obj.description_level == 'F':
-            fa_entity_count = FindingAidsEntity.objects.filter(
-                archival_unit__parent__parent=obj.archival_unit, is_template=False).count()
-            restricted_count = FindingAidsEntity.objects.filter(
-                archival_unit__parent__parent=obj.archival_unit, access_rights__id=3).count()
+            base_filter &= Q(archival_unit__parent__parent=obj.archival_unit)
+        elif obj.description_level == 'SF':
+            base_filter &= Q(archival_unit__parent=obj.archival_unit)
+        else:
+            base_filter &= Q(archival_unit=obj.archival_unit)
 
-        if obj.description_level == 'SF':
-            fa_entity_count = FindingAidsEntity.objects.filter(
-                archival_unit__parent=obj.archival_unit, is_template=False).count()
-            restricted_count = FindingAidsEntity.objects.filter(
-                archival_unit__parent=obj.archival_unit, access_rights__id=3).count()
-
-        if obj.description_level == 'S':
-            fa_entity_count = FindingAidsEntity.objects.filter(
-                archival_unit=obj.archival_unit, is_template=False).count()
-            restricted_count = FindingAidsEntity.objects.filter(
-                archival_unit=obj.archival_unit, access_rights__id=3).count()
+        counts = FindingAidsEntity.objects.filter(base_filter).aggregate(
+            fa_entity_count=Count('id'),
+            restricted_count=Count('id', filter=Q(access_rights__id=3))
+        )
+        fa_entity_count = counts['fa_entity_count'] or 0
+        restricted_count = counts['restricted_count'] or 0
 
         if fa_entity_count == restricted_count:
             return 'Restricted'
