@@ -350,12 +350,16 @@ class ArchivalUnitSelectSerializer(serializers.ModelSerializer):
 
     def get_container_count(self, obj):
         if obj.level == 'S':
+            if hasattr(obj, 'container_count_value'):
+                return obj.container_count_value
             return Container.objects.filter(archival_unit=obj).count()
         else:
             return None
 
     def get_folder_count(self, obj):
         if obj.level == 'S':
+            if hasattr(obj, 'folder_count_value'):
+                return obj.folder_count_value
             return FindingAidsEntity.objects.filter(archival_unit=obj).exclude(is_template=True).count()
         else:
             return None
