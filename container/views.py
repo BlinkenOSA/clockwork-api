@@ -1,3 +1,6 @@
+from django.db.models import Count, IntegerField, OuterRef, Subquery, Value, F
+from django.db.models.functions import Coalesce
+from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -9,6 +12,7 @@ from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from container.models import Container
 from container.serializers import ContainerReadSerializer, ContainerWriteSerializer, \
     ContainerListSerializer
+from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
 
 
@@ -81,15 +85,62 @@ class ContainerList(generics.ListAPIView):
         """
         archival_unit_id = self.kwargs.get('series_id', None)
         if archival_unit_id:
+            total_number_count = FindingAidsEntity.objects.filter(
+                container=OuterRef('pk'),
+                is_template=False
+            ).values('container').annotate(total=Count('id')).values('total')[:1]
+            total_published_number_count = FindingAidsEntity.objects.filter(
+                container=OuterRef('pk'),
+                is_template=False,
+                published=True
+            ).values('container').annotate(total=Count('id')).values('total')[:1]
+            digital_versions_masters_count = DigitalVersion.objects.filter(
+                container=OuterRef('pk'),
+                finding_aids_entity__isnull=True,
+                level='M'
+            ).values('container').annotate(total=Count('id')).values('total')[:1]
+            digital_versions_access_copies_count = DigitalVersion.objects.filter(
+                container=OuterRef('pk'),
+                finding_aids_entity__isnull=True,
+                level='A'
+            ).values('container').annotate(total=Count('id')).values('total')[:1]
+            digital_versions_in_finding_aids_count = DigitalVersion.objects.filter(
+                finding_aids_entity__container=OuterRef('pk')
+            ).values('finding_aids_entity__container').annotate(total=Count('id')).values('total')[:1]
+
+            def annotate_counts(queryset):
+                return queryset.select_related('archival_unit', 'carrier_type').annotate(
+                    total_number_count=Coalesce(
+                        Subquery(total_number_count, output_field=IntegerField()),
+                        Value(0)
+                    ),
+                    total_published_number_count=Coalesce(
+                        Subquery(total_published_number_count, output_field=IntegerField()),
+                        Value(0)
+                    ),
+                    digital_versions_masters_count=Coalesce(
+                        Subquery(digital_versions_masters_count, output_field=IntegerField()),
+                        Value(0)
+                    ),
+                    digital_versions_access_copies_count=Coalesce(
+                        Subquery(digital_versions_access_copies_count, output_field=IntegerField()),
+                        Value(0)
+                    ),
+                    digital_versions_in_finding_aids_count=Coalesce(
+                        Subquery(digital_versions_in_finding_aids_count, output_field=IntegerField()),
+                        Value(0)
+                    ),
+                )
+
             user = self.request.user
             if user.user_profile.allowed_archival_units.count() > 0:
                 if user.user_profile.allowed_archival_units.filter(id=archival_unit_id).count() > 0:
                     allowed_archival_unit = user.user_profile.allowed_archival_units.get(id=archival_unit_id)
-                    return Container.objects.filter(archival_unit_id=allowed_archival_unit.id)
+                    return annotate_counts(Container.objects.filter(archival_unit_id=allowed_archival_unit.id))
                 else:
                     return Container.objects.none()
             else:
-                return Container.objects.filter(archival_unit_id=archival_unit_id)
+                return annotate_counts(Container.objects.filter(archival_unit_id=archival_unit_id))
         else:
             return Container.objects.none()
 
@@ -127,9 +178,7 @@ class ContainerDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpd
             container_no__gt=instance.container_no).order_by('container_no')
         AuditLogMixin.log_audit_action(user=self.request.user, action='DELETE', instance=instance)
         instance.delete()
-        for container in containers.iterator():
-            container.container_no -= 1
-            container.save()
+        containers.update(container_no=F('container_no') - 1)
 
 
 class ContainerPublishAll(APIView):
@@ -151,11 +200,18 @@ class ContainerPublishAll(APIView):
         archival_unit_id = self.kwargs.get('series', None)
 
         finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit_id=archival_unit_id)
-        for finding_aids in finding_aids_entities.iterator():
-            if action == 'publish':
-                finding_aids.publish(request.user)
-            else:
-                finding_aids.unpublish()
+        if action == 'publish':
+            finding_aids_entities.update(
+                published=True,
+                user_published=request.user.username,
+                date_published=timezone.now()
+            )
+        else:
+            finding_aids_entities.update(
+                published=False,
+                user_published="",
+                date_published=None
+            )
         return Response(status=status.HTTP_200_OK)
 
 
@@ -179,11 +235,18 @@ class ContainerPublish(APIView):
         container = get_object_or_404(Container, pk=container_id)
 
         finding_aids_entities = FindingAidsEntity.objects.filter(container=container)
-        for finding_aids in finding_aids_entities.iterator():
-            if action == 'publish':
-                finding_aids.publish(request.user)
-            else:
-                finding_aids.unpublish()
+        if action == 'publish':
+            finding_aids_entities.update(
+                published=True,
+                user_published=request.user.username,
+                date_published=timezone.now()
+            )
+        else:
+            finding_aids_entities.update(
+                published=False,
+                user_published="",
+                date_published=None
+            )
         return Response(status=status.HTTP_200_OK)
 
 
