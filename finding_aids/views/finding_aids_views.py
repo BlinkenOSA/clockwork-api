@@ -1,5 +1,7 @@
 import uuid
 
+from django.db.models import Count, IntegerField, OuterRef, Subquery, Value, F
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.filters import SearchFilter
@@ -11,6 +13,7 @@ from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.permissons.allowed_archival_unit_permission import AllowedArchivalUnitPermission
 from container.models import Container
+from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
 from finding_aids.serializers.finding_aids_entity_serializers import FindingAidsSelectSerializer, \
     FindingAidsEntityReadSerializer, FindingAidsEntityWriteSerializer, FindingAidsEntityListSerializer
@@ -43,7 +46,33 @@ class FindingAidsList(generics.ListAPIView):
         """
         container_id = self.kwargs.get('container_id', None)
         if container_id:
+            masters_count = DigitalVersion.objects.filter(
+                finding_aids_entity=OuterRef('pk'),
+                level='M'
+            ).values('finding_aids_entity').annotate(total=Count('id')).values('total')[:1]
+            access_copies_count = DigitalVersion.objects.filter(
+                finding_aids_entity=OuterRef('pk'),
+                level='A'
+            ).values('finding_aids_entity').annotate(total=Count('id')).values('total')[:1]
+            container_digital_versions_count = DigitalVersion.objects.filter(
+                container_id=OuterRef('container_id')
+            ).values('container').annotate(total=Count('id')).values('total')[:1]
+
             return FindingAidsEntity.objects.filter(container_id=container_id, is_template=False)\
+                .annotate(
+                    digital_versions_masters_count=Coalesce(
+                        Subquery(masters_count, output_field=IntegerField()),
+                        Value(0)
+                    ),
+                    digital_versions_access_copies_count=Coalesce(
+                        Subquery(access_copies_count, output_field=IntegerField()),
+                        Value(0)
+                    ),
+                    digital_versions_of_container_count=Coalesce(
+                        Subquery(container_digital_versions_count, output_field=IntegerField()),
+                        Value(0)
+                    )
+                )\
                 .order_by('folder_no', 'sequence_no')
         else:
             return FindingAidsEntity.objects.none()
@@ -398,15 +427,11 @@ def renumber_entries(finding_aids, action):
                                                           description_level='L2',
                                                           folder_no=finding_aids.folder_no).count()
             if item_count == 0:
-                for folder in folders:
-                    folder.folder_no -= 1
-                    folder.save()
+                folders.update(folder_no=F('folder_no') - 1)
 
         # Clone L1 entities
         else:
-            for folder in folders:
-                folder.folder_no += 1
-                folder.save()
+            folders.update(folder_no=F('folder_no') + 1)
 
     # L2 entities
     else:
@@ -423,15 +448,9 @@ def renumber_entries(finding_aids, action):
                                                           description_level='L2',
                                                           folder_no=finding_aids.folder_no).count()
             if item_count == 0:
-                for folder in folders:
-                    folder.folder_no -= 1
-                    folder.save()
+                folders.update(folder_no=F('folder_no') - 1)
             else:
-                for item in items:
-                    item.sequence_no -= 1
-                    item.save()
+                items.update(sequence_no=F('sequence_no') - 1)
         # Clone entities
         else:
-            for item in items:
-                item.sequence_no += 1
-                item.save()
+            items.update(sequence_no=F('sequence_no') + 1)
