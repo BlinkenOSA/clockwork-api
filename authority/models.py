@@ -5,7 +5,6 @@ from django.utils import timezone
 
 from authority.helpers.similarity_helpers import fold, simhash64
 from authority.services.wikidata_cache import get_wikidata_entity_payload
-from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 
 class WikidataCacheMixin(models.Model):
