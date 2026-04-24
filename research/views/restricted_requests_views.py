@@ -171,7 +171,8 @@ class RestrictedRequestAction(APIView):
                 request_item=request_item_part.request_item_id
             ).count()
             request_item_part_rejected_count = RequestItemPart.objects.filter(
-                request_item=request_item_part.request_item_id
+                request_item=request_item_part.request_item_id,
+                status='rejected'
             ).count()
             if request_item_part_rejected_count > 0 and request_item_part_count == request_item_part_rejected_count:
                 request_item_part.request_item.status = '4'
