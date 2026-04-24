@@ -39,13 +39,15 @@ class WikidataView(APIView):
         payload = self._get_local_cached_payload(wikidata_id)
         if payload:
             return Response(payload)
+        else:
+            return Response(status=HTTP_404_NOT_FOUND)
 
-        payload = get_wikidata_entity_payload(wikidata_id)
-        if payload:
-            self._store_payload_on_authority_record(wikidata_id, payload)
-            return Response(payload)
+        # payload = get_wikidata_entity_payload(wikidata_id)
+        # if payload:
+        #    self._store_payload_on_authority_record(wikidata_id, payload)
+        #    return Response(payload)
 
-        return Response(status=HTTP_404_NOT_FOUND)
+        # return Response(status=HTTP_404_NOT_FOUND)
 
     def _get_local_cached_payload(self, wikidata_id: str):
         for model in AUTHORITY_MODELS:
