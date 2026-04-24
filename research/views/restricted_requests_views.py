@@ -149,8 +149,6 @@ class RestrictedRequestAction(APIView):
             elif action == 'reject':
                 request_item_part.status = 'rejected'
                 decision = 'Access denied'
-                request_item_part.request_item.status = '4'
-                request_item_part.request_item.save()
             elif action == 'lift':
                 request_item_part.status = 'lifted'
                 decision = 'Access granted'
@@ -167,6 +165,17 @@ class RestrictedRequestAction(APIView):
             request_item_part.decision_date = datetime.datetime.now()
             request_item_part.decision_by = request.user.username
             request_item_part.save()
+
+            # If all the request_item_part are rejected, then set the RequestItem to 'Returned'
+            request_item_part_count = RequestItemPart.objects.filter(
+                request_item=request_item_part.request_item_id
+            ).count()
+            request_item_part_rejected_count = RequestItemPart.objects.filter(
+                request_item=request_item_part.request_item_id
+            ).count()
+            if request_item_part_rejected_count > 0 and request_item_part_count == request_item_part_rejected_count:
+                request_item_part.request_item.status = '4'
+                request_item_part.request_item.save()
 
             if action != 'undo':
                 mail = EmailWithTemplate(
