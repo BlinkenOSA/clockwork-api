@@ -1,12 +1,63 @@
 import unicodedata
 
 from django.db import models
+from django.utils import timezone
 
 from authority.helpers.similarity_helpers import fold, simhash64
+from authority.services.wikidata_cache import get_wikidata_entity_payload
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 
 
-class Country(models.Model):
+class WikidataCacheMixin(models.Model):
+    """
+    Abstract mixin for authority records linked to Wikidata.
+
+    The cached payload stores the frontend-ready structure that the catalog
+    endpoint needs, so catalog requests can avoid hitting Wikidata directly
+    for records we already manage locally.
+    """
+
+    wikidata_cache = models.JSONField(blank=True, null=True)
+    wikidata_cache_updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        previous_wikidata_id = None
+        if self.pk:
+            previous_wikidata_id = type(self).objects.filter(pk=self.pk).values_list('wikidata_id', flat=True).first()
+
+        refresh_cache = bool(self.wikidata_id) and self.wikidata_id != previous_wikidata_id
+        clear_cache = bool(previous_wikidata_id) and not self.wikidata_id
+
+        super().save(*args, **kwargs)
+
+        updates = {}
+        if clear_cache:
+            updates = {
+                'wikidata_cache': None,
+                'wikidata_cache_updated_at': None,
+            }
+        elif refresh_cache:
+            try:
+                payload = get_wikidata_entity_payload(self.wikidata_id)
+            except Exception:
+                payload = None
+
+            if payload:
+                updates = {
+                    'wikidata_cache': payload,
+                    'wikidata_cache_updated_at': timezone.now(),
+                }
+
+        if updates:
+            type(self).objects.filter(pk=self.pk).update(**updates)
+            for field, value in updates.items():
+                setattr(self, field, value)
+
+
+class Country(WikidataCacheMixin, models.Model):
     """
     Represents a country authority record.
 
@@ -70,7 +121,7 @@ class Country(models.Model):
         ordering = ['country']
 
 
-class Language(models.Model):
+class Language(WikidataCacheMixin, models.Model):
     """
     Represents a language authority record.
 
@@ -141,7 +192,7 @@ class Language(models.Model):
         ordering = ['language']
 
 
-class Place(models.Model):
+class Place(WikidataCacheMixin, models.Model):
     """
     Represents a controlled-vocabulary place authority entry.
 
@@ -201,7 +252,7 @@ class Place(models.Model):
         ordering = ['place']
 
 
-class Person(models.Model):
+class Person(WikidataCacheMixin, models.Model):
     """
     Represents a person authority entry used in controlled vocabularies.
 
@@ -335,7 +386,7 @@ class PersonOtherFormat(models.Model):
         unique_together = ('last_name', 'first_name', 'person')
 
 
-class Corporation(models.Model):
+class Corporation(WikidataCacheMixin, models.Model):
     """
     Represents a corporate body authority entry.
 
@@ -437,7 +488,7 @@ class CorporationOtherFormat(models.Model):
         unique_together = ('corporation', 'name')
 
 
-class Genre(models.Model):
+class Genre(WikidataCacheMixin, models.Model):
     """
     Represents a genre authority entry.
 
@@ -502,7 +553,7 @@ class Genre(models.Model):
         ordering = ['genre']
 
 
-class Subject(models.Model):
+class Subject(WikidataCacheMixin, models.Model):
     """
     Represents a subject authority entry.
 
