@@ -1,16 +1,23 @@
 from rest_framework.reverse import reverse
+
+from authority.tests.helpers import make_country
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 
-from authority.models import Country
+from donor.tests.helpers import make_donor
 
 
 class DonorViewTest(TestViewsBaseClass):
     """ Testing Donor endpoints """
-    fixtures = ['donor']
-
     def setUp(self):
         super().setUp()
-        self.country = Country.objects.get(pk=46)
+        self.country = make_country(alpha2='CZ', alpha3='CZE', country='Czech Republic')
+        self.donor = make_donor(
+            corporation_name="Research Support Scheme",
+            first_name="",
+            last_name="",
+            email='oziris.ceu.hu',
+            country=self.country
+        )
 
     def test_filter_class(self):
         response = self.client.get(reverse('donor-v1:donor-list'), {'search': 'support scheme'})

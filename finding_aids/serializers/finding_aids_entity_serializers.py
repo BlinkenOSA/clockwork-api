@@ -189,18 +189,24 @@ class FindingAidsEntityListSerializer(serializers.ModelSerializer):
         """
         Returns the count of master digital versions associated with the finding aids record.
         """
+        if hasattr(obj, 'digital_versions_masters_count'):
+            return obj.digital_versions_masters_count
         return DigitalVersion.objects.filter(finding_aids_entity=obj, level='M').count()
 
     def get_digital_versions_access_copies(self, obj):
         """
         Returns the count of access copy digital versions associated with the finding aids record.
         """
+        if hasattr(obj, 'digital_versions_access_copies_count'):
+            return obj.digital_versions_access_copies_count
         return DigitalVersion.objects.filter(finding_aids_entity=obj, level='A').count()
 
     def get_digital_versions_of_container(self, obj):
         """
         Returns the count of digital versions associated with container entities of the finding aids record.
         """
+        if hasattr(obj, 'digital_versions_of_container_count'):
+            return obj.digital_versions_of_container_count
         return DigitalVersion.objects.filter(container=obj.container).count()
 
     class Meta:

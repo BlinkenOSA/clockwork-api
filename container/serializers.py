@@ -86,12 +86,16 @@ class ContainerListSerializer(serializers.ModelSerializer):
         """
         Returns the number of non-template finding-aid entities in the container.
         """
+        if hasattr(obj, 'total_number_count'):
+            return obj.total_number_count
         return FindingAidsEntity.objects.filter(container=obj).exclude(is_template=True).count()
 
     def get_total_published_number(self, obj):
         """
         Returns the number of published, non-template finding-aid entities in the container.
         """
+        if hasattr(obj, 'total_published_number_count'):
+            return obj.total_published_number_count
         return FindingAidsEntity.objects.filter(container=obj, published=True).exclude(is_template=True).count()
 
     def get_reference_code(self, obj):
@@ -107,18 +111,24 @@ class ContainerListSerializer(serializers.ModelSerializer):
         """
         Returns the count of master digital versions associated with the container.
         """
+        if hasattr(obj, 'digital_versions_masters_count'):
+            return obj.digital_versions_masters_count
         return DigitalVersion.objects.filter(container=obj, finding_aids_entity__isnull=True, level='M').count()
 
     def get_digital_versions_access_copies(self, obj):
         """
         Returns the count of access copy digital versions associated with the container.
         """
+        if hasattr(obj, 'digital_versions_access_copies_count'):
+            return obj.digital_versions_access_copies_count
         return DigitalVersion.objects.filter(container=obj, finding_aids_entity__isnull=True, level='A').count()
 
     def get_digital_versions_in_finding_aids(self, obj):
         """
         Returns the count of digital versions associated with finding-aid entities in the container.
         """
+        if hasattr(obj, 'digital_versions_in_finding_aids_count'):
+            return obj.digital_versions_in_finding_aids_count
         return DigitalVersion.objects.filter(finding_aids_entity__container=obj).count()
 
     class Meta:

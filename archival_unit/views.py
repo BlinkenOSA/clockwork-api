@@ -1,5 +1,7 @@
 from django.db.models import QuerySet
+from django.db.models import Count, IntegerField, OuterRef, Subquery, Value
 from django.db.models.query_utils import Q
+from django.db.models.functions import Coalesce
 from rest_framework import generics
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -12,6 +14,23 @@ from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnit
 from clockwork_api.mixins.allowed_archival_unit_mixin import ListAllowedArchivalUnitMixin
 from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
+from container.models import Container
+from finding_aids.models import FindingAidsEntity
+
+
+def annotate_archival_unit_select_counts(queryset: QuerySet[ArchivalUnit]) -> QuerySet[ArchivalUnit]:
+    container_count = Container.objects.filter(
+        archival_unit=OuterRef('pk')
+    ).values('archival_unit').annotate(total=Count('id')).values('total')[:1]
+    folder_count = FindingAidsEntity.objects.filter(
+        archival_unit=OuterRef('pk'),
+        is_template=False
+    ).values('archival_unit').annotate(total=Count('id')).values('total')[:1]
+
+    return queryset.annotate(
+        container_count_value=Coalesce(Subquery(container_count, output_field=IntegerField()), Value(0)),
+        folder_count_value=Coalesce(Subquery(folder_count, output_field=IntegerField()), Value(0))
+    )
 
 
 class ArchivalUnitFilterClass(filters.FilterSet):
@@ -126,7 +145,9 @@ class ArchivalUnitSelectList(ListAllowedArchivalUnitMixin, generics.ListAPIView)
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filterset_fields = ('fonds', 'subfonds', 'series', 'level', 'parent')
     search_fields = ['title', 'reference_code']
-    queryset = ArchivalUnit.objects.all().order_by('fonds', 'subfonds', 'series')
+    queryset = annotate_archival_unit_select_counts(
+        ArchivalUnit.objects.all().order_by('fonds', 'subfonds', 'series')
+    )
 
 
 class ArchivalUnitSelectByParentList(generics.ListAPIView):
@@ -171,15 +192,15 @@ class ArchivalUnitSelectByParentList(generics.ListAPIView):
                 allowed_parents = ArchivalUnit.objects.filter(
                     id__in=allowed_qs.values_list("parent_id", flat=True)
                 )
-                return allowed_parents & subfonds_qs
+                return annotate_archival_unit_select_counts(allowed_parents & subfonds_qs)
 
             # Subfonds → return permitted series
             if parent_unit.level == "SF":
                 series_qs = ArchivalUnit.objects.filter(parent_id=parent_id)
-                return series_qs & allowed_qs
+                return annotate_archival_unit_select_counts(series_qs & allowed_qs)
 
         # If the user has no restrictions
         if parent_id:
-            return ArchivalUnit.objects.filter(parent_id=parent_id)
+            return annotate_archival_unit_select_counts(ArchivalUnit.objects.filter(parent_id=parent_id))
 
         return ArchivalUnit.objects.none()

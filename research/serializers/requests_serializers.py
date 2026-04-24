@@ -1,5 +1,4 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
@@ -83,6 +82,11 @@ class RequestListSerializer(serializers.ModelSerializer):
     digital_version_barcode = serializers.SerializerMethodField()
     parts = RequestItemPartSerializer(source='requestitempart_set', many=True)
 
+    def _get_mlr_cache(self):
+        if 'mlr_by_series_carrier' not in self.context:
+            self.context['mlr_by_series_carrier'] = {}
+        return self.context['mlr_by_series_carrier']
+
     def get_mlr(self, obj):
         """
         Returns a display string indicating item location/availability.
@@ -101,29 +105,32 @@ class RequestListSerializer(serializers.ModelSerializer):
             - Otherwise returns ``'Library Record'``.
         """
         if obj.item_origin == 'FA':
-            same_archival_request = RequestItem.objects.filter(
-                item_origin='FA', container=obj.container).exclude(id=obj.id)
-            if same_archival_request.filter(status='3').exists():
+            if getattr(obj, 'has_same_fa_status_3', False):
                 return 'Currently used'
-            if same_archival_request.filter(status='4').exists():
+            if getattr(obj, 'has_same_fa_status_4', False):
                 return 'Waiting to be reshelved'
 
         else:
-            same_library_request = RequestItem.objects.filter(
-                identifier=obj.identifier).exclude(id=obj.id, item_origin='FA')
-            if same_library_request.filter(status='3').exists():
+            if getattr(obj, 'has_same_non_fa_status_3', False):
                 return 'Currently used'
-            if same_library_request.filter(status='4').exists():
+            if getattr(obj, 'has_same_non_fa_status_4', False):
                 return 'Waiting to be reshelved'
 
         if obj.item_origin == 'FA':
             if obj.container:
                 series = obj.container.archival_unit
                 carrier_type = obj.container.carrier_type
+                mlr_key = (series.id, carrier_type.id)
+                mlr_cache = self._get_mlr_cache()
+                if mlr_key in mlr_cache:
+                    return mlr_cache[mlr_key]
                 try:
                     mlr = MLREntity.objects.get(series=series, carrier_type=carrier_type)
-                    return mlr.get_locations()
+                    mlr_locations = mlr.get_locations()
+                    mlr_cache[mlr_key] = mlr_locations
+                    return mlr_locations
                 except ObjectDoesNotExist:
+                    mlr_cache[mlr_key] = ''
                     return ''
             else:
                 return ''
@@ -134,10 +141,9 @@ class RequestListSerializer(serializers.ModelSerializer):
         """
         Returns True if any Finding Aids entities in the requested container is restricted.
         """
-        return FindingAidsEntity.objects.filter(
-            container=obj.container,
-            access_rights__statement='Restricted'
-        ).count() > 0
+        if hasattr(obj, 'has_restricted_content_flag'):
+            return obj.has_restricted_content_flag
+        return FindingAidsEntity.objects.filter(container=obj.container, access_rights__statement='Restricted').exists()
 
     def get_research_allowed(self, obj):
         """
@@ -154,12 +160,23 @@ class RequestListSerializer(serializers.ModelSerializer):
         bool
             True if research should be allowed, otherwise False.
         """
-        count_total = obj.requestitempart_set.count()
-        count_not_restricted = obj.requestitempart_set.filter(
-            finding_aids_entity__access_rights__statement='Not restricted'
-        ).count()
-        count_new = obj.requestitempart_set.filter(Q(status='new')).count()
-        count_approved = obj.requestitempart_set.filter(Q(status='approved') | Q(status='approved_on_site')).count()
+        prefetched_parts = getattr(obj, '_prefetched_objects_cache', {}).get('requestitempart_set')
+        if prefetched_parts is not None:
+            count_total = len(prefetched_parts)
+            count_not_restricted = sum(
+                1 for part in prefetched_parts
+                if part.finding_aids_entity.access_rights and
+                part.finding_aids_entity.access_rights.statement == 'Not restricted'
+            )
+            count_new = sum(1 for part in prefetched_parts if part.status == 'new')
+            count_approved = sum(1 for part in prefetched_parts if part.status in ('approved', 'approved_on_site'))
+        else:
+            count_total = obj.requestitempart_set.count()
+            count_not_restricted = obj.requestitempart_set.filter(
+                finding_aids_entity__access_rights__statement='Not restricted'
+            ).count()
+            count_new = obj.requestitempart_set.filter(status='new').count()
+            count_approved = obj.requestitempart_set.filter(status__in=['approved', 'approved_on_site']).count()
 
         # If all the records are not restricted
         if count_not_restricted == count_total:
