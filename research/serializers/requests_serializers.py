@@ -147,6 +147,7 @@ class RequestListSerializer(serializers.ModelSerializer):
             - If all parts are not restricted: allowed.
             - If there are some not restricted and no parts in 'new' status: allowed.
             - If at least one part is approved (approved/approved_on_site) and no parts are 'new': allowed.
+            - If all parts are 'rejected': allowed.
             - Otherwise: not allowed.
 
         Returns
@@ -160,6 +161,7 @@ class RequestListSerializer(serializers.ModelSerializer):
         ).count()
         count_new = obj.requestitempart_set.filter(Q(status='new')).count()
         count_approved = obj.requestitempart_set.filter(Q(status='approved') | Q(status='approved_on_site')).count()
+        count_rejected = obj.requestitempart_set.filter(Q(status='rejected')).count()
 
         # If all the records are not restricted
         if count_not_restricted == count_total:
@@ -170,6 +172,10 @@ class RequestListSerializer(serializers.ModelSerializer):
 
         # If there is at least one approved and no new one
         if count_approved > 0 and count_new == 0:
+            return True
+
+        # If all the records are rejected (this way the status of the request is already 'Returned')
+        if count_rejected == count_total:
             return True
 
         return False
