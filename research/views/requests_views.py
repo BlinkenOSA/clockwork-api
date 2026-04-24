@@ -2,7 +2,6 @@ import datetime
 import json
 
 from clockwork_api.http import get
-from django.db.models import Exists, OuterRef, Prefetch
 from requests.exceptions import RequestException
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
@@ -19,7 +18,7 @@ from clockwork_api.mailer.email_with_template import EmailWithTemplate
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.pagination import DropDownResultSetPagination
 from container.models import Container
-from research.models import RequestItem, Request, RequestItemPart
+from research.models import RequestItem, Request
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
     RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer
 from django_filters import rest_framework as filters
@@ -127,50 +126,6 @@ class RequestFilterClass(filters.FilterSet):
             )
 
 
-def optimize_request_items_queryset(qs):
-    same_fa_status_3 = RequestItem.objects.filter(
-        item_origin='FA',
-        container_id=OuterRef('container_id'),
-        status='3'
-    ).exclude(id=OuterRef('id'))
-    same_fa_status_4 = RequestItem.objects.filter(
-        item_origin='FA',
-        container_id=OuterRef('container_id'),
-        status='4'
-    ).exclude(id=OuterRef('id'))
-    same_non_fa_status_3 = RequestItem.objects.filter(
-        identifier=OuterRef('identifier'),
-        status='3'
-    ).exclude(item_origin='FA').exclude(id=OuterRef('id'))
-    same_non_fa_status_4 = RequestItem.objects.filter(
-        identifier=OuterRef('identifier'),
-        status='4'
-    ).exclude(item_origin='FA').exclude(id=OuterRef('id'))
-    restricted_in_container = Container.objects.filter(
-        id=OuterRef('container_id'),
-        findingaidsentity__access_rights__statement='Restricted'
-    )
-
-    return qs.select_related(
-        'request',
-        'request__researcher',
-        'container',
-        'container__archival_unit',
-        'container__carrier_type'
-    ).prefetch_related(
-        Prefetch(
-            'requestitempart_set',
-            queryset=RequestItemPart.objects.select_related('finding_aids_entity__access_rights')
-        )
-    ).annotate(
-        has_same_fa_status_3=Exists(same_fa_status_3),
-        has_same_fa_status_4=Exists(same_fa_status_4),
-        has_same_non_fa_status_3=Exists(same_non_fa_status_3),
-        has_same_non_fa_status_4=Exists(same_non_fa_status_4),
-        has_restricted_content_flag=Exists(restricted_in_container)
-    )
-
-
 class RequestsList(generics.ListAPIView):
     """
     Lists research request items.
@@ -183,6 +138,7 @@ class RequestsList(generics.ListAPIView):
         - Ordering over operational workflow fields
     """
 
+    queryset = RequestItem.objects.all().order_by('-request__created_date')
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_class = RequestFilterClass
     search_fields = [
@@ -202,11 +158,6 @@ class RequestsList(generics.ListAPIView):
         'reshelve_date'
     ]
     serializer_class = RequestListSerializer
-
-    def get_queryset(self):
-        return optimize_request_items_queryset(
-            RequestItem.objects.all().order_by('-request__created_date')
-        )
 
 
 class RequestsCreate(CreateAPIView):
@@ -262,9 +213,9 @@ class RequestsListForPrint(generics.ListAPIView):
         Returns:
             A queryset of pending (status='2') request items ordered by request date.
         """
-        return optimize_request_items_queryset(
-            RequestItem.objects.filter(status='2').order_by('request__request_date')
-        )
+        return RequestItem.objects.filter(
+            status='2'
+        ).order_by('request__request_date')
 
 
 class RequestItemStatusStep(APIView):
