@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from research.models import Researcher, ResearcherVisit
+from research.models import Researcher, ResearcherVisit, RequestItem
 
 
 def get_filtered_queryset_by_date(queryset, field_name, request):
@@ -54,6 +54,10 @@ def get_month_range(date_from, date_to):
         else:
             current = date(current.year, current.month + 1, 1)
     return months
+
+
+def get_choice_label_mapping(choices):
+    return dict(choices)
 
 
 class ResearcherRegistrationStatisticsViews(APIView):
@@ -173,4 +177,69 @@ class ResearcherVisitStatisticsViews(APIView):
             'total_visits': queryset.count(),
             'total_hours': round(total_seconds / 3600, 2),
             'by_month': by_month,
+        })
+
+
+class RequestedMaterialsByOriginStatisticsViews(APIView):
+    """
+    Returns requested material totals grouped by request item origin label.
+
+    The optional date filters are applied to ``request.created_date``.
+    """
+
+    def get(self, request, *args, **kwargs):
+        queryset, _, _, error_response = get_filtered_queryset_by_date(
+            RequestItem.objects.all(),
+            'request__created_date',
+            request
+        )
+        if error_response:
+            return error_response
+
+        origin_labels = get_choice_label_mapping(RequestItem.ORIGIN)
+        by_origin = [
+            {
+                'item_origin': origin_labels.get(item['item_origin'], item['item_origin']),
+                'total': item['total']
+            }
+            for item in queryset.values('item_origin')
+            .annotate(total=Count('id'))
+            .order_by('item_origin')
+        ]
+
+        return Response({
+            'total': queryset.count(),
+            'by_item_origin': by_origin,
+        })
+
+
+class RequestedMaterialsByCarrierTypeStatisticsViews(APIView):
+    """
+    Returns requested material totals grouped by the container carrier type.
+
+    The optional date filters are applied to ``request.created_date``.
+    """
+
+    def get(self, request, *args, **kwargs):
+        queryset, _, _, error_response = get_filtered_queryset_by_date(
+            RequestItem.objects.all(),
+            'request__created_date',
+            request
+        )
+        if error_response:
+            return error_response
+
+        by_carrier_type = [
+            {
+                'carrier_type': item['container__carrier_type__type'] or 'Unknown',
+                'total': item['total']
+            }
+            for item in queryset.values('container__carrier_type__type')
+            .annotate(total=Count('id'))
+            .order_by('container__carrier_type__type')
+        ]
+
+        return Response({
+            'total': queryset.count(),
+            'by_carrier_type': by_carrier_type,
         })

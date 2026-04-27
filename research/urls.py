@@ -11,7 +11,8 @@ from research.views.researcher_visit_views import ResearcherVisitsList, Research
 from research.views.researcher_degree_views import ResearcherDegreeList, ResearcherDegreeDetail, \
     ResearcherDegreeSelectList
 from research.views.restricted_requests_views import RestrictedRequestsList, RestrictedRequestAction
-from research.views.statistics_view import ResearcherRegistrationStatisticsViews, ResearcherVisitStatisticsViews
+from research.views.statistics_view import ResearcherRegistrationStatisticsViews, ResearcherVisitStatisticsViews, \
+    RequestedMaterialsByOriginStatisticsViews, RequestedMaterialsByCarrierTypeStatisticsViews
 
 app_name = 'research'
 
@@ -35,6 +36,10 @@ urlpatterns = [
          name='researcher-registration-statistics'),
     path('statistics/researcher-visits/', ResearcherVisitStatisticsViews.as_view(),
          name='researcher-visit-statistics'),
+    path('statistics/requested-materials/origin/', RequestedMaterialsByOriginStatisticsViews.as_view(),
+         name='requested-materials-by-origin-statistics'),
+    path('statistics/requested-materials/carrier-type/', RequestedMaterialsByCarrierTypeStatisticsViews.as_view(),
+         name='requested-materials-by-carrier-type-statistics'),
 
     path('degree', ResearcherDegreeList.as_view(), name='researcher-degree-list'),
     path('degree/<int:pk>/', ResearcherDegreeDetail.as_view(), name='researher-degree-detail'),
