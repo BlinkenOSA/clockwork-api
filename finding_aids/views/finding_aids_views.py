@@ -427,11 +427,15 @@ def renumber_entries(finding_aids, action):
                                                           description_level='L2',
                                                           folder_no=finding_aids.folder_no).count()
             if item_count == 0:
-                folders.update(folder_no=F('folder_no') - 1)
+                for folder in folders:
+                    folder.folder_no -= 1
+                    folder.save()
 
         # Clone L1 entities
         else:
-            folders.update(folder_no=F('folder_no') + 1)
+            for folder in folders:
+                folder.folder_no += 1
+                folder.save()
 
     # L2 entities
     else:
@@ -448,9 +452,15 @@ def renumber_entries(finding_aids, action):
                                                           description_level='L2',
                                                           folder_no=finding_aids.folder_no).count()
             if item_count == 0:
-                folders.update(folder_no=F('folder_no') - 1)
+                for folder in folders:
+                    folder.folder_no -= 1
+                    folder.save()
             else:
-                items.update(sequence_no=F('sequence_no') - 1)
+                for item in items:
+                    item.sequence_no -= 1
+                    item.save()
         # Clone entities
         else:
-            items.update(sequence_no=F('sequence_no') + 1)
+            for item in items:
+                item.sequence_no += 1
+                item.save()
