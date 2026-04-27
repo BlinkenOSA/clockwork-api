@@ -33,13 +33,7 @@ class WikidataViewTests(TestCase):
         self.assertEqual(response.data, payload)
         mock_get_payload.assert_not_called()
 
-    def test_get_fetches_live_payload_when_cache_missing_and_stores_it(self):
-        payload = {
-            "title": "Hungary",
-            "description": "country in Central Europe",
-            "wikipedia": "https://en.wikipedia.org/wiki/Hungary",
-            "properties": {"image": "https://img.test/hungary.jpg"},
-        }
+    def test_get_returns_404_when_cache_missing_even_if_live_payload_would_exist(self):
         with patch("authority.models.get_wikidata_entity_payload", return_value=None):
             country = Country.objects.create(
                 alpha3="HUN",
@@ -49,17 +43,16 @@ class WikidataViewTests(TestCase):
 
         with patch(
             "catalog.views.facet_info_views.wikidata_view.get_wikidata_entity_payload",
-            return_value=payload,
+            return_value={"title": "Hungary"},
         ) as mock_get_payload:
             response = WikidataView.as_view()(self.factory.get("/v1/catalog/wikidata/Q28/"), wikidata_id="Q28")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, payload)
-        mock_get_payload.assert_called_once_with("Q28")
+        self.assertEqual(response.status_code, 404)
+        mock_get_payload.assert_not_called()
 
         country.refresh_from_db()
-        self.assertEqual(country.wikidata_cache, payload)
-        self.assertIsNotNone(country.wikidata_cache_updated_at)
+        self.assertIsNone(country.wikidata_cache)
+        self.assertIsNone(country.wikidata_cache_updated_at)
 
     def test_get_returns_404_when_neither_cache_nor_live_payload_is_available(self):
         with patch(
