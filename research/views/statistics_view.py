@@ -266,7 +266,7 @@ class MostRequestedArchivalUnitsStatisticsViews(APIView):
             queryset.values(
                 'container__archival_unit__id',
                 'container__archival_unit__reference_code',
-                'container__archival_unit__title',
+                'container__archival_unit__title_full',
             )
             .annotate(total=Count('id'))
             .order_by('-total', 'container__archival_unit__reference_code')[:10]
@@ -278,7 +278,7 @@ class MostRequestedArchivalUnitsStatisticsViews(APIView):
                 {
                     'id': item['container__archival_unit__id'],
                     'reference_code': item['container__archival_unit__reference_code'],
-                    'title': item['container__archival_unit__title'],
+                    'title': item['container__archival_unit__title_full'],
                     'total': item['total'],
                 }
                 for item in top_archival_units
