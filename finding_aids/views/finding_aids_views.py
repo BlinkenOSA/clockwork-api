@@ -416,17 +416,6 @@ def renumber_entries(finding_aids, action):
             - for clone, increment sequence_no for subsequent items in the same folder
     """
 
-    def _refresh_reference_codes(entity_ids):
-        if not entity_ids:
-            return
-
-        entities = list(
-            FindingAidsEntity.objects.filter(id__in=entity_ids).select_related('container__archival_unit')
-        )
-        for entity in entities:
-            entity.set_reference_code()
-        FindingAidsEntity.objects.bulk_update(entities, ['archival_reference_code'])
-
     # L1 entities
     if finding_aids.description_level == 'L1':
         folders = FindingAidsEntity.objects.filter(container=finding_aids.container,
@@ -438,15 +427,15 @@ def renumber_entries(finding_aids, action):
                                                           description_level='L2',
                                                           folder_no=finding_aids.folder_no).count()
             if item_count == 0:
-                folder_ids = list(folders.values_list('id', flat=True))
-                FindingAidsEntity.objects.filter(id__in=folder_ids).update(folder_no=F('folder_no') - 1)
-                _refresh_reference_codes(folder_ids)
+                for folder in folders:
+                    folder.folder_no -= 1
+                    folder.save()
 
         # Clone L1 entities
         else:
-            folder_ids = list(folders.values_list('id', flat=True))
-            FindingAidsEntity.objects.filter(id__in=folder_ids).update(folder_no=F('folder_no') + 1)
-            _refresh_reference_codes(folder_ids)
+            for folder in folders:
+                folder.folder_no += 1
+                folder.save()
 
     # L2 entities
     else:
@@ -463,15 +452,15 @@ def renumber_entries(finding_aids, action):
                                                           description_level='L2',
                                                           folder_no=finding_aids.folder_no).count()
             if item_count == 0:
-                folder_ids = list(folders.values_list('id', flat=True))
-                FindingAidsEntity.objects.filter(id__in=folder_ids).update(folder_no=F('folder_no') - 1)
-                _refresh_reference_codes(folder_ids)
+                for folder in folders:
+                    folder.folder_no -= 1
+                    folder.save()
             else:
-                item_ids = list(items.values_list('id', flat=True))
-                FindingAidsEntity.objects.filter(id__in=item_ids).update(sequence_no=F('sequence_no') - 1)
-                _refresh_reference_codes(item_ids)
+                for item in items:
+                    item.sequence_no -= 1
+                    item.save()
         # Clone entities
         else:
-            item_ids = list(items.values_list('id', flat=True))
-            FindingAidsEntity.objects.filter(id__in=item_ids).update(sequence_no=F('sequence_no') + 1)
-            _refresh_reference_codes(item_ids)
+            for item in items:
+                item.sequence_no += 1
+                item.save()
