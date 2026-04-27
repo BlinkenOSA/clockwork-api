@@ -243,3 +243,44 @@ class RequestedMaterialsByCarrierTypeStatisticsViews(APIView):
             'total': queryset.count(),
             'by_carrier_type': by_carrier_type,
         })
+
+
+class MostRequestedArchivalUnitsStatisticsViews(APIView):
+    """
+    Returns the top 10 most requested archival units.
+
+    The optional date filters are applied to ``request.created_date``.
+    Only request items linked to a container archival unit are included.
+    """
+
+    def get(self, request, *args, **kwargs):
+        queryset, _, _, error_response = get_filtered_queryset_by_date(
+            RequestItem.objects.filter(container__archival_unit__isnull=False),
+            'request__created_date',
+            request
+        )
+        if error_response:
+            return error_response
+
+        top_archival_units = list(
+            queryset.values(
+                'container__archival_unit__id',
+                'container__archival_unit__reference_code',
+                'container__archival_unit__title',
+            )
+            .annotate(total=Count('id'))
+            .order_by('-total', 'container__archival_unit__reference_code')[:10]
+        )
+
+        return Response({
+            'total': queryset.count(),
+            'archival_units': [
+                {
+                    'id': item['container__archival_unit__id'],
+                    'reference_code': item['container__archival_unit__reference_code'],
+                    'title': item['container__archival_unit__title'],
+                    'total': item['total'],
+                }
+                for item in top_archival_units
+            ],
+        })

@@ -251,6 +251,7 @@ class RequestedMaterialsStatisticsViewsTests(TestViewsBaseClass):
         self.request_new.save(update_fields=['created_date'])
 
         self.archival_unit = ArchivalUnit.objects.create(fonds=1301, level='F', title='Test Fonds')
+        self.second_archival_unit = ArchivalUnit.objects.create(fonds=1302, level='F', title='Second Fonds')
         self.archival_box = CarrierType.objects.create(type='Archival Box', width=10)
         self.vhs_tape = CarrierType.objects.create(type='VHS Tape', width=2)
 
@@ -261,6 +262,10 @@ class RequestedMaterialsStatisticsViewsTests(TestViewsBaseClass):
         self.vhs_container = Container.objects.create(
             archival_unit=self.archival_unit,
             carrier_type=self.vhs_tape,
+        )
+        self.second_archival_box_container = Container.objects.create(
+            archival_unit=self.second_archival_unit,
+            carrier_type=self.archival_box,
         )
 
         RequestItem.objects.create(
@@ -282,16 +287,21 @@ class RequestedMaterialsStatisticsViewsTests(TestViewsBaseClass):
             item_origin='FA',
             container=self.archival_box_container,
         )
+        RequestItem.objects.create(
+            request=self.request_new,
+            item_origin='FA',
+            container=self.second_archival_box_container,
+        )
 
     def test_returns_requested_materials_grouped_by_origin_labels(self):
         response = self.client.get(reverse('research-v1:requested-materials-by-origin-statistics'))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['total'], 4)
+        self.assertEqual(response.data['total'], 5)
         self.assertEqual(
             response.data['by_item_origin'],
             [
-                {'item_origin': 'Finding Aids', 'total': 2},
+                {'item_origin': 'Finding Aids', 'total': 3},
                 {'item_origin': 'Film Library', 'total': 1},
                 {'item_origin': 'Library', 'total': 1},
             ]
@@ -307,11 +317,11 @@ class RequestedMaterialsStatisticsViewsTests(TestViewsBaseClass):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['total'], 3)
+        self.assertEqual(response.data['total'], 4)
         self.assertEqual(
             response.data['by_item_origin'],
             [
-                {'item_origin': 'Finding Aids', 'total': 1},
+                {'item_origin': 'Finding Aids', 'total': 2},
                 {'item_origin': 'Film Library', 'total': 1},
                 {'item_origin': 'Library', 'total': 1},
             ]
@@ -321,12 +331,12 @@ class RequestedMaterialsStatisticsViewsTests(TestViewsBaseClass):
         response = self.client.get(reverse('research-v1:requested-materials-by-carrier-type-statistics'))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['total'], 4)
+        self.assertEqual(response.data['total'], 5)
         self.assertEqual(
             response.data['by_carrier_type'],
             [
                 {'carrier_type': 'Unknown', 'total': 1},
-                {'carrier_type': 'Archival Box', 'total': 2},
+                {'carrier_type': 'Archival Box', 'total': 3},
                 {'carrier_type': 'VHS Tape', 'total': 1},
             ]
         )
@@ -341,12 +351,64 @@ class RequestedMaterialsStatisticsViewsTests(TestViewsBaseClass):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['total'], 3)
+        self.assertEqual(response.data['total'], 4)
         self.assertEqual(
             response.data['by_carrier_type'],
             [
                 {'carrier_type': 'Unknown', 'total': 1},
-                {'carrier_type': 'Archival Box', 'total': 1},
+                {'carrier_type': 'Archival Box', 'total': 2},
                 {'carrier_type': 'VHS Tape', 'total': 1},
+            ]
+        )
+
+    def test_returns_top_requested_archival_units(self):
+        response = self.client.get(reverse('research-v1:most-requested-archival-units-statistics'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['total'], 4)
+        self.assertEqual(
+            response.data['archival_units'],
+            [
+                {
+                    'id': self.archival_unit.id,
+                    'reference_code': self.archival_unit.reference_code,
+                    'title': self.archival_unit.title,
+                    'total': 3,
+                },
+                {
+                    'id': self.second_archival_unit.id,
+                    'reference_code': self.second_archival_unit.reference_code,
+                    'title': self.second_archival_unit.title,
+                    'total': 1,
+                },
+            ]
+        )
+
+    def test_filters_top_requested_archival_units_by_date_interval(self):
+        response = self.client.get(
+            reverse('research-v1:most-requested-archival-units-statistics'),
+            {
+                'date_from': (timezone.now() - timedelta(days=6)).date().isoformat(),
+                'date_to': timezone.now().date().isoformat(),
+            }
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['total'], 3)
+        self.assertEqual(
+            response.data['archival_units'],
+            [
+                {
+                    'id': self.archival_unit.id,
+                    'reference_code': self.archival_unit.reference_code,
+                    'title': self.archival_unit.title,
+                    'total': 2,
+                },
+                {
+                    'id': self.second_archival_unit.id,
+                    'reference_code': self.second_archival_unit.reference_code,
+                    'title': self.second_archival_unit.title,
+                    'total': 1,
+                },
             ]
         )
