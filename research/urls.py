@@ -11,6 +11,7 @@ from research.views.researcher_visit_views import ResearcherVisitsList, Research
 from research.views.researcher_degree_views import ResearcherDegreeList, ResearcherDegreeDetail, \
     ResearcherDegreeSelectList
 from research.views.restricted_requests_views import RestrictedRequestsList, RestrictedRequestAction
+from research.views.statistics_view import ResearcherRegistrationStatisticsViews, ResearcherVisitStatisticsViews
 
 app_name = 'research'
 
@@ -30,6 +31,10 @@ urlpatterns = [
     path('researcher', ResearcherList.as_view(), name='researcher-list'),
     path('researcher/<int:pk>/', ResearcherDetail.as_view(), name='researher-detail'),
     path('researcher/select/', ResearcherSelectList.as_view(), name='researcher-select-list'),
+    path('statistics/researcher-registration/', ResearcherRegistrationStatisticsViews.as_view(),
+         name='researcher-registration-statistics'),
+    path('statistics/researcher-visits/', ResearcherVisitStatisticsViews.as_view(),
+         name='researcher-visit-statistics'),
 
     path('degree', ResearcherDegreeList.as_view(), name='researcher-degree-list'),
     path('degree/<int:pk>/', ResearcherDegreeDetail.as_view(), name='researher-degree-detail'),
