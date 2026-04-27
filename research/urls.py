@@ -33,6 +33,7 @@ urlpatterns = [
     path('researcher', ResearcherList.as_view(), name='researcher-list'),
     path('researcher/<int:pk>/', ResearcherDetail.as_view(), name='researher-detail'),
     path('researcher/select/', ResearcherSelectList.as_view(), name='researcher-select-list'),
+
     path('statistics/researcher-registration/', ResearcherRegistrationStatisticsViews.as_view(),
          name='researcher-registration-statistics'),
     path('statistics/researcher-visits/', ResearcherVisitStatisticsViews.as_view(),

@@ -372,13 +372,13 @@ class RequestedMaterialsStatisticsViewsTests(TestViewsBaseClass):
                 {
                     'id': self.archival_unit.id,
                     'reference_code': self.archival_unit.reference_code,
-                    'title': self.archival_unit.title,
+                    'title': self.archival_unit.title_full,
                     'total': 3,
                 },
                 {
                     'id': self.second_archival_unit.id,
                     'reference_code': self.second_archival_unit.reference_code,
-                    'title': self.second_archival_unit.title,
+                    'title': self.second_archival_unit.title_full,
                     'total': 1,
                 },
             ]
@@ -401,13 +401,13 @@ class RequestedMaterialsStatisticsViewsTests(TestViewsBaseClass):
                 {
                     'id': self.archival_unit.id,
                     'reference_code': self.archival_unit.reference_code,
-                    'title': self.archival_unit.title,
+                    'title': self.archival_unit.title_full,
                     'total': 2,
                 },
                 {
                     'id': self.second_archival_unit.id,
                     'reference_code': self.second_archival_unit.reference_code,
-                    'title': self.second_archival_unit.title,
+                    'title': self.second_archival_unit.title_full,
                     'total': 1,
                 },
             ]
