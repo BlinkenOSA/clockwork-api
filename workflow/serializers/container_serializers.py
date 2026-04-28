@@ -23,7 +23,7 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
     container_no = serializers.IntegerField(read_only=True)
     carrier_type = serializers.SerializerMethodField()
     archival_unit = ArchivalUnitSerializer(read_only=True)
-    digital_versions = DigitalVersionSerializer(read_only=True)
+    digital_versions = DigitalVersionSerializer(many=True, read_only=True)
 
     def get_carrier_type(self, obj):
         """
