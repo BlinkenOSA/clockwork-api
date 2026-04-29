@@ -90,6 +90,8 @@ class RequestListSerializer(serializers.ModelSerializer):
         Behavior depends on origin:
 
         - Finding Aids (FA):
+            - If another request item for the same container is available (status '1' or '2'):
+                returns ``'Appears in another request'``.
             - If another request item for the same container is currently processed (status '3'):
                 returns ``'Currently used'``.
             - If another request item for the same container is returned (status '4'):
@@ -100,9 +102,13 @@ class RequestListSerializer(serializers.ModelSerializer):
             - Checks other request items with the same identifier for usage/return state.
             - Otherwise returns ``'Library Record'``.
         """
+        appears_in_another_request = False
+
         if obj.item_origin == 'FA':
             same_archival_request = RequestItem.objects.filter(
                 item_origin='FA', container=obj.container).exclude(id=obj.id)
+            if same_archival_request.filter(Q(status='1') | Q(status='2')).exists():
+                appears_in_another_request = True
             if same_archival_request.filter(status='3').exists():
                 return 'Currently used'
             if same_archival_request.filter(status='4').exists():
@@ -111,6 +117,8 @@ class RequestListSerializer(serializers.ModelSerializer):
         else:
             same_library_request = RequestItem.objects.filter(
                 identifier=obj.identifier).exclude(id=obj.id, item_origin='FA')
+            if same_library_request.filter(Q(status='1') | Q(status='2')).exists():
+                appears_in_another_request = True
             if same_library_request.filter(status='3').exists():
                 return 'Currently used'
             if same_library_request.filter(status='4').exists():
@@ -122,7 +130,10 @@ class RequestListSerializer(serializers.ModelSerializer):
                 carrier_type = obj.container.carrier_type
                 try:
                     mlr = MLREntity.objects.get(series=series, carrier_type=carrier_type)
-                    return mlr.get_locations()
+                    return {
+                        'locations': mlr.get_locations(),
+                        'another_request': appears_in_another_request
+                    }
                 except ObjectDoesNotExist:
                     return ''
             else:
