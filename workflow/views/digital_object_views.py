@@ -618,6 +618,13 @@ class DigitalObjectUpsert(APIView):
                 defaults=updates
             )
 
+            if dv.container:
+                finding_aids_entities = FindingAidsEntity.objects.filter(
+                    container=dv.container, is_template=False
+                )
+                for finding_aids_entity in finding_aids_entities:
+                    index_catalog_finding_aids_entity.delay(finding_aids_entity.id)
+
             if dv.finding_aids_entity:
                 index_catalog_finding_aids_entity.delay(dv.finding_aids_entity.id)
 
