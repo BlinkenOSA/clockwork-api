@@ -1,4 +1,5 @@
 from datetime import timedelta
+from collections import Counter
 
 from django.utils import timezone
 from rest_framework import status
@@ -55,12 +56,16 @@ class ResearcherRegistrationStatisticsViewsTests(TestViewsBaseClass):
                 {'occupation': 'other', 'total': 2},
             ]
         )
-        self.assertEqual(
-            response.data['by_month'],
-            [
-                {'month': self.old_researcher.date_created.strftime('%Y-%m'), 'total': 3},
-            ]
+        expected_month_totals = Counter(
+            researcher.date_created.strftime('%Y-%m')
+            for researcher in (
+                self.old_researcher,
+                self.mid_researcher,
+                self.new_researcher,
+            )
         )
+        for month, total in expected_month_totals.items():
+            self.assertIn({'month': month, 'total': total}, response.data['by_month'])
 
     def test_filters_by_date_interval(self):
         response = self.client.get(
@@ -160,12 +165,16 @@ class ResearcherVisitStatisticsViewsTests(TestViewsBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['total_visits'], 3)
         self.assertEqual(response.data['total_hours'], 5.0)
-        self.assertEqual(
-            response.data['by_month'],
-            [
-                {'month': self.old_visit.check_in.strftime('%Y-%m'), 'total': 3},
-            ]
+        expected_month_totals = Counter(
+            visit.check_in.strftime('%Y-%m')
+            for visit in (
+                self.old_visit,
+                self.mid_visit,
+                self.open_visit,
+            )
         )
+        for month, total in expected_month_totals.items():
+            self.assertIn({'month': month, 'total': total}, response.data['by_month'])
 
     def test_filters_visits_by_date_interval(self):
         response = self.client.get(
