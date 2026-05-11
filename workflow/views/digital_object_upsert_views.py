@@ -8,7 +8,7 @@ from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
 from workflow.file_name_parser import FileNameParser
 from workflow.permission import APIGroupPermission
-from workflow.serializers.digital_object_serializers import (
+from workflow.serializers.digital_object_request_response_serializers import (
     DigitalObjectUpsertResponseSerializer, DigitalObjectUpsertRequestSerializer,
 )
 from finding_aids.tasks import index_catalog_finding_aids_entity
