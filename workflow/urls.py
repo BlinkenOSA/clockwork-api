@@ -5,7 +5,7 @@ from rest_framework import permissions
 
 from workflow.views.container_views import GetDigitizedContainer, GetContainerMetadata, \
     GetContainerMetadataByLegacyID
-from workflow.views.digital_object_views import DigitalObjectInfo, DigitalObjectUpsert
+from workflow.views.digital_object_views import DigitalObjectUpsert
 from workflow.views.finding_aids_views import GetFAEntityMetadataByItemID
 from workflow.views.translation_view import GetTranslationToOriginal, GetTranslationToEnglish
 
@@ -53,10 +53,6 @@ urlpatterns = [
          DigitalObjectUpsert.as_view(type='access-catalog'), name='digital_object_access_copy_upsert_catalog'),
     path('digital_object/upsert/access/rc/<str:file_name>',
          DigitalObjectUpsert.as_view(type='access-rc'), name='digital_object_access_copy_upsert_rc'),
-
-    # Get back the data for digital object upload
-    path('digital_object/info/<str:access_copy_file>',
-         DigitalObjectInfo.as_view(), name='digital_object_info'),
 
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
