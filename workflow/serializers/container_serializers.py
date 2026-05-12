@@ -92,6 +92,6 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
             'catalog_url',
             'archival_unit',
             'container',
-            'metadata',
-            'digital_versions'
+            'digital_versions',
+            'metadata'
         ]
