@@ -70,3 +70,5 @@ CELERY_TIMEZONE = 'Europe/Brussels'
 
 RESEARCH_ROOM_STAFF_EMAIL = ['example@example.com']
 RESTRICTED_DECISION_MAKER_EMAIL = ['example@example.com']
+
+CATALOG_URL = 'https://catalog.archivum.org/catalog'
