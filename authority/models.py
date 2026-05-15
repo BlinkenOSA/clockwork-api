@@ -22,6 +22,10 @@ class WikidataCacheMixin(models.Model):
     class Meta:
         abstract = True
 
+    @classmethod
+    def normalize_wikidata_payload(cls, payload):
+        return payload
+
     def save(self, *args, **kwargs):
         previous_wikidata_id = None
         if self.pk:
@@ -45,6 +49,7 @@ class WikidataCacheMixin(models.Model):
                 payload = None
 
             if payload:
+                payload = type(self).normalize_wikidata_payload(payload)
                 updates = {
                     'wikidata_cache': payload,
                     'wikidata_cache_updated_at': timezone.now(),
@@ -114,6 +119,16 @@ class Country(WikidataCacheMixin, models.Model):
     def __str__(self) -> str:
         """Returns the cleaned country name."""
         return self.country.strip()
+
+    @classmethod
+    def normalize_wikidata_payload(cls, payload):
+        payload = dict(payload)
+        properties = dict(payload.get('properties') or {})
+        properties.pop('image', None)
+        if 'geoshape' in properties:
+            properties.pop('coordinates', None)
+        payload['properties'] = properties
+        return payload
 
     class Meta:
         db_table = 'authority_countries'

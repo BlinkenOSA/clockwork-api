@@ -80,6 +80,7 @@ class Command(BaseCommand):
                     )
                     continue
 
+                payload = model.normalize_wikidata_payload(payload)
                 model.objects.filter(pk=record.pk).update(
                     wikidata_cache=payload,
                     wikidata_cache_updated_at=timezone.now(),

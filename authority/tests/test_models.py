@@ -24,7 +24,11 @@ class PersonTest(TestCase):
             "title": "Hungary",
             "description": "country in Central Europe",
             "wikipedia": "https://en.wikipedia.org/wiki/Hungary",
-            "properties": {"image": "https://img.test/hungary.jpg"},
+            "properties": {
+                "image": "https://img.test/hungary.jpg",
+                "coordinates": {"lat": 47, "long": 19},
+                "geoshape": {"type": "FeatureCollection", "features": []},
+            },
         }
         mock_get_wikidata_entity_payload.return_value = payload
 
@@ -35,7 +39,15 @@ class PersonTest(TestCase):
         )
 
         country.refresh_from_db()
-        self.assertEqual(country.wikidata_cache, payload)
+        self.assertEqual(
+            country.wikidata_cache,
+            {
+                "title": "Hungary",
+                "description": "country in Central Europe",
+                "wikipedia": "https://en.wikipedia.org/wiki/Hungary",
+                "properties": {"geoshape": {"type": "FeatureCollection", "features": []}},
+            },
+        )
         self.assertIsNotNone(country.wikidata_cache_updated_at)
 
     @patch("authority.models.get_wikidata_entity_payload")
@@ -44,7 +56,11 @@ class PersonTest(TestCase):
             "title": "Hungary",
             "description": "country in Central Europe",
             "wikipedia": "https://en.wikipedia.org/wiki/Hungary",
-            "properties": {"image": "https://img.test/hungary.jpg"},
+            "properties": {
+                "image": "https://img.test/hungary.jpg",
+                "coordinates": {"lat": 47, "long": 19},
+                "geoshape": {"type": "FeatureCollection", "features": []},
+            },
         }
         mock_get_wikidata_entity_payload.return_value = payload
 
@@ -54,7 +70,15 @@ class PersonTest(TestCase):
             wikidata_id="Q28",
         )
         country.refresh_from_db()
-        self.assertEqual(country.wikidata_cache, payload)
+        self.assertEqual(
+            country.wikidata_cache,
+            {
+                "title": "Hungary",
+                "description": "country in Central Europe",
+                "wikipedia": "https://en.wikipedia.org/wiki/Hungary",
+                "properties": {"geoshape": {"type": "FeatureCollection", "features": []}},
+            },
+        )
 
         country.wikidata_id = None
         country.save()
