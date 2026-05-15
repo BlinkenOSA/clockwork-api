@@ -33,6 +33,7 @@ class BackfillWikidataCacheCommandTests(TestCase):
         cached.refresh_from_db()
 
         self.assertEqual(missing_cache.wikidata_cache["title"], "Hungary")
+        self.assertEqual(missing_cache.wikidata_cache["properties"], {})
         self.assertIsNotNone(missing_cache.wikidata_cache_updated_at)
         self.assertEqual(cached.wikidata_cache, {"title": "English"})
         mock_get_wikidata_entity_payload.assert_called_once_with("Q28")
