@@ -125,8 +125,6 @@ class Country(WikidataCacheMixin, models.Model):
         payload = dict(payload)
         properties = dict(payload.get('properties') or {})
         properties.pop('image', None)
-        if 'geoshape' in properties:
-            properties.pop('coordinates', None)
         payload['properties'] = properties
         return payload
 
