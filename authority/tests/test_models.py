@@ -45,7 +45,10 @@ class PersonTest(TestCase):
                 "title": "Hungary",
                 "description": "country in Central Europe",
                 "wikipedia": "https://en.wikipedia.org/wiki/Hungary",
-                "properties": {"geoshape": {"type": "FeatureCollection", "features": []}},
+                "properties": {
+                    "coordinates": {"lat": 47, "long": 19},
+                    "geoshape": {"type": "FeatureCollection", "features": []},
+                },
             },
         )
         self.assertIsNotNone(country.wikidata_cache_updated_at)
@@ -76,7 +79,10 @@ class PersonTest(TestCase):
                 "title": "Hungary",
                 "description": "country in Central Europe",
                 "wikipedia": "https://en.wikipedia.org/wiki/Hungary",
-                "properties": {"geoshape": {"type": "FeatureCollection", "features": []}},
+                "properties": {
+                    "coordinates": {"lat": 47, "long": 19},
+                    "geoshape": {"type": "FeatureCollection", "features": []},
+                },
             },
         )
 
