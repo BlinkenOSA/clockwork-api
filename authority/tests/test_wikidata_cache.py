@@ -73,3 +73,56 @@ class GetWikidataEntityPayloadTests(TestCase):
 
         self.assertEqual(payload["properties"]["geoshape"], geojson)
         self.assertNotIn("geojson", payload["properties"])
+
+    @patch("authority.services.wikidata_cache.time.sleep")
+    @patch("authority.services.wikidata_cache.get")
+    @patch("authority.services.wikidata_cache.Client")
+    def test_geoshape_retries_after_transient_commons_failure(self, mock_client_class, mock_get, mock_sleep):
+        entity = SimpleNamespace(
+            data={
+                "claims": {
+                    "P3896": [
+                        {
+                            "mainsnak": {
+                                "datavalue": {
+                                    "value": "Data:Algeria.map",
+                                }
+                            }
+                        }
+                    ]
+                },
+                "sitelinks": {},
+            },
+            label={"en": "Algeria"},
+            description={"en": "country in North Africa"},
+        )
+        mock_client = Mock()
+        mock_client.get.return_value = entity
+        mock_client_class.return_value = mock_client
+
+        failed_response = Mock(status_code=503, text="maxlag")
+        success_response = Mock(status_code=200)
+        success_response.json.return_value = {
+            "query": {
+                "pages": {
+                    "1": {
+                        "revisions": [
+                            {
+                                "slots": {
+                                    "main": {
+                                        "*": '{"type": "FeatureCollection", "features": []}'
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        mock_get.side_effect = [failed_response, success_response]
+
+        payload = get_wikidata_entity_payload("Q262")
+
+        self.assertEqual(payload["properties"]["geoshape"], {"type": "FeatureCollection", "features": []})
+        self.assertEqual(mock_get.call_count, 2)
+        mock_sleep.assert_called_once_with(1.0)
