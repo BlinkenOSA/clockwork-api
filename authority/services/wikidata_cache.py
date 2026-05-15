@@ -21,6 +21,10 @@ WIKIPEDIA_LINKS = [
     'enwiki', 'huwiki', 'ruwiki', 'plwiki', 'dewiki'
 ]
 
+WIKIMEDIA_HEADERS = {
+    'User-Agent': 'Blinken OSA Archivum - Archival Management System'
+}
+
 
 def _get_commons_map_geojson(data_id):
     params = {
@@ -32,7 +36,7 @@ def _get_commons_map_geojson(data_id):
         'format': 'json'
     }
     try:
-        response = get('https://commons.wikimedia.org/w/api.php', params=params)
+        response = get('https://commons.wikimedia.org/w/api.php', headers=WIKIMEDIA_HEADERS, params=params)
     except RequestException:
         return None
 
@@ -100,7 +104,7 @@ def get_wikidata_entity_payload(wikidata_id: str):
                     'format': 'json'
                 }
                 try:
-                    response = get('https://commons.wikimedia.org/w/api.php', params=params)
+                    response = get('https://commons.wikimedia.org/w/api.php', headers=WIKIMEDIA_HEADERS, params=params)
                 except RequestException:
                     response = None
 
