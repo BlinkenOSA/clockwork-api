@@ -1,4 +1,6 @@
 import json
+import logging
+import time
 
 from clockwork_api.http import get
 from requests.exceptions import RequestException
@@ -25,6 +27,61 @@ WIKIMEDIA_HEADERS = {
     'User-Agent': 'Blinken OSA Archivum - Archival Management System'
 }
 
+COMMONS_API_URL = 'https://commons.wikimedia.org/w/api.php'
+COMMONS_RETRY_STATUS_CODES = {429, 503}
+COMMONS_RETRY_DELAYS = (1.0, 2.0, 5.0)
+
+logger = logging.getLogger(__name__)
+
+
+def _should_retry_commons_response(response):
+    if response.status_code in COMMONS_RETRY_STATUS_CODES:
+        return True
+
+    try:
+        body = response.text.lower()
+    except Exception:
+        body = ''
+
+    return 'maxlag' in body
+
+
+def _get_commons_response(params):
+    last_response = None
+
+    for attempt, delay in enumerate((0,) + COMMONS_RETRY_DELAYS):
+        if delay:
+            time.sleep(delay)
+
+        try:
+            response = get(COMMONS_API_URL, headers=WIKIMEDIA_HEADERS, params=params)
+        except RequestException as exc:
+            logger.warning("Commons API request failed on attempt %s: %s", attempt + 1, exc)
+            last_response = None
+            if attempt == len(COMMONS_RETRY_DELAYS):
+                return None
+            continue
+
+        if response.status_code == 200:
+            return response
+
+        last_response = response
+        if attempt == len(COMMONS_RETRY_DELAYS) or not _should_retry_commons_response(response):
+            logger.warning(
+                "Commons API request returned %s for params %s",
+                response.status_code,
+                params,
+            )
+            return response
+
+        logger.warning(
+            "Commons API request returned %s on attempt %s, retrying",
+            response.status_code,
+            attempt + 1,
+        )
+
+    return last_response
+
 
 def _get_commons_map_geojson(data_id):
     params = {
@@ -35,10 +92,7 @@ def _get_commons_map_geojson(data_id):
         'rvslots': 'main',
         'format': 'json'
     }
-    try:
-        response = get('https://commons.wikimedia.org/w/api.php', headers=WIKIMEDIA_HEADERS, params=params)
-    except RequestException:
-        return None
+    response = _get_commons_response(params)
 
     if not response or response.status_code != 200:
         return None
@@ -103,10 +157,7 @@ def get_wikidata_entity_payload(wikidata_id: str):
                     'iiprop': 'url',
                     'format': 'json'
                 }
-                try:
-                    response = get('https://commons.wikimedia.org/w/api.php', headers=WIKIMEDIA_HEADERS, params=params)
-                except RequestException:
-                    response = None
+                response = _get_commons_response(params)
 
                 if response and response.status_code == 200:
                     data = response.json()

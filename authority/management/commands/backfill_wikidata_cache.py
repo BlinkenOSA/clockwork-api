@@ -91,6 +91,7 @@ class Command(BaseCommand):
                         f"{model.__name__} #{record.pk} ({record.wikidata_id}) cache updated"
                     )
                 )
+                
 
         self.stdout.write(
             self.style.SUCCESS(

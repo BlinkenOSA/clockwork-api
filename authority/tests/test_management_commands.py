@@ -60,3 +60,92 @@ class BackfillWikidataCacheCommandTests(TestCase):
         language.refresh_from_db()
         self.assertEqual(language.wikidata_cache["title"], "English refreshed")
         mock_get_wikidata_entity_payload.assert_called_once_with("Q1860")
+
+
+class BackfillCountryGeoshapesCommandTests(TestCase):
+    @patch("authority.management.commands.backfill_country_geoshapes.get_wikidata_entity_payload")
+    def test_backfill_updates_only_countries_missing_geoshape(self, mock_get_wikidata_entity_payload):
+        mock_get_wikidata_entity_payload.return_value = {
+            "title": "Algeria",
+            "description": "country in North Africa",
+            "wikipedia": "https://en.wikipedia.org/wiki/Algeria",
+            "properties": {
+                "image": "https://img.test/algeria.jpg",
+                "coordinates": {"lat": 28, "long": 1},
+                "geoshape": {"type": "FeatureCollection", "features": []},
+            },
+        }
+
+        with patch("authority.models.get_wikidata_entity_payload", return_value=None):
+            missing_geoshape = Country.objects.create(
+                alpha3="DZA",
+                country="Algeria test",
+                wikidata_id="Q262",
+                wikidata_cache={
+                    "title": "Algeria",
+                    "properties": {"coordinates": {"lat": 28, "long": 1}},
+                },
+            )
+            already_has_geoshape = Country.objects.create(
+                alpha3="ALB",
+                country="Albania test",
+                wikidata_id="Q222",
+                wikidata_cache={
+                    "title": "Albania",
+                    "properties": {"geoshape": {"type": "FeatureCollection", "features": []}},
+                },
+            )
+
+        out = StringIO()
+        call_command("backfill_country_geoshapes", stdout=out)
+
+        missing_geoshape.refresh_from_db()
+        already_has_geoshape.refresh_from_db()
+
+        self.assertEqual(
+            missing_geoshape.wikidata_cache["properties"],
+            {
+                "coordinates": {"lat": 28, "long": 1},
+                "geoshape": {"type": "FeatureCollection", "features": []},
+            },
+        )
+        self.assertEqual(
+            already_has_geoshape.wikidata_cache,
+            {
+                "title": "Albania",
+                "properties": {"geoshape": {"type": "FeatureCollection", "features": []}},
+            },
+        )
+        mock_get_wikidata_entity_payload.assert_called_once_with("Q262")
+
+    @patch("authority.management.commands.backfill_country_geoshapes.get_wikidata_entity_payload")
+    def test_backfill_skips_payloads_still_missing_geoshape(self, mock_get_wikidata_entity_payload):
+        mock_get_wikidata_entity_payload.return_value = {
+            "title": "Algeria",
+            "description": "country in North Africa",
+            "wikipedia": "https://en.wikipedia.org/wiki/Algeria",
+            "properties": {"coordinates": {"lat": 28, "long": 1}},
+        }
+
+        with patch("authority.models.get_wikidata_entity_payload", return_value=None):
+            country = Country.objects.create(
+                alpha3="DZA",
+                country="Algeria still missing geoshape",
+                wikidata_id="Q262",
+                wikidata_cache={
+                    "title": "Algeria",
+                    "properties": {"coordinates": {"lat": 28, "long": 1}},
+                },
+            )
+
+        call_command("backfill_country_geoshapes")
+
+        country.refresh_from_db()
+        self.assertEqual(
+            country.wikidata_cache,
+            {
+                "title": "Algeria",
+                "properties": {"coordinates": {"lat": 28, "long": 1}},
+            },
+        )
+        mock_get_wikidata_entity_payload.assert_called_once_with("Q262")
