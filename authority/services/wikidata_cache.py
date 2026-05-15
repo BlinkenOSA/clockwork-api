@@ -22,6 +22,44 @@ WIKIPEDIA_LINKS = [
 ]
 
 
+def _get_commons_map_geojson(data_id):
+    params = {
+        'action': 'query',
+        'titles': data_id,
+        'prop': 'revisions',
+        'rvprop': 'content',
+        'rvslots': 'main',
+        'format': 'json'
+    }
+    try:
+        response = get('https://commons.wikimedia.org/w/api.php', params=params)
+    except RequestException:
+        return None
+
+    if not response or response.status_code != 200:
+        return None
+
+    data = response.json()
+    pages = data.get('query', {}).get('pages', {})
+    first_key = next(iter(pages), None)
+    revisions = pages.get(first_key, {}).get('revisions', []) if first_key else []
+    if not revisions:
+        return None
+
+    revision = revisions[0]
+    revision_content = revision.get('*')
+    if revision_content is None:
+        revision_content = revision.get('slots', {}).get('main', {}).get('*')
+
+    if revision_content is None:
+        return None
+
+    try:
+        return json.loads(revision_content)
+    except json.JSONDecodeError:
+        return None
+
+
 def get_wikidata_entity_payload(wikidata_id: str):
     """
     Builds the curated Wikidata payload used by the public catalog.
@@ -92,27 +130,9 @@ def get_wikidata_entity_payload(wikidata_id: str):
 
             elif accepted_key == 'P3896':
                 data_id = value['mainsnak']['datavalue']['value']
-                keys_dict[output_key] = 'https://commons.wikimedia.org/wiki/%s' % data_id
-
-                params = {
-                    'action': 'query',
-                    'titles': data_id,
-                    'prop': 'revisions',
-                    'rvprop': 'content',
-                    'format': 'json'
-                }
-                try:
-                    response = get('https://commons.wikimedia.org/w/api.php', params=params)
-                except RequestException:
-                    response = None
-
-                if response and response.status_code == 200:
-                    data = response.json()
-                    pages = data.get('query', {}).get('pages', {})
-                    first_key = next(iter(pages), None)
-                    revisions = pages.get(first_key, {}).get('revisions', []) if first_key else []
-                    if revisions and '*' in revisions[0]:
-                        keys_dict['geojson'] = json.loads(revisions[0]['*'])
+                geojson = _get_commons_map_geojson(data_id)
+                if geojson is not None:
+                    keys_dict[output_key] = geojson
 
             else:
                 data_id = value['mainsnak']['datavalue']['value']['id']
