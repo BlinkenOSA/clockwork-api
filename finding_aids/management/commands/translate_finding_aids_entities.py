@@ -1,11 +1,10 @@
-import time
+import deepl
+from django.conf import settings
 
 from django.core.management import BaseCommand
 
 from archival_unit.models import ArchivalUnit
 from finding_aids.models import FindingAidsEntity
-
-from deep_translator import GoogleTranslator
 
 
 class Command(BaseCommand):
@@ -23,12 +22,18 @@ class Command(BaseCommand):
                                                  subfonds=options['subfonds'],
                                                  series=options['series'])
 
+        auth_key = getattr(settings, 'DEEPL_AUTH_KEY', None)
+        translator = deepl.Translator(auth_key)
+
         finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False)
         for fa_entity in finding_aids_entities:
-            translator = GoogleTranslator(source=options['language_from'], target=options['language_to'])
-            if getattr(fa_entity, options['field_from']):
-                if len(getattr(fa_entity, options['field_from'])) < 5000:
-                    setattr(fa_entity, options['field_to'], translator.translate(getattr(fa_entity, options['field_from'])))
-                    print("%s -> %s" % (getattr(fa_entity, options['field_from']), getattr(fa_entity, options['field_to'])))
-                    fa_entity.save()
-                    time.sleep(0.5)
+            source_text = getattr(fa_entity, options['field_from'])
+            if source_text:
+                result = translator.translate_text(
+                    text=source_text,
+                    source_lang=options['language_from'],
+                    target_lang=options['language_to'],
+                )
+                setattr(fa_entity, options['field_to'], result.text)
+                print("%s -> %s" % (source_text, getattr(fa_entity, options['field_to'])))
+                fa_entity.save()
