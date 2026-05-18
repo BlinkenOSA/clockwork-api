@@ -1,3 +1,5 @@
+import time
+
 import deepl
 from django.conf import settings
 
@@ -43,3 +45,4 @@ class Command(BaseCommand):
                 setattr(fa_entity, options['field_to'], result.text)
                 print("%s -> %s" % (source_text, getattr(fa_entity, options['field_to'])))
                 fa_entity.save()
+                time.sleep(2)
