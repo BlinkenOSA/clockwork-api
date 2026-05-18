@@ -1,5 +1,10 @@
 from rest_framework import serializers
 
+from finding_aids.serializers.finding_aids_entity_serializers import FindingAidsEntityReadSerializer
+from workflow.serializers.archival_unit_serializer import ArchivalUnitSerializer
+from workflow.serializers.container_serializers import ContainerBaseSerializer
+from workflow.serializers.digital_version_serializers import DigitalVersionSerializer
+
 
 class DigitalObjectUpsertRequestSerializer(serializers.Serializer):
     technical_metadata = serializers.IntegerField(
@@ -42,3 +47,32 @@ class DigitalObjectUpsertResponseSerializer(serializers.Serializer):
         help_text='Name of the uploaded file',
         required=False
     )
+
+
+class DigitalVersionInfoSerializer(serializers.Serializer):
+    """
+    Serializer for digital object information responses.
+
+    Returned after resolving a filename to an archival unit, container, or finding aids entity.
+
+    Contains identifiers and metadata for the resolved object.
+    """
+    archival_reference_code = serializers.CharField(
+        label='Archival Reference Code',
+        help_text='Archival Reference Code of the resolved object',
+        required=False
+    )
+    level = serializers.CharField(
+        label='Level',
+        help_text='"Folder / Item" or "Container" depending on the type of object resolved from the filename',
+        required=False
+    )
+    catalog_url = serializers.CharField(
+        label='Catalog URL',
+        help_text='URL to the object in the catalog',
+        required=False
+    )
+    archival_unit = ArchivalUnitSerializer(read_only=True)
+    container = ContainerBaseSerializer(read_only=True, source='*')
+    metadata = FindingAidsEntityReadSerializer(many=True, read_only=True)
+    digital_versions = DigitalVersionSerializer(many=True, read_only=True)
