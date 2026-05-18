@@ -14,6 +14,7 @@ class Command(BaseCommand):
         parser.add_argument('--series', dest='series', help='Series Number')
         parser.add_argument('--field_from', dest='field_from', help='Field to translate from.')
         parser.add_argument('--field_to', dest='field_to', help='Field to translate to.')
+        parser.add_argument('--from_container', dest='from_container', help='Container to translate from.')
         parser.add_argument('--language_from', dest='language_from', help='Language to translate from.')
         parser.add_argument('--language_to', dest='language_to', help='Language to translate to.')
 
@@ -25,7 +26,12 @@ class Command(BaseCommand):
         auth_key = getattr(settings, 'DEEPL_AUTH_KEY', None)
         translator = deepl.Translator(auth_key)
 
-        finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False)
+        finding_aids_entities = FindingAidsEntity.objects.filter(
+            archival_unit=archival_unit,
+            is_template=False,
+            container__container_no__gte=options['from_container']
+        )
+
         for fa_entity in finding_aids_entities:
             source_text = getattr(fa_entity, options['field_from'])
             if source_text:
