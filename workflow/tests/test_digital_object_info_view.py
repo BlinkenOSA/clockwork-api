@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group
 from django.test import TestCase, override_settings
 from rest_framework import status
 from rest_framework.reverse import reverse
+from xml.etree import ElementTree
 
 from archival_unit.models import ArchivalUnit
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
@@ -97,6 +98,283 @@ class DigitalObjectInfoViewTests(TestViewsBaseClass):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('error', response.data)
+
+
+@override_settings(CATALOG_URL='https://catalog.example')
+class DigitalObjectEADViewTests(TestViewsBaseClass):
+    fixtures = ['carrier_types', 'primary_types', 'access_rights']
+
+    def setUp(self):
+        super().setUp()
+        api_group = Group.objects.create(name='Api')
+        self.user.groups.add(api_group)
+
+        self.fonds = ArchivalUnit.objects.create(fonds=303, level='F', title='Fonds Title')
+        self.subfonds = ArchivalUnit.objects.create(
+            fonds=303,
+            subfonds=1,
+            level='SF',
+            title='Subfonds Title',
+            parent=self.fonds,
+        )
+        self.series = ArchivalUnit.objects.create(
+            fonds=303,
+            subfonds=1,
+            series=1,
+            level='S',
+            title='Series Title',
+            parent=self.subfonds,
+        )
+        Isad.objects.create(
+            archival_unit=self.fonds,
+            title=self.fonds.title,
+            reference_code=self.fonds.reference_code,
+            description_level='F',
+            year_from=1945,
+            year_to=1950,
+            scope_and_content_abstract='Fonds scope',
+            administrative_history='Fonds history',
+        )
+        Isad.objects.create(
+            archival_unit=self.subfonds,
+            title=self.subfonds.title,
+            reference_code=self.subfonds.reference_code,
+            description_level='SF',
+            year_from=1945,
+            year_to=1949,
+            scope_and_content_abstract='Subfonds scope',
+        )
+        Isad.objects.create(
+            archival_unit=self.series,
+            title=self.series.title,
+            reference_code=self.series.reference_code,
+            description_level='S',
+            year_from=1946,
+            year_to=1948,
+            scope_and_content_abstract='Series scope',
+        )
+        self.container = Container.objects.create(
+            archival_unit=self.series,
+            carrier_type=CarrierType.objects.first(),
+            barcode='HU_OSA_303_1_1_0001',
+            internal_note='Container note',
+            digital_version_exists=True,
+            digital_version_online=True,
+        )
+
+        self.folder = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            sequence_no=0,
+            title='Folder Title',
+            date_from='2020-01-01',
+            contents_summary='Folder scope',
+            note='Folder note',
+            primary_type=PrimaryType.objects.first(),
+        )
+        self.item = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            sequence_no=1,
+            level='I',
+            description_level='L2',
+            title='Item Title',
+            date_from='2020-01-02',
+            contents_summary='Item scope',
+            primary_type=PrimaryType.objects.first(),
+        )
+
+    def test_digital_object_ead_invalid_filename(self):
+        response = self.client.get(
+            reverse('workflow-v1:digital_object_ead', kwargs={'file_name': 'invalid_name.txt'})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'Invalid filename'})
+
+    def test_digital_object_ead_returns_container_hierarchy_with_all_entities(self):
+        response = self.client.get(
+            reverse('workflow-v1:digital_object_ead', kwargs={'file_name': 'HU_OSA_303_1_1_0001.mp4'})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response['Content-Type'].startswith('application/xml'))
+
+        xml = response.content.decode('utf-8')
+        self.assertIn('Fonds Title', xml)
+        self.assertIn('Subfonds Title', xml)
+        self.assertIn('Series Title', xml)
+        self.assertIn('Subfonds scope', xml)
+        self.assertIn('Series scope', xml)
+        self.assertIn('Container note', xml)
+        self.assertIn('Folder Title', xml)
+        self.assertIn('Item Title', xml)
+
+        root = ElementTree.fromstring(xml)
+        ns = {'ead': 'urn:isbn:1-931666-22-9'}
+        self.assertEqual(root.tag, '{urn:isbn:1-931666-22-9}ead')
+        self.assertEqual(len(root.findall(".//ead:c[@otherlevel='container']", ns)), 1)
+        self.assertEqual(len(root.findall(".//ead:c[@level='file']", ns)), 1)
+        self.assertEqual(len(root.findall(".//ead:c[@level='item']", ns)), 1)
+
+    def test_digital_object_ead_returns_single_requested_finding_aids_entity(self):
+        response = self.client.get(
+            reverse('workflow-v1:digital_object_ead', kwargs={'file_name': 'HU_OSA_303_1_1_0001_0001_0001.mp4'})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        xml = response.content.decode('utf-8')
+        self.assertIn('Fonds Title', xml)
+        self.assertIn('Subfonds Title', xml)
+        self.assertIn('Series Title', xml)
+        self.assertIn('Item Title', xml)
+        self.assertNotIn('Folder scope', xml)
+
+        root = ElementTree.fromstring(xml)
+        ns = {'ead': 'urn:isbn:1-931666-22-9'}
+        self.assertEqual(len(root.findall(".//ead:c[@level='item']", ns)), 1)
+        self.assertEqual(len(root.findall(".//ead:c[@level='file']", ns)), 0)
+
+
+@override_settings(CATALOG_URL='https://catalog.example')
+class DigitalObjectRICViewTests(TestViewsBaseClass):
+    fixtures = ['carrier_types', 'primary_types', 'access_rights']
+
+    def setUp(self):
+        super().setUp()
+        api_group = Group.objects.create(name='Api')
+        self.user.groups.add(api_group)
+
+        self.fonds = ArchivalUnit.objects.create(fonds=304, level='F', title='RiC Fonds')
+        self.subfonds = ArchivalUnit.objects.create(
+            fonds=304,
+            subfonds=1,
+            level='SF',
+            title='RiC Subfonds',
+            parent=self.fonds,
+        )
+        self.series = ArchivalUnit.objects.create(
+            fonds=304,
+            subfonds=1,
+            series=1,
+            level='S',
+            title='RiC Series',
+            parent=self.subfonds,
+        )
+        Isad.objects.create(
+            archival_unit=self.fonds,
+            title=self.fonds.title,
+            reference_code=self.fonds.reference_code,
+            description_level='F',
+            year_from=1950,
+            scope_and_content_abstract='RiC fonds scope',
+        )
+        Isad.objects.create(
+            archival_unit=self.subfonds,
+            title=self.subfonds.title,
+            reference_code=self.subfonds.reference_code,
+            description_level='SF',
+            year_from=1951,
+            scope_and_content_abstract='RiC subfonds scope',
+        )
+        Isad.objects.create(
+            archival_unit=self.series,
+            title=self.series.title,
+            reference_code=self.series.reference_code,
+            description_level='S',
+            year_from=1952,
+            scope_and_content_abstract='RiC series scope',
+        )
+        self.container = Container.objects.create(
+            archival_unit=self.series,
+            carrier_type=CarrierType.objects.first(),
+            barcode='HU_OSA_304_1_1_0001',
+            internal_note='RiC container note',
+        )
+        self.folder = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            sequence_no=0,
+            title='RiC Folder',
+            date_from='2020-03-01',
+            contents_summary='RiC folder scope',
+            primary_type=PrimaryType.objects.first(),
+        )
+        self.item = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            sequence_no=1,
+            level='I',
+            description_level='L2',
+            title='RiC Item',
+            date_from='2020-03-02',
+            contents_summary='RiC item scope',
+            primary_type=PrimaryType.objects.first(),
+        )
+
+    def test_digital_object_ric_invalid_filename(self):
+        response = self.client.get(
+            reverse('workflow-v1:digital_object_ric', kwargs={'file_name': 'invalid_name.txt'})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'Invalid filename'})
+
+    def test_digital_object_ric_returns_container_hierarchy_with_all_entities(self):
+        response = self.client.get(
+            reverse('workflow-v1:digital_object_ric', kwargs={'file_name': 'HU_OSA_304_1_1_0001.mp4'})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response['Content-Type'].startswith('application/xml'))
+
+        xml = response.content.decode('utf-8')
+        self.assertIn('RiC Fonds', xml)
+        self.assertIn('RiC Subfonds', xml)
+        self.assertIn('RiC Series', xml)
+        self.assertIn('RiC subfonds scope', xml)
+        self.assertIn('RiC series scope', xml)
+        self.assertIn('RiC container note', xml)
+        self.assertIn('RiC Folder', xml)
+        self.assertIn('RiC Item', xml)
+
+        root = ElementTree.fromstring(xml)
+        ns = {
+            'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+            'rico': 'https://www.ica.org/standards/RiC/ontology#',
+        }
+        self.assertEqual(root.tag, '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}RDF')
+        self.assertEqual(len(root.findall('.//rico:RecordSet', ns)), 3)
+        self.assertEqual(len(root.findall('.//rico:Record', ns)), 3)
+
+    def test_digital_object_ric_returns_single_requested_finding_aids_entity(self):
+        response = self.client.get(
+            reverse('workflow-v1:digital_object_ric', kwargs={'file_name': 'HU_OSA_304_1_1_0001_0001_0001.mp4'})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        xml = response.content.decode('utf-8')
+        self.assertIn('RiC Fonds', xml)
+        self.assertIn('RiC Subfonds', xml)
+        self.assertIn('RiC Series', xml)
+        self.assertIn('RiC subfonds scope', xml)
+        self.assertIn('RiC series scope', xml)
+        self.assertIn('RiC Item', xml)
+        self.assertNotIn('RiC folder scope', xml)
+
+        root = ElementTree.fromstring(xml)
+        ns = {
+            'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+            'rico': 'https://www.ica.org/standards/RiC/ontology#',
+        }
+        records = root.findall('.//rico:Record', ns)
+        self.assertEqual(len(records), 2)
 
 
 @override_settings(CATALOG_URL='https://catalog.example')
