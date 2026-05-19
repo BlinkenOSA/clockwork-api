@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,6 +7,7 @@ from clockwork_api.authentication import BearerAuthentication
 from workflow.file_name_parser import FileNameParser
 from workflow.permission import APIGroupPermission
 from workflow.serializers.container_serializers import ContainerDigitizedSerializer
+from workflow.serializers.digital_object_request_response_serializers import DigitalVersionInfoSerializer
 from workflow.serializers.finding_aids_serializer import FindingAidsDigitizedSerializer
 
 
@@ -13,6 +15,14 @@ class DigitalObjectInfoView(APIView):
     authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
 
+    @swagger_auto_schema(
+        operation_id='digital_version_info',
+        operation_description="Returns information about the object based on the submitted file name.",
+        responses={
+            200: DigitalVersionInfoSerializer(),
+            400: 'Invalid filename'
+        }
+    )
     def get(self, request, file_name, *args, **kwargs):
         file_name_parser = FileNameParser(file_name)
 
