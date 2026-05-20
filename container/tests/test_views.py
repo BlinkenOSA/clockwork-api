@@ -74,6 +74,10 @@ class ContainerViewsTest(TestViewsBaseClass):
             access_rights=self.access_rights,
             published=False
         )
+        # Creating a FindingAidsEntity can trigger multiple saves/signals
+        # (catalog_id generation path). We only assert the publish endpoint effect.
+        mock_catalog_index.reset_mock()
+        mock_meili_index.reset_mock()
 
         response = self.client.put(
             reverse('container-v1:container-publish', kwargs={'action': 'publish', 'pk': self.container.id})
@@ -94,6 +98,10 @@ class ContainerViewsTest(TestViewsBaseClass):
             access_rights=self.access_rights,
             published=True
         )
+        # Creating a FindingAidsEntity can trigger multiple saves/signals
+        # (catalog_id generation path). We only assert the unpublish endpoint effect.
+        mock_catalog_remove.reset_mock()
+        mock_meili_index.reset_mock()
 
         response = self.client.put(
             reverse('container-v1:container-publish', kwargs={'action': 'unpublish', 'pk': self.container.id})
