@@ -1,6 +1,5 @@
 from django.db.models import Count, IntegerField, OuterRef, Subquery, Value, F
 from django.db.models.functions import Coalesce
-from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -201,17 +200,11 @@ class ContainerPublishAll(APIView):
 
         finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit_id=archival_unit_id)
         if action == 'publish':
-            finding_aids_entities.update(
-                published=True,
-                user_published=request.user.username,
-                date_published=timezone.now()
-            )
+            for finding_aids_entity in finding_aids_entities:
+                finding_aids_entity.publish(request.user)
         else:
-            finding_aids_entities.update(
-                published=False,
-                user_published="",
-                date_published=None
-            )
+            for finding_aids_entity in finding_aids_entities:
+                finding_aids_entity.unpublish()
         return Response(status=status.HTTP_200_OK)
 
 
@@ -236,17 +229,11 @@ class ContainerPublish(APIView):
 
         finding_aids_entities = FindingAidsEntity.objects.filter(container=container)
         if action == 'publish':
-            finding_aids_entities.update(
-                published=True,
-                user_published=request.user.username,
-                date_published=timezone.now()
-            )
+            for finding_aids_entity in finding_aids_entities:
+                finding_aids_entity.publish(request.user)
         else:
-            finding_aids_entities.update(
-                published=False,
-                user_published="",
-                date_published=None
-            )
+            for finding_aids_entity in finding_aids_entities:
+                finding_aids_entity.unpublish()
         return Response(status=status.HTTP_200_OK)
 
 
