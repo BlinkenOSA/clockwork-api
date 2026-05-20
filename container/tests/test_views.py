@@ -1,10 +1,13 @@
+from unittest.mock import patch
+
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from archival_unit.tests.helpers import make_fonds, make_subfonds, make_series
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from container.tests.helpers import make_container
-from controlled_list.tests.helpers import make_carrier_types
+from controlled_list.tests.helpers import make_carrier_types, make_access_rights, make_primary_types
+from finding_aids.tests.helpers import make_finding_aids
 
 
 class ContainerViewsTest(TestViewsBaseClass):
@@ -15,6 +18,8 @@ class ContainerViewsTest(TestViewsBaseClass):
         self.subfonds = make_subfonds(self.fonds)
         self.series = make_series(self.subfonds)
         self.container = make_container(self.series, self.carrier_type)
+        self.access_rights = make_access_rights()
+        self.primary_type = make_primary_types()
 
     def test_precreate_returns_next_container_no(self):
         response = self.client.get(
@@ -59,3 +64,43 @@ class ContainerViewsTest(TestViewsBaseClass):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 0)
+
+    @patch('finding_aids.signals.index_meilisearch_finding_aids_entity.delay')
+    @patch('finding_aids.signals.index_catalog_finding_aids_entity.delay')
+    def test_container_publish_triggers_indexing_signals(self, mock_catalog_index, mock_meili_index):
+        finding_aids = make_finding_aids(
+            container=self.container,
+            primary_type=self.primary_type,
+            access_rights=self.access_rights,
+            published=False
+        )
+
+        response = self.client.put(
+            reverse('container-v1:container-publish', kwargs={'action': 'publish', 'pk': self.container.id})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        finding_aids.refresh_from_db()
+        self.assertTrue(finding_aids.published)
+        self.assertEqual(mock_catalog_index.call_count, 1)
+        self.assertEqual(mock_meili_index.call_count, 1)
+
+    @patch('finding_aids.signals.index_meilisearch_finding_aids_entity.delay')
+    @patch('finding_aids.signals.index_catalog_finding_aids_entity_remove.delay')
+    def test_container_unpublish_triggers_indexing_signals(self, mock_catalog_remove, mock_meili_index):
+        finding_aids = make_finding_aids(
+            container=self.container,
+            primary_type=self.primary_type,
+            access_rights=self.access_rights,
+            published=True
+        )
+
+        response = self.client.put(
+            reverse('container-v1:container-publish', kwargs={'action': 'unpublish', 'pk': self.container.id})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        finding_aids.refresh_from_db()
+        self.assertFalse(finding_aids.published)
+        self.assertEqual(mock_catalog_remove.call_count, 1)
+        self.assertEqual(mock_meili_index.call_count, 1)
