@@ -3,7 +3,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from container.models import Container
 from digitization.models import DigitalVersion
 from digitization.serializers.container_serializers import DigitizationContainerLogSerializer, \
-    DigitizationContainerDataSerializer
+    DigitizationContainerDataSerializer, DigitizationContainerCheckListSerializer
 
 
 class DigitizationContainerList(ListAPIView):
@@ -127,3 +127,55 @@ class DigitizationContainerDetail(RetrieveAPIView):
 
     queryset = DigitalVersion.objects.all()
     serializer_class = DigitizationContainerDataSerializer
+
+
+class DigitizationContainerCheckList(ListAPIView):
+    filter_backends = (SearchFilter, OrderingFilter)
+    serializer_class = DigitizationContainerCheckListSerializer
+    search_fields = (
+        'archival_unit__reference_code',
+        'barcode',
+    )
+
+    def get_queryset(self):
+        qs = Container.objects.filter(digital_versions__isnull=True, barcode__isnull=False).select_related(
+            'archival_unit', 'carrier_type'
+        ).distinct().order_by(
+            'barcode',
+        )
+
+        ordering = self.request.query_params.get('ordering', None)
+        if ordering:
+            if 'container_no' in ordering:
+                if '-' in ordering:
+                    qs = qs.order_by(
+                        '-archival_unit__fonds',
+                        '-archival_unit__subfonds',
+                        '-archival_unit__series',
+                        '-container_no'
+                    )
+                else:
+                    qs = qs.order_by(
+                        'archival_unit__fonds',
+                        'archival_unit__subfonds',
+                        'archival_unit__series',
+                        'container_no'
+                    )
+
+            if 'carrier_type' in ordering:
+                if '-' in ordering:
+                    qs = qs.order_by('-carrier_type__type')
+                else:
+                    qs = qs.order_by('carrier_type__type')
+
+            if 'barcode' in ordering:
+                if '-' in ordering:
+                    qs = qs.order_by('-barcode')
+                else:
+                    qs = qs.order_by('barcode')
+
+        carrier_type = self.request.query_params.get('carrier_type', None)
+        if carrier_type:
+            qs = qs.filter(carrier_type=carrier_type)
+
+        return qs
