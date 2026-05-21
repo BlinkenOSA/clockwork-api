@@ -11,7 +11,8 @@ Archival Management System components to:
 
 from django.urls import path
 
-from digitization.views.container_views import DigitizationContainerDetail, DigitizationContainerList
+from digitization.views.container_views import DigitizationContainerDetail, DigitizationContainerList, \
+    DigitizationContainerCheckList
 from digitization.views.finding_aids_views import DigitizationFindingAidsList, DigitizationFindingAidsDetail
 
 app_name = 'digitization'
@@ -20,6 +21,9 @@ urlpatterns = [
     # Container digitization endpoints
     path('container/', DigitizationContainerList.as_view(), name='digitization-list'),
     path('container/<int:pk>/', DigitizationContainerDetail.as_view(), name='digitization-detail'),
+
+    # Checklist for containers
+    path('container/checklist/', DigitizationContainerCheckList.as_view(), name='digitization-container-check-list'),
 
     # Finding aids digitization endpoints
     path('finding_aids/', DigitizationFindingAidsList.as_view(), name='digitization-finding_aids-list'),

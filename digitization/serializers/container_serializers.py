@@ -105,3 +105,28 @@ class DigitizationContainerDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = DigitalVersion
         fields = ('technical_metadata',)
+
+
+class DigitizationContainerCheckListSerializer(serializers.ModelSerializer):
+    container_no = serializers.SerializerMethodField()
+    archival_unit_id = serializers.SerializerMethodField()
+    carrier_type = serializers.SerializerMethodField()
+
+    def get_container_no(self, obj):
+        """
+        Builds a human-readable container reference code.
+
+        Format:
+            <archival_unit.reference_code>:<container_no>
+        """
+        return "%s:%s" % (obj.archival_unit.reference_code, obj.container_no)
+
+    def get_archival_unit_id(self, obj):
+        return obj.archival_unit.id if obj.archival_unit else None
+
+    def get_carrier_type(self, obj):
+        return obj.carrier_type.type if obj.carrier_type else None
+
+    class Meta:
+        model = Container
+        fields = ('id', 'barcode', 'archival_unit_id', 'container_no', 'carrier_type')

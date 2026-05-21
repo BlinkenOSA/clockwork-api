@@ -93,6 +93,20 @@ class DigitizationViewsTests(TestViewsBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('technical_metadata', response.data)
 
+    def test_container_checklist_returns_only_containers_without_digital_versions(self):
+        no_dv_container = make_container(
+            series=self.series,
+            carrier_type=self.carrier_type,
+            barcode='HU_OSA_88888888',
+        )
+
+        response = self.client.get(reverse('digitization-v1:digitization-container-check-list'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = {row['id'] for row in response.data['results']}
+        self.assertIn(no_dv_container.id, ids)
+        self.assertNotIn(self.container.id, ids)
+
     def test_finding_aids_list_filters_digital_version_online(self):
         response = self.client.get(
             reverse('digitization-v1:digitization-finding_aids-list'),
