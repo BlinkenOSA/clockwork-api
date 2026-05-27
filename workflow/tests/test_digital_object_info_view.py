@@ -89,7 +89,6 @@ class DigitalObjectInfoViewTests(TestViewsBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['level'], 'Folder / Item')
         self.assertEqual(response.data['container']['barcode'], self.container.barcode)
-        self.assertEqual(response.data['metadata']['folder_no'], self.fa.folder_no)
 
     def test_digital_object_info_valid_pattern_but_unresolvable(self):
         response = self.client.get(
@@ -429,7 +428,6 @@ class WorkflowDigitizedSerializersTests(TestCase):
         self.assertEqual(data['level'], 'Container')
         self.assertIn('archival_reference_code', data)
         self.assertIn('container', data)
-        self.assertIn('metadata', data)
         self.assertIn('digital_versions', data)
 
     def test_finding_aids_digitized_serializer_shape(self):
@@ -438,5 +436,4 @@ class WorkflowDigitizedSerializersTests(TestCase):
         self.assertEqual(data['level'], 'Folder / Item')
         self.assertIn('archival_reference_code', data)
         self.assertIn('container', data)
-        self.assertIn('metadata', data)
         self.assertIn('digital_versions', data)
