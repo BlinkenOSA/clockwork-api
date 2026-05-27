@@ -67,7 +67,6 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
     catalog_url = serializers.SerializerMethodField()
     archival_unit = ArchivalUnitSerializer(read_only=True)
     container = ContainerBaseSerializer(read_only=True, source='*')
-    metadata = FindingAidsEntityReadSerializer(many=True, read_only=True, source='findingaidsentity_set')
     digital_versions = DigitalVersionSerializer(many=True, read_only=True)
     level = serializers.SerializerMethodField()
 
@@ -93,5 +92,4 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
             'archival_unit',
             'container',
             'digital_versions',
-            'metadata'
         ]
