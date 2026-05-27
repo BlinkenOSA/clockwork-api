@@ -9,7 +9,6 @@ from hashids import Hashids
 from model_clone import CloneMixin
 
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
-from digitization.models import DigitalVersion
 
 
 class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
