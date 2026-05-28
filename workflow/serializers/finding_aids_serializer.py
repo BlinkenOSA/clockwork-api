@@ -1,7 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from container.models import Container
 from finding_aids.models import FindingAidsEntity
 from finding_aids.serializers.finding_aids_entity_serializers import FindingAidsEntityReadSerializer
 from workflow.serializers.archival_unit_serializer import ArchivalUnitSerializer
@@ -27,7 +26,6 @@ class FindingAidsDigitizedSerializer(serializers.ModelSerializer):
     catalog_url = serializers.SerializerMethodField()
     archival_unit = ArchivalUnitSerializer(read_only=True, source='container.archival_unit')
     container = ContainerBaseSerializer(read_only=True)
-    metadata = FindingAidsEntityReadSerializer(read_only=True, source='*')
     digital_versions = DigitalVersionSerializer(many=True, read_only=True)
     level = serializers.SerializerMethodField()
 
@@ -48,5 +46,4 @@ class FindingAidsDigitizedSerializer(serializers.ModelSerializer):
             'archival_unit',
             'container',
             'digital_versions',
-            'metadata'
         ]
