@@ -1,3 +1,6 @@
+from digitization.models import DigitalVersion
+
+
 class DigitalVersionIdentifierGenerator:
     """
     Generates and detects digital-version identifiers for finding aids entities.
@@ -34,17 +37,17 @@ class DigitalVersionIdentifierGenerator:
 
         Resolution order:
             1. Entity has related DigitalVersion records
-            2. Entity has digital_version_exists flag set
-            3. Container has digital_version_exists flag set
+            2. Container has related DigitalVersion records
 
         Returns:
             bool: True if a digital version is detected, otherwise False.
         """
-        if self.finding_aids_entity.digital_versions.count() > 0 or self.finding_aids_entity.digital_version_exists:
+        if self.finding_aids_entity.digital_versions.count() > 0:
             return True
-        else:
-            if self.finding_aids_entity.container.digital_version_exists:
-                return True
+
+        if self.finding_aids_entity.container.digital_versions.count() > 0:
+            return True
+
         return False
 
     def detect_available_online(self):
@@ -53,17 +56,23 @@ class DigitalVersionIdentifierGenerator:
 
         Resolution order:
             1. Entity has related DigitalVersion records marked online (available_online property)
-            2. Entity has digital_version_online flag set
-            3. Container has digital_version_online flag set
+            2. Container has related DigitalVersion records marked online (available_online property)
 
         Returns:
             bool: True if online availability is detected, otherwise False.
         """
-        if self.finding_aids_entity.available_online or self.finding_aids_entity.digital_version_online:
+        if DigitalVersion.objects.filter(
+            finding_aids_entity=self.finding_aids_entity,
+            available_online=True
+        ).count() > 0:
             return True
-        else:
-            if self.finding_aids_entity.container.digital_version_online:
-                return True
+
+        if DigitalVersion.objects.filter(
+            container=self.finding_aids_entity.container,
+            available_online=True
+        ).count() > 0:
+            return True
+
         return False
 
     def generate_identifier(self):
@@ -76,7 +85,6 @@ class DigitalVersionIdentifierGenerator:
                 - Uses description level to produce folder vs item identifiers
             2. Container-level identifier (when only container digitization exists):
                 - container.barcode (preferred)
-                - container.legacy_id
                 - generated <archival_unit_ref>_<container_no>
 
         This identifier is used for:
@@ -90,7 +98,7 @@ class DigitalVersionIdentifierGenerator:
         barcode = ''
 
         # Entity-level digital versions or flags
-        if self.finding_aids_entity.digital_versions.count() > 0 or self.finding_aids_entity.digital_version_exists:
+        if self.finding_aids_entity.digital_versions.count() > 0:
             if self.finding_aids_entity.description_level == 'L1':
                 return "%s_%04d_%04d" % (
                     self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_").replace("-", "_"),
@@ -106,14 +114,12 @@ class DigitalVersionIdentifierGenerator:
                 )
 
         # Container-level digitization fallback
-        else:
-            if self.finding_aids_entity.container.digital_version_exists:
-                if self.finding_aids_entity.container.barcode:
-                    return self.finding_aids_entity.container.barcode
-                if self.finding_aids_entity.container.legacy_id:
-                    return self.finding_aids_entity.container.legacy_id
-                return "%s_%04d" % (
-                    self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_").replace("-", "_"),
-                    self.finding_aids_entity.container.container_no
-                )
+        if self.finding_aids_entity.container.digital_versions.count() > 0:
+            if self.finding_aids_entity.container.barcode:
+                return self.finding_aids_entity.container.barcode
+            return "%s_%04d" % (
+                self.finding_aids_entity.archival_unit.reference_code.replace(" ", "_").replace("-", "_"),
+                self.finding_aids_entity.container.container_no
+            )
+
         return barcode
