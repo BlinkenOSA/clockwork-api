@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import SessionAuthentication
@@ -8,20 +7,18 @@ from rest_framework.views import APIView
 from clockwork_api.authentication import BearerAuthentication
 from workflow.file_name_parser import FileNameParser
 from workflow.permission import APIGroupPermission
-from workflow.services.ric_exporter import RICExporter
+
+from workflow.serializers.digital_version_json_serializers import DigitalObjectJSONSerializer
 
 
-class DigitalObjectRICView(APIView):
+class DigitalObjectJSONView(APIView):
     authentication_classes = [BearerAuthentication, SessionAuthentication]
     permission_classes = (APIGroupPermission, )
 
     @swagger_auto_schema(
-        operation_id='digital_object_ric_export',
-        operation_description="Exports archival metadata resolved from the submitted file name as Records in Context XML.",
+        operation_id='digital_object_json_export',
+        operation_description="Exports archival metadata resolved from the submitted file name as JSON",
         responses={
-            200: openapi.Response(
-                description="A valid RiC XML document will be returned as the response body."
-            ),
             400: 'Invalid filename'
         }
     )
@@ -32,14 +29,9 @@ class DigitalObjectRICView(APIView):
             return Response({'error': 'Invalid filename'}, status=400)
 
         resolved_object = file_name_parser.resolve_archival_unit_or_container()
-        exporter = RICExporter()
 
-        if resolved_object['level'] == 'container' and resolved_object['container'] is not None:
-            xml = exporter.render_for_container(resolved_object['container'], file_name)
-            return HttpResponse(xml, content_type='application/xml; charset=utf-8')
-
-        if resolved_object['finding_aids_entity'] is not None:
-            xml = exporter.render_for_finding_aids_entity(resolved_object['finding_aids_entity'], file_name)
-            return HttpResponse(xml, content_type='application/xml; charset=utf-8')
+        if resolved_object['container'] is not None or resolved_object['finding_aids_entity'] is not None:
+            serializer = DigitalObjectJSONSerializer(resolved_object)
+            return Response(serializer.data)
 
         return Response({'error': 'Could not resolve archival object'}, status=400)

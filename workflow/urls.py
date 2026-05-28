@@ -5,7 +5,7 @@ from rest_framework import permissions
 
 from workflow.views.digital_object_info_views import DigitalObjectInfoView
 from workflow.views.digital_object_ead_views import DigitalObjectEADView
-from workflow.views.digital_object_ric_views import DigitalObjectRICView
+from workflow.views.digital_object_json_views import DigitalObjectJSONView
 from workflow.views.digital_object_upsert_views import DigitalObjectUpsert
 from workflow.views.translation_view import GetTranslationToOriginal, GetTranslationToEnglish
 
@@ -34,10 +34,10 @@ urlpatterns = [
     # Used by the workflow to get information about a digital object based on its file name
     path('digital_object/info/<str:file_name>',
          DigitalObjectInfoView.as_view(), name='digital_object_info'),
-    path('digital_object/ead/<str:file_name>',
+    path('digital_object/metadata/ead/<str:file_name>',
          DigitalObjectEADView.as_view(), name='digital_object_ead'),
-    path('digital_object/ric/<str:file_name>',
-         DigitalObjectRICView.as_view(), name='digital_object_ric'),
+    path('digital_object/metadata/json/<str:file_name>',
+         DigitalObjectJSONView.as_view(), name='digital_object_json'),
 
     path('digital_object/upsert/master/<str:file_name>',
          DigitalObjectUpsert.as_view(type='master'), name='digital_object_master_upsert'),
