@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
+from clockwork_api.tests.no_index_signals_mixin import NoIndexSignalsMixin
 from archival_unit.models import ArchivalUnit
 from container.models import Container
 from controlled_list.models import CarrierType, PrimaryType
@@ -12,7 +13,7 @@ from isad.models import Isad
 
 
 @override_settings(CATALOG_URL='https://catalog.example')
-class DigitalObjectJSONViewTests(TestViewsBaseClass):
+class DigitalObjectJSONViewTests(NoIndexSignalsMixin, TestViewsBaseClass):
     fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):

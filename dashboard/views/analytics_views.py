@@ -1,5 +1,6 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -33,14 +34,15 @@ class AnalyticsActivityView(APIView):
         The month list includes each month boundary starting at the first day
         of the month and ending at the current month.
         """
-        date_from = datetime.now() - relativedelta(years=3)
-        date_to = datetime.now()
+        date_from = timezone.now() - relativedelta(years=3)
+        date_to = timezone.now()
 
         total_months = lambda dt: dt.month + 12 * dt.year
         month_list = []
+        current_tz = timezone.get_current_timezone()
         for tot_m in range(total_months(date_from) - 1, total_months(date_to)):
             y, m = divmod(tot_m, 12)
-            month_list.append(datetime(y, m + 1, 1))
+            month_list.append(timezone.make_aware(datetime(y, m + 1, 1), current_tz))
 
         analytics_data = []
         for month in month_list:
@@ -101,14 +103,15 @@ class AnalyticsTotalView(APIView):
         Cumulative values are computed using `date_created__lte=month`, where
         `month` is the first day of the month.
         """
-        date_from = datetime.now() - relativedelta(years=3)
-        date_to = datetime.now()
+        date_from = timezone.now() - relativedelta(years=3)
+        date_to = timezone.now()
 
         total_months = lambda dt: dt.month + 12 * dt.year
         month_list = []
+        current_tz = timezone.get_current_timezone()
         for tot_m in range(total_months(date_from) - 1, total_months(date_to)):
             y, m = divmod(tot_m, 12)
-            month_list.append(datetime(y, m + 1, 1))
+            month_list.append(timezone.make_aware(datetime(y, m + 1, 1), current_tz))
 
         analytics_data = []
         for month in month_list:

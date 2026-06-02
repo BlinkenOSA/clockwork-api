@@ -9,7 +9,7 @@
         "authority_url": null,
         "country": "Czech Republic",
         "user_created": "",
-        "date_created": "2017-11-24T00:00:00",
+        "date_created": "2017-11-24T00:00:00Z",
         "user_updated": "",
         "date_updated": null
     }
@@ -36,9 +36,9 @@
         "website": "N/A",
         "note": null,
         "user_created": "finding.aids",
-        "date_created": "2018-05-07T08:24:21",
+        "date_created": "2018-05-07T08:24:21Z",
         "user_updated": "",
-        "date_updated": "2018-05-07T08:24:21"
+        "date_updated": "2018-05-07T08:24:21Z"
     }
 }
 ]

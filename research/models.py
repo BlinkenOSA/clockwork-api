@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 from django.db import models
+from django.utils import timezone
 
 from clockwork_api.fields.email_null_field import EmailNullField
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
@@ -246,11 +247,11 @@ class RequestItem(models.Model):
                     requested_item_next_in_queue.save()
 
             if not self.return_date:
-                self.return_date = datetime.datetime.now()
+                self.return_date = timezone.now()
 
         if self.status == '5':
             if not self.reshelve_date:
-                self.reshelve_date = datetime.datetime.now()
+                self.reshelve_date = timezone.now()
 
         # Save ordering
         if self.item_origin == 'FA':
@@ -321,4 +322,3 @@ class RequestItemPart(models.Model):
 
     class Meta:
         db_table = 'research_request_items_parts'
-

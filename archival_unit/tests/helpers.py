@@ -17,9 +17,9 @@ def make_fonds(**kwargs):
         "status": "Final",
         "ready_to_publish": False,
         "user_created": "finding.aids",
-        "date_created": "2018-05-07T08:24:22",
+        "date_created": "2018-05-07T08:24:22Z",
         "user_updated": "finding.aids",
-        "date_updated": "2018-05-07T08:24:22",
+        "date_updated": "2018-05-07T08:24:22Z",
     }
     defaults.update(kwargs)
     return ArchivalUnit.objects.create(**defaults)
@@ -41,9 +41,9 @@ def make_subfonds(fonds, **kwargs):
         "status": "Final",
         "ready_to_publish": False,
         "user_created": "finding.aids",
-        "date_created": "2018-05-07T08:24:25",
+        "date_created": "2018-05-07T08:24:25Z",
         "user_updated": "finding.aids",
-        "date_updated": "2020-04-28T15:12:57",
+        "date_updated": "2020-04-28T15:12:57Z",
       }
     defaults.update(kwargs)
     return ArchivalUnit.objects.create(**defaults)
@@ -64,9 +64,9 @@ def make_series(subfonds, **kwargs):
         "status": "Final",
         "ready_to_publish": False,
         "user_created": "finding.aids",
-        "date_created": "2018-05-07T08:24:31",
+        "date_created": "2018-05-07T08:24:31Z",
         "user_updated": "",
-        "date_updated": "2018-05-07T08:24:31"
+        "date_updated": "2018-05-07T08:24:31Z"
     }
     defaults.update(kwargs)
     return ArchivalUnit.objects.create(**defaults)

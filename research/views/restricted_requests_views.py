@@ -1,6 +1,7 @@
 import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -80,7 +81,7 @@ class RestrictedRequestsList(generics.ListAPIView):
     queryset = (
         RequestItemPart.objects.filter(
             finding_aids_entity__access_rights__statement='Restricted',
-            request_item__request__request_date__gte='2025-01-01'
+            request_item__request__request_date__date__gte=datetime.date(2025, 1, 1)
         )
         .order_by('-request_item__request__created_date')
     )
@@ -162,7 +163,7 @@ class RestrictedRequestAction(APIView):
             else:
                 return Response("wrong action type", status=status.HTTP_400_BAD_REQUEST)
 
-            request_item_part.decision_date = datetime.datetime.now()
+            request_item_part.decision_date = timezone.now()
             request_item_part.decision_by = request.user.username
             request_item_part.save()
 

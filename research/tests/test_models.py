@@ -1,6 +1,7 @@
 import datetime
 
 from django.test import TestCase
+from django.utils import timezone
 
 from archival_unit.models import ArchivalUnit
 from container.models import Container
@@ -21,7 +22,7 @@ class ResearchModelsTests(TestCase):
 
     def test_request_item_queue_promotion_and_return_date(self):
         researcher = Researcher.objects.create(first_name='Ada', last_name='Lovelace', email='ada@example.com')
-        request = Request.objects.create(researcher=researcher, request_date=datetime.datetime.now())
+        request = Request.objects.create(researcher=researcher, request_date=timezone.now())
 
         pending = RequestItem.objects.create(request=request, item_origin='L', status='2')
         queued = RequestItem.objects.create(request=request, item_origin='L', status='1')
@@ -37,7 +38,7 @@ class ResearchModelsTests(TestCase):
 
     def test_request_item_ordering_for_finding_aids(self):
         researcher = Researcher.objects.create(first_name='Ada', last_name='Lovelace', email='ada@example.com')
-        request = Request.objects.create(researcher=researcher, request_date=datetime.datetime.now())
+        request = Request.objects.create(researcher=researcher, request_date=timezone.now())
 
         fonds = ArchivalUnit.objects.create(fonds=1200, level='F', title='Fonds')
         subfonds = ArchivalUnit.objects.create(

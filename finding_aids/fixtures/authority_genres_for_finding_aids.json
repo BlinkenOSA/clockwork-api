@@ -9,9 +9,9 @@
       "authority_url": null,
       "other_url": null,
       "user_created": "",
-      "date_created": "2020-01-01T00:00:00",
+      "date_created": "2020-01-01T00:00:00Z",
       "user_updated": "",
-      "date_updated": "2020-01-01T00:00:00"
+      "date_updated": "2020-01-01T00:00:00Z"
     }
   },
   {
@@ -24,9 +24,9 @@
       "authority_url": null,
       "other_url": null,
       "user_created": "",
-      "date_created": "2020-01-01T00:00:00",
+      "date_created": "2020-01-01T00:00:00Z",
       "user_updated": "",
-      "date_updated": "2020-01-01T00:00:00"
+      "date_updated": "2020-01-01T00:00:00Z"
     }
   }
 ]

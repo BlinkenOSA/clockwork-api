@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from archival_unit.models import ArchivalUnit
+from clockwork_api.tests.no_index_signals_mixin import NoIndexSignalsMixin
 from container.models import Container
 from controlled_list.models import CarrierType, PrimaryType
 from finding_aids.models import FindingAidsEntity
@@ -11,7 +12,7 @@ from finding_aids.serializers.finding_aids_entity_serializers import (
 from finding_aids.serializers.finding_aids_template_serializers import FindingAidsTemplateWriteSerializer
 
 
-class FindingAidsSerializerTests(TestCase):
+class FindingAidsSerializerTests(NoIndexSignalsMixin, TestCase):
     fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):

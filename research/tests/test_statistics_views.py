@@ -92,13 +92,13 @@ class ResearcherRegistrationStatisticsViewsTests(TestViewsBaseClass):
         )
 
     def test_returns_monthly_totals_for_each_month_in_requested_range(self):
-        self.old_researcher.date_created = timezone.datetime(2026, 1, 15)
+        self.old_researcher.date_created = timezone.make_aware(timezone.datetime(2026, 1, 15))
         self.old_researcher.save(update_fields=['date_created'])
 
-        self.mid_researcher.date_created = timezone.datetime(2026, 3, 10)
+        self.mid_researcher.date_created = timezone.make_aware(timezone.datetime(2026, 3, 10))
         self.mid_researcher.save(update_fields=['date_created'])
 
-        self.new_researcher.date_created = timezone.datetime(2026, 3, 20)
+        self.new_researcher.date_created = timezone.make_aware(timezone.datetime(2026, 3, 20))
         self.new_researcher.save(update_fields=['date_created'])
 
         response = self.client.get(
@@ -196,15 +196,15 @@ class ResearcherVisitStatisticsViewsTests(TestViewsBaseClass):
         )
 
     def test_returns_monthly_visit_totals_for_each_month_in_requested_range(self):
-        self.old_visit.check_in = timezone.datetime(2026, 1, 15, 9, 0)
-        self.old_visit.check_out = timezone.datetime(2026, 1, 15, 12, 0)
+        self.old_visit.check_in = timezone.make_aware(timezone.datetime(2026, 1, 15, 9, 0))
+        self.old_visit.check_out = timezone.make_aware(timezone.datetime(2026, 1, 15, 12, 0))
         self.old_visit.save(update_fields=['check_in', 'check_out'])
 
-        self.mid_visit.check_in = timezone.datetime(2026, 3, 10, 10, 0)
-        self.mid_visit.check_out = timezone.datetime(2026, 3, 10, 12, 0)
+        self.mid_visit.check_in = timezone.make_aware(timezone.datetime(2026, 3, 10, 10, 0))
+        self.mid_visit.check_out = timezone.make_aware(timezone.datetime(2026, 3, 10, 12, 0))
         self.mid_visit.save(update_fields=['check_in', 'check_out'])
 
-        self.open_visit.check_in = timezone.datetime(2026, 3, 20, 9, 0)
+        self.open_visit.check_in = timezone.make_aware(timezone.datetime(2026, 3, 20, 9, 0))
         self.open_visit.save(update_fields=['check_in'])
 
         response = self.client.get(
