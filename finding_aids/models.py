@@ -9,6 +9,7 @@ from hashids import Hashids
 from model_clone import CloneMixin
 
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
+from clockwork_api.services.ark import ensure_ark
 
 
 class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
@@ -40,6 +41,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
 
     old_id = models.CharField(max_length=12, blank=True, null=True)
     catalog_id = models.CharField(max_length=12, blank=True, null=True, db_index=True)
+    ark = models.CharField(max_length=255, blank=True, null=True, db_index=True)
 
     DESCRIPTION_LEVEL = [('L1', 'Level 1'), ('L2', 'Level 2')]
     description_level = models.CharField(max_length=2, choices=DESCRIPTION_LEVEL, default='L1')
@@ -179,6 +181,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         self.user_published = user.username
         self.date_published = timezone.now()
         self.save()
+        ensure_ark(self)
 
     def unpublish(self):
         """
@@ -265,7 +268,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         self.set_duration()
         if not self.catalog_id:
             self.set_catalog_id()
-        super(FindingAidsEntity, self).save()
+        super(FindingAidsEntity, self).save(**kwargs)
 
 
 class FindingAidsEntityAlternativeTitle(models.Model):

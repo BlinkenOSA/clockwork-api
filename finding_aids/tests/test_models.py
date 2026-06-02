@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from hashids import Hashids
+from unittest.mock import patch
 
 from archival_unit.models import ArchivalUnit
 from container.models import Container
@@ -105,3 +106,21 @@ class FindingAidsTest(TestCase):
         self.findings_aids_folder.set_catalog_id()
         hashids = Hashids(salt="blinkenosa", min_length=10)
         self.assertEqual(self.findings_aids_folder.catalog_id, hashids.encode(self.findings_aids_folder.id))
+
+    @patch("finding_aids.models.ensure_ark")
+    def test_publish_creates_ark_when_missing(self, mock_ensure_ark):
+        mock_ensure_ark.return_value = "ark:/12345/fa-1"
+
+        self.findings_aids_folder.ark = None
+        self.findings_aids_folder.publish(self.user)
+
+        mock_ensure_ark.assert_called_once_with(self.findings_aids_folder)
+
+    @patch("finding_aids.models.ensure_ark")
+    def test_publish_does_not_create_ark_when_present(self, mock_ensure_ark):
+        self.findings_aids_folder.ark = "ark:/12345/existing-fa"
+        self.findings_aids_folder.save()
+
+        self.findings_aids_folder.publish(self.user)
+
+        mock_ensure_ark.assert_called_once_with(self.findings_aids_folder)
