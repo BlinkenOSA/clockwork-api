@@ -344,7 +344,11 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
         citation.append('; ')
 
         # OSA
-        citation.append("Vera and Donald Blinken Open Society Archives at Central European University, Budapest")
+        citation.append("Blinken OSA Archivum at Central European University, Budapest")
+
+        # ARK
+        if obj.ark:
+            citation.append(f". https://ark.archivum.org/{obj.ark}")
 
         return "".join(citation)
 
