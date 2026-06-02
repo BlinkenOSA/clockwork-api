@@ -5,6 +5,8 @@ from django.utils import timezone
 from django_date_extensions.fields import ApproximateDateField
 from hashids import Hashids
 
+from clockwork_api.services.ark import ensure_ark
+
 
 class Isad(models.Model):
     """
@@ -21,6 +23,7 @@ class Isad(models.Model):
 
     id = models.AutoField(primary_key=True)
     catalog_id = models.CharField(max_length=20, blank=True, null=True, db_index=True)
+    ark = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     archival_unit = models.OneToOneField('archival_unit.ArchivalUnit', on_delete=models.PROTECT, related_name='isad')
     original_locale = models.ForeignKey('controlled_list.Locale', blank=True, null=True, on_delete=models.PROTECT)
     legacy_id = models.IntegerField(blank=True, null=True)
@@ -137,6 +140,7 @@ class Isad(models.Model):
         self.user_published = user.username
         self.date_published = timezone.now()
         self.save()
+        ensure_ark(self)
 
     def unpublish(self):
         """
@@ -159,7 +163,7 @@ class Isad(models.Model):
         self.title = self.archival_unit.title
         self.reference_code = self.archival_unit.reference_code
         self.catalog_id = self._get_catalog_id()
-        super(Isad, self).save()
+        super(Isad, self).save(**kwargs)
 
 
 class IsadCreator(models.Model):
