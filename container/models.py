@@ -1,6 +1,5 @@
 import datetime
 from django.db import models
-from django.utils import timezone
 
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 from digitization.models import DigitalVersion
@@ -68,7 +67,7 @@ class Container(models.Model, DetectProtectedMixin):
             else:
                 self.container_no = 1
         if self.digital_version_exists and not self.digital_version_creation_date:
-            self.digital_version_creation_date = timezone.now()
+            self.digital_version_creation_date = datetime.datetime.now()
         super(Container, self).save()
 
     @property

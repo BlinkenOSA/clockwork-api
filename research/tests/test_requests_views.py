@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 from rest_framework import status
 from rest_framework.reverse import reverse
-from django.utils import timezone
 
 from archival_unit.models import ArchivalUnit
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
@@ -24,7 +23,7 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
             email='ada@example.com',
             status='approved',
         )
-        self.request = Request.objects.create(researcher=self.researcher, request_date=timezone.now())
+        self.request = Request.objects.create(researcher=self.researcher, request_date=datetime.datetime.now())
 
         fonds = ArchivalUnit.objects.create(fonds=1201, level='F', title='Fonds')
         subfonds = ArchivalUnit.objects.create(

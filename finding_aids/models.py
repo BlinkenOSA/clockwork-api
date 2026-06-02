@@ -232,7 +232,9 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         """
         Generates a stable, public-facing catalog identifier using Hashids.
         """
-        if not self.is_template and self.id:
+        if not self.is_template:
+            super(FindingAidsEntity, self).save()
+            # Add hashids
             hashids = Hashids(salt="blinkenosa", min_length=10)
             self.catalog_id = hashids.encode(self.id)
 
@@ -259,20 +261,12 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
             - catalog_id is generated for non-template entities
         """
         if not self.date_created:
-            self.date_created = timezone.now()
+            self.date_created = datetime.datetime.now()
         self.set_reference_code()
         if self.digital_version_exists and not self.digital_version_creation_date:
             self.digital_version_creation_date = timezone.now().date()
         self.set_duration()
-        needs_catalog_id = not self.catalog_id and not self.is_template
-
-        if self._state.adding and needs_catalog_id:
-            super(FindingAidsEntity, self).save(**kwargs)
-            self.set_catalog_id()
-            super(FindingAidsEntity, self).save(update_fields=['catalog_id'])
-            return
-
-        if needs_catalog_id:
+        if not self.catalog_id:
             self.set_catalog_id()
         super(FindingAidsEntity, self).save(**kwargs)
 

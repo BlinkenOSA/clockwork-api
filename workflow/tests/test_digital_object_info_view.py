@@ -5,7 +5,6 @@ from rest_framework.reverse import reverse
 from xml.etree import ElementTree
 
 from archival_unit.models import ArchivalUnit
-from clockwork_api.tests.no_index_signals_mixin import NoIndexSignalsMixin
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from container.models import Container
 from controlled_list.models import CarrierType, PrimaryType
@@ -16,7 +15,7 @@ from workflow.serializers.finding_aids_serializer import FindingAidsDigitizedSer
 
 
 @override_settings(CATALOG_URL='https://catalog.example')
-class DigitalObjectInfoViewTests(NoIndexSignalsMixin, TestViewsBaseClass):
+class DigitalObjectInfoViewTests(TestViewsBaseClass):
     fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):
@@ -101,7 +100,7 @@ class DigitalObjectInfoViewTests(NoIndexSignalsMixin, TestViewsBaseClass):
 
 
 @override_settings(CATALOG_URL='https://catalog.example')
-class DigitalObjectEADViewTests(NoIndexSignalsMixin, TestViewsBaseClass):
+class DigitalObjectEADViewTests(TestViewsBaseClass):
     fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):
@@ -240,7 +239,7 @@ class DigitalObjectEADViewTests(NoIndexSignalsMixin, TestViewsBaseClass):
 
 
 @override_settings(CATALOG_URL='https://catalog.example')
-class WorkflowDigitizedSerializersTests(NoIndexSignalsMixin, TestCase):
+class WorkflowDigitizedSerializersTests(TestCase):
     fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):

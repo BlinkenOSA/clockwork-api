@@ -2,14 +2,13 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from archival_unit.models import ArchivalUnit
-from clockwork_api.tests.no_index_signals_mixin import NoIndexSignalsMixin
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from container.models import Container
 from controlled_list.models import CarrierType, PrimaryType
 from finding_aids.models import FindingAidsEntity
 
 
-class FindingAidsExtraViewsTests(NoIndexSignalsMixin, TestViewsBaseClass):
+class FindingAidsExtraViewsTests(TestViewsBaseClass):
     fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):

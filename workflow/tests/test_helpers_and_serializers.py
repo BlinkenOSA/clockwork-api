@@ -1,7 +1,6 @@
 from django.test import TestCase
 
 from archival_unit.models import ArchivalUnit
-from clockwork_api.tests.no_index_signals_mixin import NoIndexSignalsMixin
 from container.models import Container
 from controlled_list.models import CarrierType
 from isad.models import Isad
@@ -9,7 +8,7 @@ from workflow.serializers.archival_unit_serializer import ArchivalUnitSerializer
 from workflow.serializers.container_serializers import ContainerDigitizedSerializer
 
 
-class WorkflowSerializersTests(NoIndexSignalsMixin, TestCase):
+class WorkflowSerializersTests(TestCase):
     fixtures = ['carrier_types']
 
     def setUp(self):

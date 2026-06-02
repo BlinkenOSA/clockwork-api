@@ -2,12 +2,11 @@ from django.test import TestCase
 
 from archival_unit.models import ArchivalUnit
 from authority.models import Language
-from clockwork_api.tests.no_index_signals_mixin import NoIndexSignalsMixin
 from isad.models import Isad, IsadCreator
 from isad.serializers.isad_serializers import IsadReadSerializer, IsadPreCreateSerializer
 
 
-class IsadSerializerTests(NoIndexSignalsMixin, TestCase):
+class IsadSerializerTests(TestCase):
     def setUp(self):
         self.fonds = ArchivalUnit.objects.create(fonds=1000, level='F', title='Fonds')
         self.language = Language.objects.create(language='English')
