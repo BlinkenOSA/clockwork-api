@@ -65,9 +65,17 @@ class ContainerViewsTest(TestViewsBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 0)
 
+    @patch('finding_aids.signals.index_meilisearch_finding_aids_entity_remove.delay')
+    @patch('finding_aids.signals.index_catalog_finding_aids_entity_remove.delay')
     @patch('finding_aids.signals.index_meilisearch_finding_aids_entity.delay')
     @patch('finding_aids.signals.index_catalog_finding_aids_entity.delay')
-    def test_container_publish_triggers_indexing_signals(self, mock_catalog_index, mock_meili_index):
+    def test_container_publish_triggers_indexing_signals(
+            self,
+            mock_catalog_index,
+            mock_meili_index,
+            mock_catalog_remove,
+            mock_meili_remove,
+    ):
         finding_aids = make_finding_aids(
             container=self.container,
             primary_type=self.primary_type,
@@ -78,6 +86,8 @@ class ContainerViewsTest(TestViewsBaseClass):
         # (catalog_id generation path). We only assert the publish endpoint effect.
         mock_catalog_index.reset_mock()
         mock_meili_index.reset_mock()
+        mock_catalog_remove.reset_mock()
+        mock_meili_remove.reset_mock()
 
         response = self.client.put(
             reverse('container-v1:container-publish', kwargs={'action': 'publish', 'pk': self.container.id})
@@ -89,9 +99,17 @@ class ContainerViewsTest(TestViewsBaseClass):
         self.assertEqual(mock_catalog_index.call_count, 1)
         self.assertEqual(mock_meili_index.call_count, 1)
 
-    @patch('finding_aids.signals.index_meilisearch_finding_aids_entity.delay')
+    @patch('finding_aids.signals.index_meilisearch_finding_aids_entity_remove.delay')
     @patch('finding_aids.signals.index_catalog_finding_aids_entity_remove.delay')
-    def test_container_unpublish_triggers_indexing_signals(self, mock_catalog_remove, mock_meili_index):
+    @patch('finding_aids.signals.index_meilisearch_finding_aids_entity.delay')
+    @patch('finding_aids.signals.index_catalog_finding_aids_entity.delay')
+    def test_container_unpublish_triggers_indexing_signals(
+            self,
+            mock_catalog_index,
+            mock_meili_index,
+            mock_catalog_remove,
+            mock_meili_remove,
+    ):
         finding_aids = make_finding_aids(
             container=self.container,
             primary_type=self.primary_type,
@@ -100,8 +118,10 @@ class ContainerViewsTest(TestViewsBaseClass):
         )
         # Creating a FindingAidsEntity can trigger multiple saves/signals
         # (catalog_id generation path). We only assert the unpublish endpoint effect.
+        mock_catalog_index.reset_mock()
         mock_catalog_remove.reset_mock()
         mock_meili_index.reset_mock()
+        mock_meili_remove.reset_mock()
 
         response = self.client.put(
             reverse('container-v1:container-publish', kwargs={'action': 'unpublish', 'pk': self.container.id})

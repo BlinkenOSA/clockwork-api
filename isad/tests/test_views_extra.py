@@ -5,11 +5,12 @@ from rest_framework.reverse import reverse
 
 from archival_unit.models import ArchivalUnit
 from authority.models import Language
+from clockwork_api.tests.no_index_signals_mixin import NoIndexSignalsMixin
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from isad.models import Isad
 
 
-class IsadExtraViewsTests(TestViewsBaseClass):
+class IsadExtraViewsTests(NoIndexSignalsMixin, TestViewsBaseClass):
     def setUp(self):
         super().setUp()
         self.fonds = ArchivalUnit.objects.create(fonds=1001, level='F', title='Fonds')

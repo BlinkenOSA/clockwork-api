@@ -2,10 +2,12 @@ import json
 
 from rest_framework import status
 from rest_framework.reverse import reverse
+
+from clockwork_api.tests.no_index_signals_mixin import NoIndexSignalsMixin
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 
 
-class FindingAidsPublishTest(TestViewsBaseClass):
+class FindingAidsPublishTest(NoIndexSignalsMixin, TestViewsBaseClass):
     """ Testing Finding Aids publishing endpoints"""
     fixtures = ['carrier_types', 'primary_types', 'access_rights', 'archival_unit_themes', 'finding_aids']
 
