@@ -72,3 +72,10 @@ RESEARCH_ROOM_STAFF_EMAIL = ['example@example.com']
 RESTRICTED_DECISION_MAKER_EMAIL = ['example@example.com']
 
 CATALOG_URL = 'https://catalog.archivum.org/catalog'
+
+# User-Agent used for Wikidata and Wikipedia requests. Override in the
+# environment for deployments that need a contact address.
+WIKIDATA_USER_AGENT = os.environ.get(
+    "WIKIDATA_USER_AGENT",
+    "Blinken OSA Archivum - Archival Management System",
+)

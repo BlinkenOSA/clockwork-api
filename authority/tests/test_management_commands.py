@@ -4,7 +4,7 @@ from unittest.mock import patch
 from django.core.management import call_command
 from django.test import TestCase
 
-from authority.models import Country, Language
+from authority.models import Corporation, Country, Language, Person
 
 
 class BackfillWikidataCacheCommandTests(TestCase):
@@ -149,3 +149,167 @@ class BackfillCountryGeoshapesCommandTests(TestCase):
             },
         )
         mock_get_wikidata_entity_payload.assert_called_once_with("Q262")
+
+
+class BackfillPersonWikidataIdsCommandTests(TestCase):
+    @patch("authority.management.commands.backfill_person_wikidata_ids.resolve_person_wikidata_id")
+    def test_backfill_updates_missing_person_wikidata_id(self, mock_resolve_person_wikidata_id):
+        mock_resolve_person_wikidata_id.return_value = (
+            "Q42",
+            {
+                "status": "resolved",
+                "source": "wikipedia",
+                "wikipedia_id": "Q42",
+                "viaf_id": None,
+            },
+        )
+
+        with patch("authority.models.get_wikidata_entity_payload", return_value=None), patch(
+            "authority.models.simhash64", return_value=1
+        ):
+            person = Person.objects.create(
+                first_name="Douglas",
+                last_name="Adams",
+                wiki_url="https://en.wikipedia.org/wiki/Douglas_Adams",
+            )
+
+        out = StringIO()
+        with patch("authority.models.simhash64", return_value=1):
+            call_command("backfill_person_wikidata_ids", stdout=out)
+
+        person.refresh_from_db()
+        self.assertEqual(person.wikidata_id, "Q42")
+        mock_resolve_person_wikidata_id.assert_called_once_with(
+            wiki_url="https://en.wikipedia.org/wiki/Douglas_Adams",
+            authority_url="",
+        )
+
+    @patch("authority.management.commands.backfill_person_wikidata_ids.resolve_person_wikidata_id")
+    def test_backfill_skips_conflicts(self, mock_resolve_person_wikidata_id):
+        mock_resolve_person_wikidata_id.return_value = (
+            None,
+            {
+                "status": "conflict",
+                "source": None,
+                "wikipedia_id": "Q42",
+                "viaf_id": "Q1",
+            },
+        )
+
+        with patch("authority.models.get_wikidata_entity_payload", return_value=None), patch(
+            "authority.models.simhash64", return_value=1
+        ):
+            person = Person.objects.create(
+                first_name="Douglas",
+                last_name="Adams",
+                wiki_url="https://en.wikipedia.org/wiki/Douglas_Adams",
+                authority_url="http://www.viaf.org/viaf/113230702",
+            )
+
+        call_command("backfill_person_wikidata_ids")
+
+        person.refresh_from_db()
+        self.assertIsNone(person.wikidata_id)
+
+    @patch("authority.management.commands.backfill_person_wikidata_ids.resolve_person_wikidata_id")
+    def test_backfill_dry_run_does_not_save(self, mock_resolve_person_wikidata_id):
+        mock_resolve_person_wikidata_id.return_value = (
+            "Q42",
+            {
+                "status": "resolved",
+                "source": "viaf",
+                "wikipedia_id": None,
+                "viaf_id": "Q42",
+            },
+        )
+
+        with patch("authority.models.get_wikidata_entity_payload", return_value=None), patch(
+            "authority.models.simhash64", return_value=1
+        ):
+            person = Person.objects.create(
+                first_name="Douglas",
+                last_name="Adams",
+                authority_url="http://www.viaf.org/viaf/113230702",
+            )
+
+        call_command("backfill_person_wikidata_ids", "--dry-run")
+
+        person.refresh_from_db()
+        self.assertIsNone(person.wikidata_id)
+
+
+class BackfillCorporationWikidataIdsCommandTests(TestCase):
+    @patch("authority.management.commands.backfill_corporation_wikidata_ids.resolve_corporation_wikidata_id")
+    def test_backfill_updates_missing_corporation_wikidata_id(self, mock_resolve_corporation_wikidata_id):
+        mock_resolve_corporation_wikidata_id.return_value = (
+            "Q95",
+            {
+                "status": "resolved",
+                "source": "wikipedia",
+                "wikipedia_id": "Q95",
+                "viaf_id": None,
+            },
+        )
+
+        with patch("authority.models.get_wikidata_entity_payload", return_value=None):
+            corporation = Corporation.objects.create(
+                name="Google",
+                wiki_url="https://en.wikipedia.org/wiki/Google",
+            )
+
+        out = StringIO()
+        call_command("backfill_corporation_wikidata_ids", stdout=out)
+
+        corporation.refresh_from_db()
+        self.assertEqual(corporation.wikidata_id, "Q95")
+        mock_resolve_corporation_wikidata_id.assert_called_once_with(
+            wiki_url="https://en.wikipedia.org/wiki/Google",
+            authority_url="",
+        )
+
+    @patch("authority.management.commands.backfill_corporation_wikidata_ids.resolve_corporation_wikidata_id")
+    def test_backfill_skips_corporation_conflicts(self, mock_resolve_corporation_wikidata_id):
+        mock_resolve_corporation_wikidata_id.return_value = (
+            None,
+            {
+                "status": "conflict",
+                "source": None,
+                "wikipedia_id": "Q95",
+                "viaf_id": "Q1",
+            },
+        )
+
+        with patch("authority.models.get_wikidata_entity_payload", return_value=None):
+            corporation = Corporation.objects.create(
+                name="Google",
+                wiki_url="https://en.wikipedia.org/wiki/Google",
+                authority_url="http://www.viaf.org/viaf/136145864",
+            )
+
+        call_command("backfill_corporation_wikidata_ids")
+
+        corporation.refresh_from_db()
+        self.assertIsNone(corporation.wikidata_id)
+
+    @patch("authority.management.commands.backfill_corporation_wikidata_ids.resolve_corporation_wikidata_id")
+    def test_backfill_corporation_dry_run_does_not_save(self, mock_resolve_corporation_wikidata_id):
+        mock_resolve_corporation_wikidata_id.return_value = (
+            "Q95",
+            {
+                "status": "resolved",
+                "source": "viaf",
+                "wikipedia_id": None,
+                "viaf_id": "Q95",
+            },
+        )
+
+        with patch("authority.models.get_wikidata_entity_payload", return_value=None):
+            corporation = Corporation.objects.create(
+                name="Google",
+                authority_url="http://www.viaf.org/viaf/136145864",
+            )
+
+        call_command("backfill_corporation_wikidata_ids", "--dry-run")
+
+        corporation.refresh_from_db()
+        self.assertIsNone(corporation.wikidata_id)
