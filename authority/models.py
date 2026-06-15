@@ -27,22 +27,15 @@ class WikidataCacheMixin(models.Model):
         return payload
 
     def save(self, *args, **kwargs):
-        previous_wikidata_id = None
-        if self.pk:
-            previous_wikidata_id = type(self).objects.filter(pk=self.pk).values_list('wikidata_id', flat=True).first()
-
-        refresh_cache = bool(self.wikidata_id) and self.wikidata_id != previous_wikidata_id
-        clear_cache = bool(previous_wikidata_id) and not self.wikidata_id
-
         super().save(*args, **kwargs)
 
         updates = {}
-        if clear_cache:
+        if not self.wikidata_id:
             updates = {
                 'wikidata_cache': None,
                 'wikidata_cache_updated_at': None,
             }
-        elif refresh_cache:
+        else:
             try:
                 payload = get_wikidata_entity_payload(self.wikidata_id)
             except Exception:

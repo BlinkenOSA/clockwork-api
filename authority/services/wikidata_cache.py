@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+from urllib.parse import quote
 
 from clockwork_api.http import get
 from requests.exceptions import RequestException
@@ -11,6 +12,7 @@ ACCEPTED_KEYS = {
     'P18': 'image',
     'P19': 'place_of_birth',
     'P20': 'place_of_death',
+    'P214': 'viaf',
     'P106': 'occupation',
     'P569': 'date_of_birth',
     'P570': 'date_of_death',
@@ -32,6 +34,32 @@ COMMONS_RETRY_STATUS_CODES = {429, 503}
 COMMONS_RETRY_DELAYS = (1.0, 2.0, 5.0)
 
 logger = logging.getLogger(__name__)
+
+
+def _build_wikipedia_url(sitelink):
+    url = sitelink.get('url')
+    if url and '.wikipedia.org/' in url:
+        return url
+
+    site = sitelink.get('site', '')
+    title = sitelink.get('title')
+    if not site.endswith('wiki') or not title:
+        return None
+
+    language_code = site[:-4]
+    if not language_code:
+        return None
+
+    return f"https://{language_code}.wikipedia.org/wiki/{quote(title.replace(' ', '_'))}"
+
+
+def _get_wikipedia_pages(sitelinks):
+    return {
+        key: wikipedia_url
+        for key, value in sitelinks.items()
+        for wikipedia_url in [_build_wikipedia_url(value)]
+        if wikipedia_url
+    }
 
 
 def _should_retry_commons_response(response):
@@ -176,6 +204,9 @@ def get_wikidata_entity_payload(wikidata_id: str):
             elif accepted_key in ('P569', 'P570'):
                 keys_dict[output_key] = value['mainsnak']['datavalue']['value']['time']
 
+            elif accepted_key == 'P214':
+                keys_dict[output_key] = value['mainsnak']['datavalue']['value']
+
             elif accepted_key in ('P106', 'P800'):
                 if output_key not in keys_dict:
                     keys_dict[output_key] = []
@@ -196,15 +227,20 @@ def get_wikidata_entity_payload(wikidata_id: str):
 
     wikipedia = ''
     sitelinks = entity.data.get('sitelinks', {})
+    wikipedia_pages = _get_wikipedia_pages(sitelinks)
+
     for wikikey in WIKIPEDIA_LINKS:
         if wikikey in sitelinks:
-            wikipedia = sitelinks[wikikey]['url']
-            break
+            wikipedia = _build_wikipedia_url(sitelinks[wikikey]) or ''
+            if wikipedia:
+                break
 
     return {
         'title': entity.label['en'],
         'description': get_best_description(entity.description),
+        'viaf': keys_dict.pop('viaf', None),
         'wikipedia': wikipedia,
+        'wikipedia_pages': wikipedia_pages,
         'properties': keys_dict
     }
 
