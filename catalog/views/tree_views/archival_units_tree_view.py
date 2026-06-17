@@ -197,6 +197,7 @@ class ArchivalUnitsTreeView(APIView):
                     if actual_fond != 0:
                         tree.append(fonds)
                 fonds = self.get_unit_data(au)
+                subfonds = {'children': []}
 
             if au['level'] == 'SF':
                 if au['subfonds'] != 0:
@@ -211,7 +212,7 @@ class ArchivalUnitsTreeView(APIView):
                 if au['subfonds'] == 0:
                     series['subfonds'] = False
                     fonds['children'].append(series)
-                else:
+                elif subfonds.get('id') == au['subfonds']:
                     series['subfonds'] = True
                     subfonds['children'].append(series)
 
