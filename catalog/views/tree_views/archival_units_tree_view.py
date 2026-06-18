@@ -164,6 +164,7 @@ class ArchivalUnitsTreeView(APIView):
         subfonds = {}
         actual_fond = 0
         actual_subfonds = 0
+        current_subfonds_value = 0
 
         # Query selection logic
         if archival_unit_id == 'all':
@@ -198,21 +199,24 @@ class ArchivalUnitsTreeView(APIView):
                         tree.append(fonds)
                 fonds = self.get_unit_data(au)
                 subfonds = {'children': []}
+                current_subfonds_value = 0
 
             if au['level'] == 'SF':
                 if au['subfonds'] != 0:
                     subfonds = self.get_unit_data(au)
+                    current_subfonds_value = au['subfonds']
                     if actual_subfonds != au['subfonds']:
                         fonds['children'].append(subfonds)
                 else:
                     subfonds = {'children': []}
+                    current_subfonds_value = 0
 
             if au['level'] == 'S':
                 series = self.get_unit_data(au)
                 if au['subfonds'] == 0:
                     series['subfonds'] = False
                     fonds['children'].append(series)
-                elif subfonds.get('id') == au['subfonds']:
+                elif current_subfonds_value == au['subfonds']:
                     series['subfonds'] = True
                     subfonds['children'].append(series)
 
