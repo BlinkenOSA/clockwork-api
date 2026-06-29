@@ -3,6 +3,9 @@ from email.utils import getaddresses
 
 
 def parse_admins(value):
+    if isinstance(value, (list, tuple)):
+        return tuple((name or address, address) for name, address in value if address)
+
     return tuple(
         (name or address, address)
         for name, address in getaddresses([value])
@@ -69,7 +72,9 @@ EMAIL_SUBJECT_PREFIX = os.environ.get(
     "[Clockwork API] ",
 )
 
-ADMINS = parse_admins(os.environ.get("DJANGO_ADMINS", ""))
+# `local.py` can override this directly with Django's native tuple-of-tuples
+# format, while env-based deployments can continue to use `DJANGO_ADMINS`.
+ADMINS = parse_admins(globals().get("ADMINS", os.environ.get("DJANGO_ADMINS", "")))
 MANAGERS = ADMINS
 
 O365_MAIL_CLIENT_ID = os.environ.get("O365_MAIL_CLIENT_ID")

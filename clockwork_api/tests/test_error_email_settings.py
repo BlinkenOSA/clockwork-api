@@ -21,6 +21,11 @@ class ErrorEmailSettingsTests(SimpleTestCase):
     def test_parse_admins_ignores_empty_values(self):
         self.assertEqual(parse_admins(""), ())
 
+    def test_parse_admins_accepts_django_admin_tuple_format(self):
+        admins = parse_admins((("Josh", "josh@example.com"),))
+
+        self.assertEqual(admins, (("Josh", "josh@example.com"),))
+
     def test_build_error_email_logging_sets_mail_admins_handlers(self):
         logging_config = build_error_email_logging(
             {
