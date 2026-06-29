@@ -223,3 +223,45 @@ class ArchivalUnitsTreeViewTests(SimpleTestCase):
 
         mock_get_object_or_404.assert_called_once()
         mock_filter.assert_called_once_with(isad__published=True, fonds=9)
+
+    def test_get_skips_series_when_parent_subfonds_is_not_published(self):
+        rows = [
+            {
+                "id": 1,
+                "fonds": 1,
+                "subfonds": 0,
+                "series": 0,
+                "reference_code": "HU OSA 100",
+                "title": "Fonds",
+                "title_original": "Fonds Orig",
+                "level": "F",
+                "isad__catalog_id": "ISAD-F",
+                "theme": "theme-a",
+            },
+            {
+                "id": 3,
+                "fonds": 1,
+                "subfonds": 9,
+                "series": 1,
+                "reference_code": "HU OSA 100/9/1",
+                "title": "Series Orphaned By Filter",
+                "title_original": "Series Orphaned By Filter Orig",
+                "level": "S",
+                "isad__catalog_id": "ISAD-S1",
+                "theme": "theme-a",
+            },
+        ]
+
+        qs = _ArchivalUnitQS(rows)
+        request = self.factory.get("/v1/catalog/archival-units-tree/all/theme-a/")
+
+        with patch(
+            "catalog.views.tree_views.archival_units_tree_view.ArchivalUnit.objects.filter",
+            return_value=qs,
+        ):
+            response = self.view.get(request, archival_unit_id="all", theme="theme-a")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], 1)
+        self.assertEqual(response.data[0]["children"], [])
