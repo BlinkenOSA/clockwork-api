@@ -260,6 +260,7 @@ class FindingAidsClone(APIView):
         else:
             clone.sequence_no += 1
         clone.published = False
+        clone.missing = False
         clone.user_created = request.user.username
         clone.date_created = timezone.now()
         clone.user_updated = None
@@ -278,6 +279,8 @@ class FindingAidsAction(APIView):
     Supported actions:
         - publish: mark published and set published metadata
         - unpublish: unpublish and clear published metadata
+        - set_missing: mark record as missing
+        - set_non_missing: clear missing status
         - set_confidential: mark record as confidential
         - (default): set_non_confidential (any other action value)
 
@@ -289,7 +292,7 @@ class FindingAidsAction(APIView):
         Applies the requested action to the target entity.
 
         URL kwargs:
-            action: action string (publish|unpublish|set_confidential|...)
+            action: action string (publish|unpublish|set_missing|set_non_missing|set_confidential|...)
             pk: FindingAidsEntity id
 
         Returns:
@@ -303,6 +306,10 @@ class FindingAidsAction(APIView):
             finding_aids.publish(request.user)
         elif action == 'unpublish':
             finding_aids.unpublish()
+        elif action == 'set_missing':
+            finding_aids.set_missing()
+        elif action == 'set_non_missing':
+            finding_aids.set_non_missing()
         elif action == 'set_confidential':
             finding_aids.set_confidential()
         else:

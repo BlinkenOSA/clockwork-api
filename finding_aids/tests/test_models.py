@@ -105,6 +105,17 @@ class FindingAidsTest(NoIndexSignalsMixin, TestCase):
         self.findings_aids_folder.set_non_confidential()
         self.assertFalse(self.findings_aids_folder.confidential)
 
+    def test_set_missing(self):
+        self.findings_aids_folder.set_missing()
+        self.assertTrue(self.findings_aids_folder.missing)
+
+    def test_set_non_missing(self):
+        self.findings_aids_folder.missing = True
+        self.findings_aids_folder.save()
+
+        self.findings_aids_folder.set_non_missing()
+        self.assertFalse(self.findings_aids_folder.missing)
+
     def test_set_catalog_id(self):
         self.findings_aids_folder.set_catalog_id()
         hashids = Hashids(salt="blinkenosa", min_length=10)

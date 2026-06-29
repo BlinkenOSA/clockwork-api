@@ -212,7 +212,7 @@ class FindingAidsEntityListSerializer(serializers.ModelSerializer):
     class Meta:
         model = FindingAidsEntity
         fields = ('id', 'archival_reference_code', 'title', 'level', 'date_from', 'date_to', 'catalog_id',
-                  'published', 'confidential', 'is_removable',
+                  'published', 'missing', 'confidential', 'is_removable',
                   'digital_versions_masters', 'digital_versions_access_copies', 'digital_versions_of_container')
 
 

@@ -115,3 +115,18 @@ class FindingAidsExtraViewsTests(NoIndexSignalsMixin, TestViewsBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.l1.refresh_from_db()
         self.assertFalse(self.l1.confidential)
+
+    def test_action_set_and_unset_missing(self):
+        response = self.client.put(
+            reverse('finding_aids-v1:finding_aids-publish', kwargs={'action': 'set_missing', 'pk': self.l1.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.l1.refresh_from_db()
+        self.assertTrue(self.l1.missing)
+
+        response = self.client.put(
+            reverse('finding_aids-v1:finding_aids-publish', kwargs={'action': 'set_non_missing', 'pk': self.l1.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.l1.refresh_from_db()
+        self.assertFalse(self.l1.missing)

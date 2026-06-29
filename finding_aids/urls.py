@@ -11,7 +11,7 @@ Entity CRUD and helpers:
     - selection list for UI widgets
     - compute the next folder/sequence numbers
     - clone entities
-    - state actions (publish/unpublish/confidential)
+    - state actions (publish/unpublish/missing/confidential)
 
 Templates:
     - list/select templates per series
@@ -84,7 +84,7 @@ urlpatterns = [
     # Excel export (series-scoped)
     path('excel/export/<int:series_id>/', FindingAidsExcelExport.as_view(), name='finding_aids-excel-export'),
 
-    # Actions (publish/unpublish/confidential toggles)
-    re_path(r'(?P<action>["publish"|"unpublish"|"set_confidential"|"set_non_confidential"]+)/(?P<pk>[0-9]+)/',
+    # Actions (publish/unpublish/missing/confidential toggles)
+    re_path(r'(?P<action>["publish"|"unpublish"|"set_missing"|"set_non_missing"|"set_confidential"|"set_non_confidential"]+)/(?P<pk>[0-9]+)/',
             FindingAidsAction.as_view(), name='finding_aids-publish')
 ]
