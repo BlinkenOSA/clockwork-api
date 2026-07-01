@@ -6,12 +6,13 @@ related workflows, including:
 
 Entity CRUD and helpers:
     - list entities within a container
+    - list all missing entities
     - pre-create payload (numbering + reference code)
     - create/update/delete entities
     - selection list for UI widgets
     - compute the next folder/sequence numbers
     - clone entities
-    - state actions (publish/unpublish/confidential)
+    - state actions (publish/unpublish/missing/confidential)
 
 Templates:
     - list/select templates per series
@@ -39,16 +40,22 @@ from finding_aids.views.finding_aids_excel_views import FindingAidsExcelExport
 from finding_aids.views.finding_aids_grid_views import FindingAidsGridList, FindingAidsGridListExport
 from finding_aids.views.finding_aids_index_views import FindingAidsEntityIndexTestView
 from finding_aids.views.finding_aids_label_views import FindingAidsLabelDataView, FindingAidsCarrierTypeDataView
+from finding_aids.views.finding_aids_missing_views import FindingAidsMissingList, \
+    FindingAidsMissingArchivalUnitSelectList
 from finding_aids.views.finding_aids_template_views import FindingAidsTemplateList, FindingAidsTemplateSelect, \
     FindingAidsTemplateDetail, FindingAidsTemplateCreate, FindingAidsTemplatePreCreate
 from finding_aids.views.finding_aids_views import FindingAidsSelectList, FindingAidsCreate, FindingAidsDetail, \
-    FindingAidsList, FindingAidsClone, FindingAidsAction, FindingAidsPreCreate, FindingAidsGetNextFolder
+    FindingAidsList, FindingAidsClone, FindingAidsAction, FindingAidsPreCreate, \
+    FindingAidsGetNextFolder
 
 app_name = 'finding_aids'
 
 urlpatterns = [
     # Finding Aids entities (container-scoped)
     path('list/<int:container_id>/', FindingAidsList.as_view(), name='finding_aids-list'),
+    path('missing/', FindingAidsMissingList.as_view(), name='finding_aids-missing-list'),
+    path('missing/series/select/', FindingAidsMissingArchivalUnitSelectList.as_view(),
+         name='finding_aids-missing-series-select'),
     path('<int:pk>/', FindingAidsDetail.as_view(), name='finding_aids-detail'),
     path('pre_create/<int:container_id>/', FindingAidsPreCreate.as_view(), name='finding_aids-pre-create'),
     path('create/<int:container_id>/', FindingAidsCreate.as_view(), name='finding_aids-create'),
@@ -84,7 +91,7 @@ urlpatterns = [
     # Excel export (series-scoped)
     path('excel/export/<int:series_id>/', FindingAidsExcelExport.as_view(), name='finding_aids-excel-export'),
 
-    # Actions (publish/unpublish/confidential toggles)
-    re_path(r'(?P<action>["publish"|"unpublish"|"set_confidential"|"set_non_confidential"]+)/(?P<pk>[0-9]+)/',
+    # Actions (publish/unpublish/missing/confidential toggles)
+    re_path(r'(?P<action>["publish"|"unpublish"|"set_missing"|"set_non_missing"|"set_confidential"|"set_non_confidential"]+)/(?P<pk>[0-9]+)/',
             FindingAidsAction.as_view(), name='finding_aids-publish')
 ]

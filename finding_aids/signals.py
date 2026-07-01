@@ -19,11 +19,15 @@ def update_finding_aids_index(sender, instance, **kwargs):
     Behavior depends on publication state:
         - If the entity is published, it is indexed
         - If the entity is unpublished, it is removed from the index
+        - If the entity is marked as missing, it is removed from the index
 
     Indexing is performed asynchronously via Celery tasks.
     """
     if instance.published:
-        index_catalog_finding_aids_entity.delay(finding_aids_entity_id=instance.id)
+        if instance.missing:
+            index_catalog_finding_aids_entity_remove.delay(finding_aids_entity_id=instance.id)
+        else:
+            index_catalog_finding_aids_entity.delay(finding_aids_entity_id=instance.id)
     else:
         index_catalog_finding_aids_entity_remove.delay(finding_aids_entity_id=instance.id)
 

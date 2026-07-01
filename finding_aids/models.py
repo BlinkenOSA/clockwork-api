@@ -109,7 +109,8 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     internal_note = models.TextField(blank=True, null=True)
 
     # Published
-    published = models.BooleanField(default=False)
+    published = models.BooleanField(default=False, db_index=True)
+    missing = models.BooleanField(default=False, db_index=True)
 
     # Digital Version
     digital_version_exists = models.BooleanField(default=False, db_index=True)
@@ -138,7 +139,8 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, db_index=True)
 
     # Clone fields
-    _clone_excluded_fields = ['id', 'uuid', 'legacy_id', 'archival_reference_code', 'old_id', 'catalog_id', 'published']
+    _clone_excluded_fields = ['id', 'uuid', 'legacy_id', 'archival_reference_code', 'old_id', 'catalog_id',
+                              'published', 'missing']
     _clone_linked_m2m_fields = ['genre', 'spatial_coverage_country', 'spatial_coverage_place',
                                 'subject_person', 'subject_corporation', 'subject_keyword']
     _clone_m2o_or_o2m_fields = [
@@ -204,6 +206,20 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
         Removes confidential status.
         """
         self.confidential = False
+        self.save()
+
+    def set_missing(self):
+        """
+        Marks the entity as missing.
+        """
+        self.missing = True
+        self.save()
+
+    def set_non_missing(self):
+        """
+        Clears missing status.
+        """
+        self.missing = False
         self.save()
 
     def set_reference_code(self):

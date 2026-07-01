@@ -22,6 +22,7 @@ class RequestItemPartSerializer(serializers.ModelSerializer):
 
     reference_code = serializers.SerializerMethodField()
     is_restricted = serializers.SerializerMethodField()
+    is_missing = serializers.SerializerMethodField()
 
     def get_reference_code(self, obj):
         """
@@ -35,9 +36,15 @@ class RequestItemPartSerializer(serializers.ModelSerializer):
         """
         return obj.finding_aids_entity.access_rights.statement == 'Restricted'
 
+    def get_is_missing(self, obj):
+        """
+        Returns True if the linked finding aids entity is missing.
+        """
+        return obj.finding_aids_entity.missing
+
     class Meta:
         model = RequestItemPart
-        fields = ['finding_aids_entity', 'reference_code', 'is_restricted', 'status']
+        fields = ['finding_aids_entity', 'reference_code', 'is_restricted', 'is_missing', 'status']
 
 
 class RequestListSerializer(serializers.ModelSerializer):
