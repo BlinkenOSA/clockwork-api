@@ -41,6 +41,27 @@ class FindingAidsExtraViewsTests(NoIndexSignalsMixin, TestViewsBaseClass):
             barcode='HU_OSA_TEST',
         )
 
+        subfonds_other = ArchivalUnit.objects.create(
+            fonds=901,
+            subfonds=2,
+            level='SF',
+            title='Other Subfonds',
+            parent=fonds,
+        )
+        self.other_series = ArchivalUnit.objects.create(
+            fonds=901,
+            subfonds=2,
+            series=1,
+            level='S',
+            title='Other Series',
+            parent=subfonds_other,
+        )
+        self.other_container = Container.objects.create(
+            archival_unit=self.other_series,
+            carrier_type=CarrierType.objects.first(),
+            container_no=2,
+        )
+
         self.l1 = FindingAidsEntity.objects.create(
             archival_unit=self.series,
             container=self.container,
@@ -59,6 +80,16 @@ class FindingAidsExtraViewsTests(NoIndexSignalsMixin, TestViewsBaseClass):
             folder_no=1,
             sequence_no=1,
             title='Item',
+            date_from='2020-01-01',
+            primary_type=PrimaryType.objects.first(),
+        )
+        self.other_l1 = FindingAidsEntity.objects.create(
+            archival_unit=self.other_series,
+            container=self.other_container,
+            description_level='L1',
+            level='F',
+            folder_no=1,
+            title='Other Folder',
             date_from='2020-01-01',
             primary_type=PrimaryType.objects.first(),
         )
@@ -130,3 +161,44 @@ class FindingAidsExtraViewsTests(NoIndexSignalsMixin, TestViewsBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.l1.refresh_from_db()
         self.assertFalse(self.l1.missing)
+
+    def test_missing_list_returns_only_missing_entities(self):
+        self.l1.missing = True
+        self.l1.save()
+
+        response = self.client.get(
+            reverse('finding_aids-v1:finding_aids-missing-list')
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['id'], self.l1.id)
+        self.assertTrue(response.data['results'][0]['missing'])
+
+    def test_missing_list_filters_by_archival_unit_id(self):
+        self.l1.missing = True
+        self.l1.save()
+        self.other_l1.missing = True
+        self.other_l1.save()
+
+        response = self.client.get(
+            reverse('finding_aids-v1:finding_aids-missing-list'),
+            {'archival_unit_id': self.series.id},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['id'], self.l1.id)
+
+    def test_missing_series_select_returns_only_series_with_missing_entities(self):
+        self.l1.missing = True
+        self.l1.save()
+
+        response = self.client.get(
+            reverse('finding_aids-v1:finding_aids-missing-series-select')
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], self.series.id)
+        self.assertEqual(response.data[0]['title'], self.series.title)

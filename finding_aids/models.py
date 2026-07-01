@@ -109,8 +109,8 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     internal_note = models.TextField(blank=True, null=True)
 
     # Published
-    published = models.BooleanField(default=False)
-    missing = models.BooleanField(default=False)
+    published = models.BooleanField(default=False, db_index=True)
+    missing = models.BooleanField(default=False, db_index=True)
 
     # Digital Version
     digital_version_exists = models.BooleanField(default=False, db_index=True)
