@@ -8,7 +8,7 @@ from finding_aids.signals import remove_finding_aids_index, update_finding_aids_
 
 class FindingAidsSignalTests(SimpleTestCase):
     def test_update_finding_aids_index_published_enqueues_catalog_and_meili_index(self):
-        instance = SimpleNamespace(id=42, published=True, catalog_id="fa-doc-42")
+        instance = SimpleNamespace(id=42, published=True, missing=False, catalog_id="fa-doc-42")
 
         with patch("finding_aids.signals.index_catalog_finding_aids_entity.delay") as mock_catalog_index_delay, patch(
             "finding_aids.signals.index_catalog_finding_aids_entity_remove.delay"
@@ -25,7 +25,7 @@ class FindingAidsSignalTests(SimpleTestCase):
         mock_meili_remove_delay.assert_not_called()
 
     def test_update_finding_aids_index_unpublished_enqueues_catalog_remove_and_meili_index(self):
-        instance = SimpleNamespace(id=77, published=False, catalog_id="fa-doc-77")
+        instance = SimpleNamespace(id=77, published=False, missing=False, catalog_id="fa-doc-77")
 
         with patch("finding_aids.signals.index_catalog_finding_aids_entity.delay") as mock_catalog_index_delay, patch(
             "finding_aids.signals.index_catalog_finding_aids_entity_remove.delay"
