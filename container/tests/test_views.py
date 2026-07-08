@@ -89,9 +89,10 @@ class ContainerViewsTest(TestViewsBaseClass):
         mock_catalog_remove.reset_mock()
         mock_meili_remove.reset_mock()
 
-        response = self.client.put(
-            reverse('container-v1:container-publish', kwargs={'action': 'publish', 'pk': self.container.id})
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.put(
+                reverse('container-v1:container-publish', kwargs={'action': 'publish', 'pk': self.container.id})
+            )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         finding_aids.refresh_from_db()
@@ -123,9 +124,10 @@ class ContainerViewsTest(TestViewsBaseClass):
         mock_meili_index.reset_mock()
         mock_meili_remove.reset_mock()
 
-        response = self.client.put(
-            reverse('container-v1:container-publish', kwargs={'action': 'unpublish', 'pk': self.container.id})
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.put(
+                reverse('container-v1:container-publish', kwargs={'action': 'unpublish', 'pk': self.container.id})
+            )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         finding_aids.refresh_from_db()
