@@ -19,9 +19,10 @@ class FindingMeilisearchIndexer:
     Class to index Finding Aids records to Solr for the catalog.
     """
 
-    def __init__(self, finding_aids_entity_id):
+    def __init__(self, finding_aids_entity_id, load_record=True, document_id=None):
         self.finding_aids_entity_id = finding_aids_entity_id
-        self.finding_aids_entity = self._get_finding_aids_record(finding_aids_entity_id)
+        self.finding_aids_entity = None
+        self.document_id = document_id
         self.hashids = Hashids(salt="osacontent", min_length=10)
 
         self.meilisearch_url = getattr(settings, "MEILISEARCH_URL", "")
@@ -32,6 +33,8 @@ class FindingMeilisearchIndexer:
         self.meilisearch_index = self.client.index(self.meilisearch_index)
         self.locales = ['en', 'hu', 'ru', 'pl']
         self.doc = {}
+        if load_record:
+            self.finding_aids_entity = self._get_finding_aids_record(finding_aids_entity_id)
 
     def index(self):
         self._index_record()
@@ -76,10 +79,11 @@ class FindingMeilisearchIndexer:
             self.doc['contents_summary_original'] = strip_tags(self.finding_aids_entity.contents_summary_original)
 
     def _get_meilisearch_id(self):
-        if self.finding_aids_entity.catalog_id:
+        if self.document_id:
+            return self.document_id
+        if self.finding_aids_entity and self.finding_aids_entity.catalog_id:
             return self.finding_aids_entity.catalog_id
-        else:
-            return self.hashids.encode(self.finding_aids_entity.id)
+        return self.hashids.encode(self.finding_aids_entity_id)
 
     def _get_description_level(self):
         if self.finding_aids_entity.level == 'F':

@@ -16,8 +16,12 @@ class FindingAidsSignalTests(SimpleTestCase):
             "finding_aids.signals.index_meilisearch_finding_aids_entity.delay"
         ) as mock_meili_index_delay, patch(
             "finding_aids.signals.index_meilisearch_finding_aids_entity_remove.delay"
-        ) as mock_meili_remove_delay:
+        ) as mock_meili_remove_delay, patch("finding_aids.signals.transaction.on_commit") as mock_on_commit:
+            callbacks = []
+            mock_on_commit.side_effect = callbacks.append
             update_finding_aids_index(sender=None, instance=instance)
+            for callback in callbacks:
+                callback()
 
         mock_catalog_index_delay.assert_called_once_with(finding_aids_entity_id=42)
         mock_catalog_remove_delay.assert_not_called()
@@ -33,11 +37,15 @@ class FindingAidsSignalTests(SimpleTestCase):
             "finding_aids.signals.index_meilisearch_finding_aids_entity.delay"
         ) as mock_meili_index_delay, patch(
             "finding_aids.signals.index_meilisearch_finding_aids_entity_remove.delay"
-        ) as mock_meili_remove_delay:
+        ) as mock_meili_remove_delay, patch("finding_aids.signals.transaction.on_commit") as mock_on_commit:
+            callbacks = []
+            mock_on_commit.side_effect = callbacks.append
             update_finding_aids_index(sender=None, instance=instance)
+            for callback in callbacks:
+                callback()
 
         mock_catalog_index_delay.assert_not_called()
-        mock_catalog_remove_delay.assert_called_once_with(finding_aids_entity_id=77)
+        mock_catalog_remove_delay.assert_called_once_with(finding_aids_entity_id=77, document_id="fa-doc-77")
         mock_meili_index_delay.assert_called_once_with(finding_aids_entity_id=77)
         mock_meili_remove_delay.assert_not_called()
 
@@ -46,8 +54,12 @@ class FindingAidsSignalTests(SimpleTestCase):
 
         with patch("finding_aids.signals.index_catalog_finding_aids_entity_remove.delay") as mock_catalog_remove_delay, patch(
             "finding_aids.signals.index_meilisearch_finding_aids_entity_remove.delay"
-        ) as mock_meili_remove_delay:
+        ) as mock_meili_remove_delay, patch("finding_aids.signals.transaction.on_commit") as mock_on_commit:
+            callbacks = []
+            mock_on_commit.side_effect = callbacks.append
             remove_finding_aids_index(sender=None, instance=instance)
+            for callback in callbacks:
+                callback()
 
-        mock_catalog_remove_delay.assert_called_once_with(finding_aids_entity_id=15)
-        mock_meili_remove_delay.assert_called_once_with(finding_aids_entity_id=15,)
+        mock_catalog_remove_delay.assert_called_once_with(finding_aids_entity_id=15, document_id="fa-doc-15")
+        mock_meili_remove_delay.assert_called_once_with(finding_aids_entity_id=15, document_id="fa-doc-15")

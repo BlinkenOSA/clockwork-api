@@ -1,7 +1,6 @@
 from django.db.models.signals import post_save, pre_delete
+from django.db import transaction
 from django.dispatch import receiver
-from hashids import Hashids
-
 from finding_aids.models import FindingAidsEntity
 from finding_aids.tasks import (
     index_catalog_finding_aids_entity,
@@ -9,6 +8,10 @@ from finding_aids.tasks import (
     index_meilisearch_finding_aids_entity,
     index_meilisearch_finding_aids_entity_remove,
 )
+
+
+def _delay_after_commit(task, **kwargs):
+    transaction.on_commit(lambda: task.delay(**kwargs))
 
 
 @receiver(post_save, sender=FindingAidsEntity)
@@ -25,15 +28,23 @@ def update_finding_aids_index(sender, instance, **kwargs):
     """
     if instance.published:
         if instance.missing:
-            index_catalog_finding_aids_entity_remove.delay(finding_aids_entity_id=instance.id)
+            _delay_after_commit(
+                index_catalog_finding_aids_entity_remove,
+                finding_aids_entity_id=instance.id,
+                document_id=instance.catalog_id,
+            )
         else:
-            index_catalog_finding_aids_entity.delay(finding_aids_entity_id=instance.id)
+            _delay_after_commit(index_catalog_finding_aids_entity, finding_aids_entity_id=instance.id)
     else:
-        index_catalog_finding_aids_entity_remove.delay(finding_aids_entity_id=instance.id)
+        _delay_after_commit(
+            index_catalog_finding_aids_entity_remove,
+            finding_aids_entity_id=instance.id,
+            document_id=instance.catalog_id,
+        )
 
     # Internal AMS search index should always contain saved records,
     # regardless of publication status.
-    index_meilisearch_finding_aids_entity.delay(finding_aids_entity_id=instance.id)
+    _delay_after_commit(index_meilisearch_finding_aids_entity, finding_aids_entity_id=instance.id)
 
 
 @receiver(pre_delete, sender=FindingAidsEntity)
@@ -44,5 +55,13 @@ def remove_finding_aids_index(sender, instance, **kwargs):
     This ensures the index remains consistent even if the entity is deleted
     directly rather than unpublished first.
     """
-    index_catalog_finding_aids_entity_remove.delay(finding_aids_entity_id=instance.id)
-    index_meilisearch_finding_aids_entity_remove.delay(finding_aids_entity_id=instance.id)
+    _delay_after_commit(
+        index_catalog_finding_aids_entity_remove,
+        finding_aids_entity_id=instance.id,
+        document_id=instance.catalog_id,
+    )
+    _delay_after_commit(
+        index_meilisearch_finding_aids_entity_remove,
+        finding_aids_entity_id=instance.id,
+        document_id=instance.catalog_id,
+    )
