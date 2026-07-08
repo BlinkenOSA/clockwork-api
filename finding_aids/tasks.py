@@ -5,6 +5,7 @@ from django.conf import settings
 
 from finding_aids.indexers.finding_aids_meilisearch_indexer import FindingMeilisearchIndexer
 from finding_aids.indexers.finding_aids_new_catalog_indexer import FindingAidsNewCatalogIndexer
+from finding_aids.models import FindingAidsEntity
 
 
 @shared_task
@@ -21,13 +22,16 @@ def index_catalog_finding_aids_entity(finding_aids_entity_id):
         - publication of a finding aids entity
         - updates to a published entity
     """
-    indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
+    try:
+        indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
+    except FindingAidsEntity.DoesNotExist:
+        return
     indexer.index()
     indexer.commit()
 
 
 @shared_task
-def index_catalog_finding_aids_entity_remove(finding_aids_entity_id):
+def index_catalog_finding_aids_entity_remove(finding_aids_entity_id, document_id=None):
     """
     Removes a finding aids entity from the catalog search index.
 
@@ -38,7 +42,11 @@ def index_catalog_finding_aids_entity_remove(finding_aids_entity_id):
     The index removal is performed asynchronously to avoid blocking
     request/response cycles.
     """
-    indexer = FindingAidsNewCatalogIndexer(finding_aids_entity_id)
+    indexer = FindingAidsNewCatalogIndexer(
+        finding_aids_entity_id,
+        load_record=False,
+        document_id=document_id,
+    )
     indexer.delete()
 
 
@@ -55,14 +63,21 @@ def index_meilisearch_finding_aids_entity(finding_aids_entity_id):
     """
     Indexes a finding aids entity in Meilisearch.
     """
-    indexer = FindingMeilisearchIndexer(finding_aids_entity_id)
+    try:
+        indexer = FindingMeilisearchIndexer(finding_aids_entity_id)
+    except FindingAidsEntity.DoesNotExist:
+        return
     indexer.index()
 
 
 @shared_task
-def index_meilisearch_finding_aids_entity_remove(finding_aids_entity_id):
+def index_meilisearch_finding_aids_entity_remove(finding_aids_entity_id, document_id=None):
     """
     Removes a finding aids entity in Meilisearch.
     """
-    indexer = FindingMeilisearchIndexer(finding_aids_entity_id)
+    indexer = FindingMeilisearchIndexer(
+        finding_aids_entity_id,
+        load_record=False,
+        document_id=document_id,
+    )
     indexer.delete()

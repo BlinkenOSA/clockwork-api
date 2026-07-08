@@ -30,7 +30,7 @@ class FindingAidsNewCatalogIndexer:
     The resulting Solr document is stored in `self.doc`.
     """
 
-    def __init__(self, finding_aids_entity_id):
+    def __init__(self, finding_aids_entity_id, load_record=True, document_id=None):
         """
         Initializes the indexer and prepares Solr connectivity.
 
@@ -42,7 +42,8 @@ class FindingAidsNewCatalogIndexer:
             - prepares a pysolr client using SOLR_URL and SOLR_CORE_CATALOG_NEW settings
         """
         self.finding_aids_entity_id = finding_aids_entity_id
-        self.finding_aids_entity = self._get_finding_aids_record(finding_aids_entity_id)
+        self.finding_aids_entity = None
+        self.document_id = document_id
         self.hashids = Hashids(salt="osacontent", min_length=10)
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG_NEW", "catalog")
         self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
@@ -51,6 +52,8 @@ class FindingAidsNewCatalogIndexer:
             ))
         self.locales = ['en', 'hu', 'ru', 'pl']
         self.doc = {}
+        if load_record:
+            self.finding_aids_entity = self._get_finding_aids_record(finding_aids_entity_id)
 
     def get_solr_document(self):
         """
@@ -267,10 +270,11 @@ class FindingAidsNewCatalogIndexer:
             1. catalog_id (stored on the entity)
             2. hashids-encoded primary key
         """
-        if self.finding_aids_entity.catalog_id:
+        if self.document_id:
+            return self.document_id
+        if self.finding_aids_entity and self.finding_aids_entity.catalog_id:
             return self.finding_aids_entity.catalog_id
-        else:
-            return self.hashids.encode(self.finding_aids_entity.id)
+        return self.hashids.encode(self.finding_aids_entity_id)
 
     def _get_description_level(self):
         """

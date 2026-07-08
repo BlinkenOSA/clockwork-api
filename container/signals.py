@@ -1,4 +1,5 @@
 from django.db.models.signals import post_save
+from django.db import transaction
 from django.dispatch import receiver
 
 from container.models import Container
@@ -26,6 +27,16 @@ def update_finding_aids_index_upon_container_save(sender, instance, **kwargs):
     # Index the underlying finding aids entities
     for finding_aids_entity in finding_aids_entities.all():
         if finding_aids_entity.published:
-            index_catalog_finding_aids_entity.delay(finding_aids_entity_id=finding_aids_entity.id)
+            transaction.on_commit(
+                lambda entity_id=finding_aids_entity.id: index_catalog_finding_aids_entity.delay(
+                    finding_aids_entity_id=entity_id
+                )
+            )
         else:
-            index_catalog_finding_aids_entity_remove.delay(finding_aids_entity_id=finding_aids_entity.id)
+            transaction.on_commit(
+                lambda entity_id=finding_aids_entity.id, document_id=finding_aids_entity.catalog_id:
+                index_catalog_finding_aids_entity_remove.delay(
+                    finding_aids_entity_id=entity_id,
+                    document_id=document_id,
+                )
+            )
