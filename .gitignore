@@ -127,3 +127,5 @@ finding_aids/management/commands/populate*.py
 finding_aids/management/commands/json
 
 /digitization/management/commands/tapelogs
+
+selfsigncert.pem
