@@ -108,6 +108,7 @@ venv.bak/
 
 # Local config
 /clockwork_api/settings_components/local.py
+/clockwork_api/settings_components/sharepoint.py
 
 .DS_STORE
 
