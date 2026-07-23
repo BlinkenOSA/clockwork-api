@@ -280,11 +280,11 @@ class FindingAidsEntityDetailSerializer(serializers.ModelSerializer):
         archival_unit_ref_code = obj.archival_unit.reference_code.replace(" ", "_")
 
         # Folder level indicator
-        if obj.digital_version_exists:
-            return "%s-%04d-%03d" % (archival_unit_ref_code, obj.container.container_no, obj.folder_no)
+        if obj.has_digital_version:
+            return "%s-%04d-%04d" % (archival_unit_ref_code, obj.container.container_no, obj.folder_no)
 
         # Container level indicator
-        if obj.container.digital_version_exists:
+        if obj.container.has_digital_version:
             if obj.container.barcode:
                 return obj.container.barcode
             else:

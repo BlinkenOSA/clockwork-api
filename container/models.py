@@ -66,8 +66,6 @@ class Container(models.Model, DetectProtectedMixin):
                 self.container_no = container.container_no + 1
             else:
                 self.container_no = 1
-        if self.digital_version_exists and not self.digital_version_creation_date:
-            self.digital_version_creation_date = datetime.datetime.now()
         super(Container, self).save()
 
     @property
