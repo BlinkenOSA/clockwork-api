@@ -12,6 +12,12 @@ class DigitalObjectUpsertRequestSerializer(serializers.Serializer):
         help_text='Extracted technical metadata, only required for master files.',
         required=False
     )
+    subdirectory = serializers.CharField(
+        label='Subdirectory',
+        help_text='Optional subdirectory inserted before the filename in the Research Cloud path.',
+        required=False,
+        allow_blank=False
+    )
 
 
 class DigitalObjectUpsertResponseSerializer(serializers.Serializer):

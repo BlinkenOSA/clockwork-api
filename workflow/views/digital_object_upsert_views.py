@@ -47,6 +47,7 @@ class DigitalObjectUpsert(APIView):
     def post(self, request, file_name, *args, **kwargs):
         upsert_type = self.type
         technical_metadata = request.data.get('technical_metadata', None)
+        subdirectory = request.data.get('subdirectory') or request.query_params.get('subdirectory')
 
         file_name_parser = FileNameParser(file_name)
 
@@ -71,7 +72,11 @@ class DigitalObjectUpsert(APIView):
             elif upsert_type == 'access-rc':
                 lookup_fields['level'] = 'A'
                 lookup_fields['available_research_cloud'] = True
-                updates['research_cloud_path'] = self._get_research_cloud_path(file_name, resolved_object['archival_unit'])
+                updates['research_cloud_path'] = self._get_research_cloud_path(
+                    file_name,
+                    resolved_object['archival_unit'],
+                    subdirectory=subdirectory,
+                )
             # If we are talking about an access file upload to the catalog
             else:
                 lookup_fields['level'] = 'A'
@@ -117,9 +122,15 @@ class DigitalObjectUpsert(APIView):
         return file_name
 
     @staticmethod
-    def _get_research_cloud_path(file_name, archival_unit):
+    def _get_research_cloud_path(file_name, archival_unit, subdirectory=None):
         fonds = archival_unit.get_fonds().reference_code
         subfonds = archival_unit.get_subfonds().reference_code
         series = archival_unit.reference_code
 
-        return f'{fonds}/{subfonds}/{series}/{file_name}'
+        path_parts = [fonds, subfonds, series]
+        normalized_subdirectory = subdirectory.strip('/') if subdirectory else ''
+        if normalized_subdirectory:
+            path_parts.append(normalized_subdirectory)
+        path_parts.append(file_name)
+
+        return '/'.join(path_parts)
