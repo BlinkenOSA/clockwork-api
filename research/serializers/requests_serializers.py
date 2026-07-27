@@ -203,7 +203,7 @@ class RequestListSerializer(serializers.ModelSerializer):
         Returns True if the linked container has a digital version.
         """
         if obj.container:
-            return obj.container.digital_version_exists
+            return obj.container.has_digital_version
         else:
             return False
 
