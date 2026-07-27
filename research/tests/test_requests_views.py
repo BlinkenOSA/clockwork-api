@@ -95,24 +95,36 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
     @patch('research.views.requests_views.deliver_requested_materials_sharepoint_job.delay')
     def test_request_requested_materials_sharepoint_creates_job(self, mocked_delay):
         mocked_delay.return_value = SimpleNamespace(id='celery-123')
+        request_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FA',
+            container=self.container,
+        )
         response = self.client.post(
             reverse(
-                'research-v1:request-requested-materials-sharepoint',
-                kwargs={'request_id': self.request.id}
+                'research-v1:request-item-requested-materials-sharepoint',
+                kwargs={'request_item_id': request_item.id}
             )
         )
 
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
         mocked_delay.assert_called_once()
         job = RequestedMaterialsSharePointJob.objects.get(pk=response.data['id'])
-        self.assertEqual(job.request, self.request)
+        self.assertEqual(job.request_item, request_item)
         self.assertEqual(job.status, 'pending')
         self.assertEqual(job.current_step, 'queued')
         self.assertEqual(job.celery_task_id, 'celery-123')
+        self.assertEqual(response.data['request_item_id'], request_item.id)
+        self.assertEqual(response.data['request_id'], self.request.id)
 
     def test_requested_materials_sharepoint_job_detail_returns_status(self):
-        job = RequestedMaterialsSharePointJob.objects.create(
+        request_item = RequestItem.objects.create(
             request=self.request,
+            item_origin='FA',
+            container=self.container,
+        )
+        job = RequestedMaterialsSharePointJob.objects.create(
+            request_item=request_item,
             status='running',
             current_step='copying_files',
             message='Copying files... (1/2)',
@@ -132,6 +144,7 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
         self.assertEqual(response.data['status'], 'running')
         self.assertEqual(response.data['current_step'], 'copying_files')
         self.assertEqual(response.data['message'], 'Copying files... (1/2)')
+        self.assertEqual(response.data['request_item_id'], request_item.id)
 
 
 class RequestLibraryMLRHelperTests(TestViewsBaseClass):
@@ -184,7 +197,7 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
             carrier_type=CarrierType.objects.first(),
             barcode='HU_OSA_SERVICE_REQ',
         )
-        RequestItem.objects.create(
+        self.request_item = RequestItem.objects.create(
             request=self.request,
             item_origin='FA',
             container=self.container,
@@ -217,7 +230,7 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
             research_cloud_path='',
         )
 
-        digital_versions = list(self.service.get_eligible_digital_versions(self.request))
+        digital_versions = list(self.service.get_eligible_digital_versions(self.request_item))
 
         self.assertEqual(digital_versions, [matching])
 
@@ -249,9 +262,9 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
         mocked_folder = type('FolderStub', (), {'properties': {'ServerRelativeUrl': '/sites/osa-researchcloud-requests/confidential/Lovelace, Ada'}})()
         mocked_ensure_folder.return_value = (mocked_folder, True)
 
-        result = self.service.deliver_requested_materials_for_request(self.request)
+        result = self.service.deliver_requested_materials_for_request_item(self.request_item)
 
-        self.assertEqual(list(self.service.get_eligible_digital_versions(self.request)), [matching])
+        self.assertEqual(list(self.service.get_eligible_digital_versions(self.request_item)), [matching])
         self.assertEqual(mocked_get_context.call_count, 2)
         mocked_copy_file.assert_called_once()
         mocked_share_folder.assert_called_once_with(mocked_folder, self.researcher.email)
@@ -274,7 +287,7 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
             research_cloud_path='HU OSA 394/test-file.mp4',
         )
 
-        result = self.service.deliver_requested_materials_for_request(self.request)
+        result = self.service.deliver_requested_materials_for_request_item(self.request_item)
 
         mocked_get_file_info.assert_called_once()
         self.assertEqual(result['copied_files_count'], 0)

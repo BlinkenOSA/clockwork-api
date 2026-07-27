@@ -176,7 +176,7 @@ class RequestedMaterialsSharePointJob(models.Model):
     """
 
     id = models.AutoField(primary_key=True)
-    request = models.ForeignKey('Request', on_delete=models.CASCADE, related_name='requested_materials_jobs')
+    request_item = models.ForeignKey('RequestItem', on_delete=models.CASCADE, related_name='requested_materials_jobs')
 
     STATUS_CHOICES = [
         ('pending', 'Pending'),

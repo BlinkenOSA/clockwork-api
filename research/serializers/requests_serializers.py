@@ -346,13 +346,15 @@ class RequestedMaterialsSharePointJobSerializer(serializers.ModelSerializer):
     Serializer for requested-materials SharePoint delivery jobs.
     """
 
-    request_id = serializers.IntegerField(source='request.id', read_only=True)
+    request_id = serializers.IntegerField(source='request_item.request.id', read_only=True)
+    request_item_id = serializers.IntegerField(source='request_item.id', read_only=True)
 
     class Meta:
         model = RequestedMaterialsSharePointJob
         fields = (
             'id',
             'request_id',
+            'request_item_id',
             'status',
             'current_step',
             'message',

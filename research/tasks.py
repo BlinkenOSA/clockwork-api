@@ -9,8 +9,9 @@ from research.services import RequestedMaterialsSharePointError, RequestedMateri
 def deliver_requested_materials_sharepoint_job(job_id):
     try:
         job = RequestedMaterialsSharePointJob.objects.select_related(
-            'request',
-            'request__researcher',
+            'request_item',
+            'request_item__request',
+            'request_item__request__researcher',
         ).get(pk=job_id)
     except RequestedMaterialsSharePointJob.DoesNotExist:
         return
@@ -33,8 +34,8 @@ def deliver_requested_materials_sharepoint_job(job_id):
         job.save(update_fields=['current_step', 'message', 'progress_current'])
 
     try:
-        result = RequestedMaterialsSharePointService().deliver_requested_materials_for_request(
-            job.request,
+        result = RequestedMaterialsSharePointService().deliver_requested_materials_for_request_item(
+            job.request_item,
             progress_callback=update_progress,
         )
         job.status = 'completed'

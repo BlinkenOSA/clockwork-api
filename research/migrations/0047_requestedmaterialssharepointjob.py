@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('created_date', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('started_date', models.DateTimeField(blank=True, null=True)),
                 ('finished_date', models.DateTimeField(blank=True, null=True)),
-                ('request', models.ForeignKey(on_delete=models.deletion.CASCADE, related_name='requested_materials_jobs', to='research.request')),
+                ('request_item', models.ForeignKey(on_delete=models.deletion.CASCADE, related_name='requested_materials_jobs', to='research.requestitem')),
             ],
             options={
                 'db_table': 'research_requested_materials_sharepoint_jobs',

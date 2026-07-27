@@ -177,7 +177,7 @@ class RequestsCreate(CreateAPIView):
 
 class RequestRequestedMaterialsSharePoint(APIView):
     """
-    Starts a background requested-materials SharePoint delivery job for a request.
+    Starts a background requested-materials SharePoint delivery job for a request item.
 
     POST:
         Creates a delivery job record and enqueues a Celery task. The Admin UI
@@ -185,9 +185,9 @@ class RequestRequestedMaterialsSharePoint(APIView):
     """
 
     def post(self, request, *args, **kwargs):
-        request_obj = get_object_or_404(Request, pk=self.kwargs['request_id'])
+        request_item = get_object_or_404(RequestItem, pk=self.kwargs['request_item_id'])
         job = RequestedMaterialsSharePointJob.objects.create(
-            request=request_obj,
+            request_item=request_item,
             status='pending',
             current_step='queued',
             message='Requested materials delivery queued.',

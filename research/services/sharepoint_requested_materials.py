@@ -23,12 +23,14 @@ class RequestedMaterialsSharePointService:
 
     INVALID_FOLDER_CHARS_RE = re.compile(r'[\"*:<>?/\\\\|]')
 
-    def deliver_requested_materials_for_request(self, request_obj, progress_callback=None):
+    def deliver_requested_materials_for_request_item(self, request_item, progress_callback=None):
+        request_obj = request_item.request
+
         if not request_obj.researcher.email:
             raise RequestedMaterialsSharePointError('Researcher email address is missing.')
 
         self._report_progress(progress_callback, 'checking_files', 'Checking files...', 1)
-        digital_versions = self.get_eligible_digital_versions(request_obj)
+        digital_versions = self.get_eligible_digital_versions(request_item)
         if not digital_versions:
             return self._build_result()
 
@@ -105,17 +107,12 @@ class RequestedMaterialsSharePointService:
             },
         )
 
-    def get_eligible_digital_versions(self, request_obj):
-        container_ids = list(
-            request_obj.requestitem_set.filter(container__isnull=False)
-            .values_list('container_id', flat=True)
-            .distinct()
-        )
-        if not container_ids:
+    def get_eligible_digital_versions(self, request_item):
+        if request_item.item_origin != 'FA' or not request_item.container_id:
             return DigitalVersion.objects.none()
 
         return DigitalVersion.objects.filter(
-            Q(container_id__in=container_ids) | Q(finding_aids_entity__container_id__in=container_ids),
+            Q(container_id=request_item.container_id) | Q(finding_aids_entity__container_id=request_item.container_id),
             level='A',
             available_research_cloud=True,
         ).exclude(
