@@ -55,10 +55,13 @@ urlpatterns = [
 
     path('requests', RequestsList.as_view(), name='requests-list'),
     path('requests/create/', RequestsCreate.as_view(), name='requests-create'),
+
+    # Content Sharing Endpoints
     path('request_item/<int:request_item_id>/requested-materials-sharepoint/', RequestRequestedMaterialsSharePoint.as_view(),
          name='request-item-requested-materials-sharepoint'),
     path('requested-materials-sharepoint-jobs/<int:pk>/', RequestedMaterialsSharePointJobDetail.as_view(),
          name='requested-materials-sharepoint-job-detail'),
+
     path('requests/print/', RequestsListForPrint.as_view(), name='requests-list-for-print'),
     re_path(r'requests/(?P<action>["next"|"previous"]+)/(?P<request_item_id>[0-9]+)/$', RequestItemStatusStep.as_view(),
             name='request-item-status-change'),
