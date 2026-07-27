@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br>
+
+        <h2>Requested digital materials were shared.</h2>
+
+        <p>
+            The requested digital materials for the following researcher have been delivered through SharePoint.
+        </p>
+
+        <p>
+            <strong>Researcher:</strong> {{ researcher.last_name }}, {{ researcher.first_name }}<br/>
+            <strong>Email:</strong> {{ researcher.email }}<br/>
+            <strong>Request date:</strong> {{ request.request_date }}<br/>
+            <strong>Shared folder:</strong> <a href="{{ folder_url }}">{{ folder_url }}</a>
+        </p>
+
+        <p>
+            <strong>Files:</strong>
+            <ul>
+                {% for file in files %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+            </ul>
+        </p>
+
+        <p>
+            Regards,<br/>
+            Blinken OSA Archivum - AMS
+        </p>
+    </body>
+</html>

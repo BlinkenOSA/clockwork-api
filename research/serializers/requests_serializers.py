@@ -6,7 +6,7 @@ from rest_framework import serializers
 from container.models import Container
 from finding_aids.models import FindingAidsEntity
 from mlr.models import MLREntity
-from research.models import RequestItem, Request, RequestItemPart
+from research.models import RequestItem, Request, RequestItemPart, RequestedMaterialsSharePointJob
 
 
 class RequestItemPartSerializer(serializers.ModelSerializer):
@@ -339,3 +339,29 @@ class RequestItemWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItem
         fields = ('id', 'item_origin', 'container', 'identifier', 'title', 'quantity')
+
+
+class RequestedMaterialsSharePointJobSerializer(serializers.ModelSerializer):
+    """
+    Serializer for requested-materials SharePoint delivery jobs.
+    """
+
+    request_id = serializers.IntegerField(source='request.id', read_only=True)
+
+    class Meta:
+        model = RequestedMaterialsSharePointJob
+        fields = (
+            'id',
+            'request_id',
+            'status',
+            'current_step',
+            'message',
+            'progress_current',
+            'progress_total',
+            'celery_task_id',
+            'result',
+            'error_message',
+            'created_date',
+            'started_date',
+            'finished_date',
+        )

@@ -170,6 +170,49 @@ class Request(models.Model):
         db_table = 'research_requests'
 
 
+class RequestedMaterialsSharePointJob(models.Model):
+    """
+    Tracks asynchronous requested-materials SharePoint delivery jobs.
+    """
+
+    id = models.AutoField(primary_key=True)
+    request = models.ForeignKey('Request', on_delete=models.CASCADE, related_name='requested_materials_jobs')
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('running', 'Running'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
+
+    STEP_CHOICES = [
+        ('queued', 'Queued'),
+        ('checking_files', 'Checking files'),
+        ('creating_directory', 'Creating directory'),
+        ('copying_files', 'Copying files'),
+        ('sharing_directory', 'Sharing directory'),
+        ('sending_emails', 'Sending emails'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ]
+    current_step = models.CharField(max_length=30, choices=STEP_CHOICES, default='queued')
+    message = models.TextField(blank=True, null=True)
+    progress_current = models.IntegerField(default=0)
+    progress_total = models.IntegerField(default=5)
+
+    celery_task_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    result = models.JSONField(blank=True, null=True)
+    error_message = models.TextField(blank=True, null=True)
+
+    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    started_date = models.DateTimeField(blank=True, null=True)
+    finished_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'research_requested_materials_sharepoint_jobs'
+
+
 class RequestItem(models.Model):
     """
     Represents a single requested item within a research request.
@@ -321,4 +364,3 @@ class RequestItemPart(models.Model):
 
     class Meta:
         db_table = 'research_request_items_parts'
-

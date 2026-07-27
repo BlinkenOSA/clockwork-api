@@ -18,9 +18,11 @@ from clockwork_api.mailer.email_with_template import EmailWithTemplate
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.pagination import DropDownResultSetPagination
 from container.models import Container
-from research.models import RequestItem, Request
+from research.models import RequestItem, Request, RequestedMaterialsSharePointJob
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
-    RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer
+    RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer, \
+    RequestedMaterialsSharePointJobSerializer
+from research.tasks import deliver_requested_materials_sharepoint_job
 from django_filters import rest_framework as filters
 from hashids import Hashids
 
@@ -171,6 +173,43 @@ class RequestsCreate(CreateAPIView):
 
     serializer_class = RequestCreateSerializer
     queryset = Request.objects.all()
+
+
+class RequestRequestedMaterialsSharePoint(APIView):
+    """
+    Starts a background requested-materials SharePoint delivery job for a request.
+
+    POST:
+        Creates a delivery job record and enqueues a Celery task. The Admin UI
+        can poll the returned job id for step-by-step progress updates.
+    """
+
+    def post(self, request, *args, **kwargs):
+        request_obj = get_object_or_404(Request, pk=self.kwargs['request_id'])
+        job = RequestedMaterialsSharePointJob.objects.create(
+            request=request_obj,
+            status='pending',
+            current_step='queued',
+            message='Requested materials delivery queued.',
+            progress_current=0,
+            progress_total=5,
+        )
+        async_result = deliver_requested_materials_sharepoint_job.delay(job.id)
+        job.celery_task_id = async_result.id
+        job.save(update_fields=['celery_task_id'])
+        return Response(
+            RequestedMaterialsSharePointJobSerializer(job).data,
+            status=status.HTTP_202_ACCEPTED,
+        )
+
+
+class RequestedMaterialsSharePointJobDetail(generics.RetrieveAPIView):
+    """
+    Returns the current status of a requested-materials SharePoint delivery job.
+    """
+
+    queryset = RequestedMaterialsSharePointJob.objects.all()
+    serializer_class = RequestedMaterialsSharePointJobSerializer
 
 
 class RequestItemRetrieveUpdate(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):

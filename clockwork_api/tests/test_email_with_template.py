@@ -92,6 +92,8 @@ class EmailWithTemplateTests(SimpleTestCase):
             "new_request_restricted_decision_user": "Decision about requesting restricted content!",
             "new_request_restricted_decision_admin": "Decision about requesting restricted content!",
             "request_delivered_user": "Requested items are prepared",
+            "requested_materials_shared_user": "Requested digital materials are now available",
+            "requested_materials_shared_admin": "Requested digital materials were shared",
         }
 
         for template_name, expected in cases.items():
@@ -115,6 +117,8 @@ class EmailWithTemplateTests(SimpleTestCase):
             ("send_new_request_restricted_decision_admin", "new_request_restricted_decision_admin", "admin"),
             ("send_request_delivered_user", "request_delivered_user", "user"),
             ("send_researcher_forgot_card_number", "researcher_forgot_card_number", "user"),
+            ("send_requested_materials_shared_user", "requested_materials_shared_user", "user"),
+            ("send_requested_materials_shared_admin", "requested_materials_shared_admin", "admin"),
         ]
 
         with patch.object(mailer, "_send_mail") as mock_send_mail:

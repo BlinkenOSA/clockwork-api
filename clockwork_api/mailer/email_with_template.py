@@ -127,6 +127,20 @@ class EmailWithTemplate:
         self.template = "researcher_forgot_card_number"
         self._send_mail('user')
 
+    def send_requested_materials_shared_user(self):
+        """
+        Notify the researcher that digital requested materials were shared.
+        """
+        self.template = "requested_materials_shared_user"
+        self._send_mail('user')
+
+    def send_requested_materials_shared_admin(self):
+        """
+        Notify staff that digital requested materials were shared.
+        """
+        self.template = "requested_materials_shared_admin"
+        self._send_mail('admin')
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
@@ -212,3 +226,9 @@ class EmailWithTemplate:
         # Request Item status change
         if self.template == 'request_delivered_user':
             return "Requested items are prepared"
+
+        if self.template == 'requested_materials_shared_user':
+            return "Requested digital materials are now available"
+
+        if self.template == 'requested_materials_shared_admin':
+            return "Requested digital materials were shared"
