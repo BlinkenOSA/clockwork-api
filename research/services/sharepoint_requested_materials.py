@@ -1,12 +1,20 @@
+import json
 import os
 import re
+import tempfile
+import time
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.db.models import Q
+from office365.runtime.client_result import ClientResult
+from office365.runtime.client_value_collection import ClientValueCollection
 from office365.runtime.client_request_exception import ClientRequestException
+from office365.runtime.queries.service_operation import ServiceOperationQuery
 from office365.sharepoint.client_context import ClientContext
+from office365.sharepoint.migration.copy_migration_options import CopyMigrationOptions
 from office365.sharepoint.sharing.external_site_option import ExternalSharingSiteOption
-from office365.sharepoint.utilities.move_copy_util import MoveCopyUtil
+from office365.sharepoint.sites.copy_migration_iInfo import CopyMigrationInfo
 
 from clockwork_api.mailer.email_with_template import EmailWithTemplate
 from digitization.models import DigitalVersion
@@ -14,6 +22,18 @@ from digitization.models import DigitalVersion
 
 class RequestedMaterialsSharePointError(Exception):
     pass
+
+
+class SharePointCopyMigrationOptions(CopyMigrationOptions):
+    @property
+    def entity_type_name(self):
+        return 'SP.CopyMigrationOptions'
+
+
+class SharePointCopyMigrationInfo(CopyMigrationInfo):
+    @property
+    def entity_type_name(self):
+        return 'SP.CopyMigrationInfo'
 
 
 class RequestedMaterialsSharePointService:
@@ -69,6 +89,7 @@ class RequestedMaterialsSharePointService:
                 requested_materials_ctx,
                 folder,
                 file_info,
+                progress_callback=progress_callback,
             )
             if copied:
                 copied_files.append(file_info['name'])
@@ -134,7 +155,7 @@ class RequestedMaterialsSharePointService:
         if not research_cloud_path:
             return None
 
-        file_path = self._build_server_relative_path(document_library, research_cloud_path)
+        file_path = self._build_server_relative_path(ctx, document_library, research_cloud_path)
         try:
             sp_file = ctx.web.get_file_by_server_relative_path(file_path).get().execute_query()
             return {
@@ -144,39 +165,173 @@ class RequestedMaterialsSharePointService:
         except ClientRequestException as exc:
             if exc.response.status_code == 404:
                 return None
-            raise RequestedMaterialsSharePointError(exc.response.text)
+            raise self._sharepoint_error(exc, 'checking_files')
 
     def _ensure_folder(self, ctx, document_library, folder_name):
-        folder_path = self._build_server_relative_path(document_library, folder_name)
+        folder_path = self._build_server_relative_path(ctx, document_library, folder_name)
         try:
             return ctx.web.get_folder_by_server_relative_path(folder_path).get().execute_query(), False
         except ClientRequestException as exc:
             if exc.response.status_code != 404:
-                raise RequestedMaterialsSharePointError(exc.response.text)
+                raise self._sharepoint_error(exc, 'creating_directory')
 
         try:
-            parent_folder = ctx.web.get_folder_by_server_relative_path(document_library)
+            parent_folder = ctx.web.get_folder_by_server_relative_path(
+                self._build_server_relative_path(ctx, document_library, '')
+            )
             parent_folder.folders.add(folder_name).execute_query()
             return ctx.web.get_folder_by_server_relative_path(folder_path).get().execute_query(), True
         except ClientRequestException as exc:
-            raise RequestedMaterialsSharePointError(exc.response.text)
+            raise self._sharepoint_error(exc, 'creating_directory')
 
-    def _copy_file_to_requested_materials(self, source_ctx, destination_ctx, folder, file_info):
+    def _copy_file_to_requested_materials(
+            self,
+            source_ctx,
+            destination_ctx,
+            folder,
+            file_info,
+            progress_callback=None,
+    ):
         destination_file_path = '/'.join([folder.properties['ServerRelativeUrl'].rstrip('/'), file_info['name']])
         if self._destination_file_exists(destination_ctx, destination_file_path):
             return False
 
         try:
-            MoveCopyUtil.copy_file_by_path(
+            self._copy_file_via_sharepoint_job(
                 source_ctx,
-                file_info['server_relative_url'],
-                self._build_absolute_url(settings.SHAREPOINT_REQUESTED_MATERIALS, destination_file_path),
-                overwrite=False,
+                destination_ctx,
+                folder,
+                file_info,
+                destination_file_path,
+                progress_callback=progress_callback,
             )
-            source_ctx.execute_query()
             return True
         except ClientRequestException as exc:
-            raise RequestedMaterialsSharePointError(exc.response.text)
+            raise self._sharepoint_error(exc, 'copying_files')
+
+    def _copy_file_via_sharepoint_job(
+            self,
+            source_ctx,
+            destination_ctx,
+            folder,
+            file_info,
+            destination_file_path,
+            progress_callback=None,
+    ):
+        source_file_url = self._build_absolute_url(settings.SHAREPOINT_SITE, file_info['server_relative_url'])
+        destination_file_url = self._build_absolute_url(
+            settings.SHAREPOINT_REQUESTED_MATERIALS,
+            destination_file_path,
+        )
+        destination_folder_url = self._build_absolute_url(
+            settings.SHAREPOINT_REQUESTED_MATERIALS,
+            folder.properties['ServerRelativeUrl'],
+        )
+        self._report_progress(
+            progress_callback,
+            'copying_files',
+            'Copying {0} to {1}'.format(file_info['name'], destination_file_url),
+            3,
+        )
+        copy_job_info = self._create_copy_job(source_ctx, source_file_url, destination_folder_url)
+        self._wait_for_copy_job(
+            source_ctx,
+            destination_ctx,
+            destination_file_path,
+            copy_job_info,
+            progress_callback=progress_callback,
+            file_name=file_info['name'],
+            destination_file_url=destination_file_url,
+        )
+
+    def _create_copy_job(self, ctx, source_file_url, destination_folder_url):
+        options = SharePointCopyMigrationOptions()
+        return_type = ClientResult(ctx, ClientValueCollection(SharePointCopyMigrationInfo))
+        payload = {
+            'exportObjectUris': {
+                'results': [source_file_url],
+            },
+            'destinationUri': destination_folder_url,
+            'options': options,
+        }
+        qry = ServiceOperationQuery(
+            ctx.site,
+            'CreateCopyJobs',
+            None,
+            payload,
+            None,
+            return_type,
+        )
+        ctx.add_query(qry)
+        return_type.execute_query()
+        copy_jobs = return_type.value
+        if len(copy_jobs) == 0:
+            raise RequestedMaterialsSharePointError('copying_files: SharePoint did not return a copy job.')
+        return copy_jobs[0]
+
+    def _wait_for_copy_job(
+            self,
+            source_ctx,
+            destination_ctx,
+            destination_file_path,
+            copy_job_info,
+            progress_callback=None,
+            file_name=None,
+            destination_file_url=None,
+            max_attempts=180,
+            poll_interval_seconds=2,
+    ):
+        for _ in range(max_attempts):
+            progress = source_ctx.site.get_copy_job_progress(copy_job_info).execute_query().value
+            job_state = getattr(progress, 'JobState', None)
+            logs = getattr(progress, 'Logs', None) or []
+
+            if self._copy_job_logs_indicate_error(logs):
+                raise RequestedMaterialsSharePointError(
+                    'copying_files: SharePoint copy job failed for {0}. Logs: {1}'.format(
+                        file_name or destination_file_path,
+                        ' | '.join(str(log) for log in logs),
+                    )
+                )
+
+            if self._destination_file_exists(destination_ctx, destination_file_path):
+                return
+
+            message = 'Copying files...'
+            if job_state == 2:
+                message = 'Copying files... (SharePoint job queued'
+            elif job_state == 4:
+                message = 'Copying files... (SharePoint job processing'
+
+            if job_state in (2, 4):
+                if file_name:
+                    message = '{0}: {1})'.format(message, file_name)
+                if destination_file_url:
+                    message = '{0} -> {1}'.format(message, destination_file_url)
+                self._report_progress(progress_callback, 'copying_files', message, 3)
+                time.sleep(poll_interval_seconds)
+                continue
+
+            time.sleep(poll_interval_seconds)
+
+        raise RequestedMaterialsSharePointError(
+            'copying_files: SharePoint copy job timed out for {0}.'.format(file_name or destination_file_path)
+        )
+
+    def _copy_file_via_download_upload(self, source_ctx, destination_ctx, folder, file_info):
+        source_file = source_ctx.web.get_file_by_server_relative_path(file_info['server_relative_url'])
+        try:
+            with tempfile.NamedTemporaryFile(mode='w+b') as temp_file:
+                source_file.download_session(temp_file, chunk_size=10 * 1024 * 1024).execute_query()
+                temp_file.flush()
+                temp_file.seek(0)
+                folder.files.create_upload_session(
+                    temp_file,
+                    chunk_size=10 * 1024 * 1024,
+                    file_name=file_info['name'],
+                ).execute_query()
+        except ClientRequestException as exc:
+            raise self._sharepoint_error(exc, 'copying_files')
 
     def _destination_file_exists(self, ctx, destination_file_path):
         try:
@@ -185,7 +340,7 @@ class RequestedMaterialsSharePointService:
         except ClientRequestException as exc:
             if exc.response.status_code == 404:
                 return False
-            raise RequestedMaterialsSharePointError(exc.response.text)
+            raise self._sharepoint_error(exc, 'copying_files')
 
     def _share_folder_with_researcher(self, folder, researcher_email):
         try:
@@ -195,7 +350,7 @@ class RequestedMaterialsSharePointService:
                 send_email=False,
             ).execute_query()
         except ClientRequestException as exc:
-            raise RequestedMaterialsSharePointError(exc.response.text)
+            raise self._sharepoint_error(exc, 'sharing_directory')
 
     def _send_notifications(self, request_obj, folder_url, files):
         mail = EmailWithTemplate(
@@ -210,16 +365,38 @@ class RequestedMaterialsSharePointService:
         mail.send_requested_materials_shared_user()
         mail.send_requested_materials_shared_admin()
 
-    def _build_server_relative_path(self, document_library, value):
+    def _build_server_relative_path(self, ctx, document_library, value):
+        web_server_relative_url = self._get_web_server_relative_url(ctx).rstrip('/')
+        normalized_library = document_library.strip('/')
         normalized_value = value.strip('/')
-        if normalized_value.startswith(document_library):
-            return normalized_value
-        return '{0}/{1}'.format(document_library, normalized_value)
+
+        base_path = '{0}/{1}'.format(web_server_relative_url, normalized_library)
+        if not normalized_value:
+            return base_path
+
+        if normalized_value.startswith(normalized_library):
+            return '{0}/{1}'.format(web_server_relative_url, normalized_value)
+        return '{0}/{1}'.format(base_path, normalized_value)
 
     def _build_absolute_url(self, site_url, value):
-        normalized_site = site_url.rstrip('/')
-        normalized_value = value.lstrip('/')
-        return '{0}/{1}'.format(normalized_site, normalized_value)
+        parsed_site = urlsplit(site_url)
+        server_relative_value = self._normalize_server_relative_url(value)
+        return '{0}://{1}{2}'.format(parsed_site.scheme, parsed_site.netloc, server_relative_value)
+
+    def _normalize_server_relative_url(self, value):
+        parsed_value = urlsplit(value)
+        if parsed_value.scheme and parsed_value.netloc:
+            return parsed_value.path
+        if not value.startswith('/'):
+            return '/{0}'.format(value)
+        return value
+
+    def _get_web_server_relative_url(self, ctx):
+        server_relative_url = ctx.web.properties.get('ServerRelativeUrl')
+        if server_relative_url is None:
+            ctx.web.get().execute_query()
+            server_relative_url = ctx.web.properties.get('ServerRelativeUrl', '')
+        return server_relative_url.rstrip('/') or ''
 
     def _build_result(
             self,
@@ -250,6 +427,24 @@ class RequestedMaterialsSharePointService:
     def _report_progress(self, progress_callback, current_step, message, progress_current):
         if callable(progress_callback):
             progress_callback(current_step, message, progress_current)
+
+    def _copy_job_logs_indicate_error(self, logs):
+        error_markers = ('error', 'failed', 'exception')
+        for log in logs:
+            if any(marker in str(log).lower() for marker in error_markers):
+                return True
+        return False
+
+    def _sharepoint_error(self, exc, stage):
+        try:
+            payload = json.loads(exc.response.text)
+            code = payload.get('error', {}).get('code')
+            message = payload.get('error', {}).get('message', {}).get('value')
+            if code and message:
+                return RequestedMaterialsSharePointError('{0}: {1} ({2})'.format(stage, message, code))
+        except (TypeError, ValueError, AttributeError):
+            pass
+        return RequestedMaterialsSharePointError('{0}: {1}'.format(stage, exc.response.text))
 
     def _sanitize_folder_name(self, folder_name):
         return self.INVALID_FOLDER_CHARS_RE.sub('_', folder_name).strip()

@@ -2,6 +2,7 @@ import datetime
 import json
 
 from clockwork_api.http import get
+from django.db.models import Q
 from requests.exceptions import RequestException
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
@@ -160,6 +161,25 @@ class RequestsList(generics.ListAPIView):
         'reshelve_date'
     ]
     serializer_class = RequestListSerializer
+
+
+class DigitalRequestsList(RequestsList):
+    """
+    Lists only research request items whose linked container has a digital version.
+
+    The filtering mirrors ``Container.has_digital_version`` by including:
+        - container-level digital-version flags
+        - finding-aids digital-version flags on entities in the container
+        - direct digital-version records on the container
+        - digital-version records on finding-aids entities in the container
+    """
+
+    queryset = RequestItem.objects.filter(
+        Q(container__digital_version_exists=True) |
+        Q(container__findingaidsentity__digital_version_exists=True) |
+        Q(container__digital_versions__isnull=False) |
+        Q(container__findingaidsentity__digital_versions__isnull=False)
+    ).distinct().order_by('-request__created_date')
 
 
 class RequestsCreate(CreateAPIView):

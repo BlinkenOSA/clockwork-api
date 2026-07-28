@@ -348,6 +348,14 @@ class RequestedMaterialsSharePointJobSerializer(serializers.ModelSerializer):
 
     request_id = serializers.IntegerField(source='request_item.request.id', read_only=True)
     request_item_id = serializers.IntegerField(source='request_item.id', read_only=True)
+    progress_percent = serializers.SerializerMethodField()
+
+    def get_progress_percent(self, obj):
+        if obj.status == 'completed':
+            return 100
+        if obj.progress_total:
+            return int((obj.progress_current / obj.progress_total) * 100)
+        return 0
 
     class Meta:
         model = RequestedMaterialsSharePointJob
@@ -360,6 +368,7 @@ class RequestedMaterialsSharePointJobSerializer(serializers.ModelSerializer):
             'message',
             'progress_current',
             'progress_total',
+            'progress_percent',
             'celery_task_id',
             'result',
             'error_message',

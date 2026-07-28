@@ -38,6 +38,8 @@ def deliver_requested_materials_sharepoint_job(job_id):
             job.request_item,
             progress_callback=update_progress,
         )
+        job.request_item.status = '9'
+        job.request_item.save(update_fields=['status'])
         job.status = 'completed'
         job.current_step = 'completed'
         job.message = 'Requested materials delivery completed.'

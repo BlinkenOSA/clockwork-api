@@ -1,6 +1,6 @@
 from django.urls.conf import path, re_path
 
-from research.views.requests_views import RequestsList, RequestsListForPrint, \
+from research.views.requests_views import RequestsList, DigitalRequestsList, RequestsListForPrint, \
     RequestSeriesSelect, RequestContainerSelect, RequestsCreate, RequestItemStatusStep, RequestItemRetrieveUpdate, \
     RequestLibraryMLR, RequestRequestedMaterialsSharePoint, RequestedMaterialsSharePointJobDetail
 from research.views.researcher_views import ResearcherList, ResearcherDetail, ResearcherSelectList, \
@@ -54,6 +54,7 @@ urlpatterns = [
     path('visits/check-out/<int:pk>', ResearcherVisitsCheckOut.as_view(), name='researcher-visits-check-out'),
 
     path('requests', RequestsList.as_view(), name='requests-list'),
+    path('requests/digital', DigitalRequestsList.as_view(), name='requests-digital-list'),
     path('requests/create/', RequestsCreate.as_view(), name='requests-create'),
 
     # Content Sharing Endpoints
