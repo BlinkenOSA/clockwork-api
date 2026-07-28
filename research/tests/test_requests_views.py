@@ -3,6 +3,7 @@ import json
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -195,6 +196,12 @@ class RequestLibraryMLRHelperTests(TestViewsBaseClass):
         self.assertEqual(collections, {'Collection A'})
 
 
+@override_settings(
+    SHAREPOINT_SITE='https://example.com/sites/researchcloud/',
+    SHAREPOINT_DOCUMENT_LIBRARY='Shared Documents',
+    SHAREPOINT_REQUESTED_MATERIALS='https://example.com/sites/requested-materials/',
+    SHAREPOINT_REQUESTED_MATERIALS_DOCUMENT_LIBRARY='confidential',
+)
 class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
     fixtures = ['carrier_types']
 
@@ -353,6 +360,12 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
         )
 
 
+@override_settings(
+    SHAREPOINT_SITE='https://example.com/sites/researchcloud/',
+    SHAREPOINT_DOCUMENT_LIBRARY='Shared Documents',
+    SHAREPOINT_REQUESTED_MATERIALS='https://example.com/sites/requested-materials/',
+    SHAREPOINT_REQUESTED_MATERIALS_DOCUMENT_LIBRARY='confidential',
+)
 class RequestedMaterialsSharePointTaskTests(TestViewsBaseClass):
     fixtures = ['carrier_types']
 
