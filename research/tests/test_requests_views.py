@@ -202,6 +202,8 @@ class RequestLibraryMLRHelperTests(TestViewsBaseClass):
     SHAREPOINT_DOCUMENT_LIBRARY='Shared Documents',
     SHAREPOINT_REQUESTED_MATERIALS='https://example.com/sites/requested-materials/',
     SHAREPOINT_REQUESTED_MATERIALS_DOCUMENT_LIBRARY='confidential',
+    SHAREPOINT_FILM_LIBRARY='https://example.com/sites/film-library/',
+    SHAREPOINT_FILM_LIBRARY_DOCUMENT_LIBRARY='Film Documents',
 )
 class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
     fixtures = ['carrier_types']
@@ -274,12 +276,42 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
 
         self.assertEqual(digital_versions, [matching])
 
+    @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
+    @patch.object(RequestedMaterialsSharePointService, '_get_sharepoint_file_info')
+    def test_get_available_source_files_uses_film_library_for_film_library_item(
+            self, mocked_get_file_info, mocked_get_context
+    ):
+        film_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FL',
+            identifier='HU_OSA_0001',
+        )
+        film_ctx = SimpleNamespace()
+        mocked_get_context.return_value = film_ctx
+        mocked_get_file_info.return_value = {
+            'name': 'HU_OSA_0001.mp4',
+            'server_relative_url': '/sites/film-library/Film Documents/HU_OSA_0001.mp4',
+            'source_site_url': 'https://example.com/sites/film-library/',
+        }
+
+        source_ctx, files = self.service._get_available_source_files(film_item)
+
+        self.assertEqual(source_ctx, film_ctx)
+        self.assertEqual(files, [mocked_get_file_info.return_value])
+        mocked_get_context.assert_called_once_with('https://example.com/sites/film-library/')
+        mocked_get_file_info.assert_called_once_with(
+            film_ctx,
+            'Film Documents',
+            'HU_OSA_0001.mp4',
+            'https://example.com/sites/film-library/',
+        )
+
     @patch('research.services.sharepoint_requested_materials.EmailWithTemplate')
     @patch.object(RequestedMaterialsSharePointService, '_share_folder_with_researcher')
     @patch.object(RequestedMaterialsSharePointService, '_copy_file_to_requested_materials', return_value=True)
     @patch.object(RequestedMaterialsSharePointService, '_ensure_folder')
     @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
-    @patch.object(RequestedMaterialsSharePointService, '_get_research_cloud_file_info')
+    @patch.object(RequestedMaterialsSharePointService, '_get_sharepoint_file_info')
     def test_deliver_requested_materials_for_request_copies_and_notifies_staff_only(
             self,
             mocked_get_file_info,
@@ -316,8 +348,58 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
         self.assertIsNone(result['shared_with'])
         self.assertEqual(result['notification_emails'], {'staff': ['staff@example.com']})
 
+    @patch('research.services.sharepoint_requested_materials.EmailWithTemplate')
+    @patch.object(RequestedMaterialsSharePointService, '_copy_file_to_requested_materials', return_value=True)
+    @patch.object(RequestedMaterialsSharePointService, '_ensure_folder')
     @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
-    @patch.object(RequestedMaterialsSharePointService, '_get_research_cloud_file_info', return_value=None)
+    @patch.object(RequestedMaterialsSharePointService, '_get_sharepoint_file_info')
+    def test_deliver_requested_materials_for_film_library_item_copies_identifier_mp4(
+            self,
+            mocked_get_file_info,
+            mocked_get_context,
+            mocked_ensure_folder,
+            mocked_copy_file,
+            mocked_mailer,
+    ):
+        film_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FL',
+            identifier='HU_OSA_FILM_001',
+        )
+        film_ctx = SimpleNamespace(name='film')
+        requested_materials_ctx = SimpleNamespace(name='requested')
+        mocked_get_context.side_effect = [film_ctx, requested_materials_ctx]
+        mocked_get_file_info.return_value = {
+            'name': 'HU_OSA_FILM_001.mp4',
+            'server_relative_url': '/sites/film-library/Film Documents/HU_OSA_FILM_001.mp4',
+            'source_site_url': 'https://example.com/sites/film-library/',
+        }
+        mocked_folder = type('FolderStub', (), {'properties': {'ServerRelativeUrl': '/sites/requested-materials/confidential/Lovelace, Ada'}})()
+        mocked_ensure_folder.return_value = (mocked_folder, False)
+
+        result = self.service.deliver_requested_materials_for_request_item(film_item)
+
+        self.assertEqual(result['copied_files'], ['HU_OSA_FILM_001.mp4'])
+        self.assertEqual(mocked_get_context.call_count, 2)
+        mocked_get_context.assert_any_call('https://example.com/sites/film-library/')
+        mocked_get_context.assert_any_call('https://example.com/sites/requested-materials/')
+        mocked_get_file_info.assert_called_once_with(
+            film_ctx,
+            'Film Documents',
+            'HU_OSA_FILM_001.mp4',
+            'https://example.com/sites/film-library/',
+        )
+        mocked_copy_file.assert_called_once_with(
+            film_ctx,
+            requested_materials_ctx,
+            mocked_folder,
+            mocked_get_file_info.return_value,
+            progress_callback=None,
+        )
+        mocked_mailer.return_value.send_requested_materials_shared_admin.assert_called_once()
+
+    @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
+    @patch.object(RequestedMaterialsSharePointService, '_get_sharepoint_file_info', return_value=None)
     def test_deliver_requested_materials_for_request_returns_empty_result_when_no_file_exists(
             self, mocked_get_file_info, mocked_get_context
     ):
@@ -367,6 +449,8 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
     SHAREPOINT_DOCUMENT_LIBRARY='Shared Documents',
     SHAREPOINT_REQUESTED_MATERIALS='https://example.com/sites/requested-materials/',
     SHAREPOINT_REQUESTED_MATERIALS_DOCUMENT_LIBRARY='confidential',
+    SHAREPOINT_FILM_LIBRARY='https://example.com/sites/film-library/',
+    SHAREPOINT_FILM_LIBRARY_DOCUMENT_LIBRARY='Film Documents',
 )
 class RequestedMaterialsSharePointTaskTests(TestViewsBaseClass):
     fixtures = ['carrier_types']

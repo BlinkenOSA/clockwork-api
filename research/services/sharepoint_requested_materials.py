@@ -50,23 +50,7 @@ class RequestedMaterialsSharePointService:
             raise RequestedMaterialsSharePointError('Researcher email address is missing.')
 
         self._report_progress(progress_callback, 'checking_files', 'Checking files...', 1)
-        digital_versions = self.get_eligible_digital_versions(request_item)
-        if not digital_versions:
-            return self._build_result()
-
-        research_cloud_ctx = self._get_client_context(settings.SHAREPOINT_SITE)
-        available_files = [
-            file_info
-            for file_info in (
-                self._get_research_cloud_file_info(
-                    research_cloud_ctx,
-                    settings.SHAREPOINT_DOCUMENT_LIBRARY,
-                    digital_version.research_cloud_path,
-                )
-                for digital_version in digital_versions
-            )
-            if file_info is not None
-        ]
+        source_ctx, available_files = self._get_available_source_files(request_item)
 
         if not available_files:
             return self._build_result()
@@ -85,7 +69,7 @@ class RequestedMaterialsSharePointService:
         self._report_progress(progress_callback, 'copying_files', 'Copying files...', 3)
         for file_info in available_files:
             copied = self._copy_file_to_requested_materials(
-                research_cloud_ctx,
+                source_ctx,
                 requested_materials_ctx,
                 folder,
                 file_info,
@@ -142,6 +126,41 @@ class RequestedMaterialsSharePointService:
             research_cloud_path__exact=''
         ).distinct()
 
+    def _get_available_source_files(self, request_item):
+        if request_item.item_origin == 'FA':
+            digital_versions = self.get_eligible_digital_versions(request_item)
+            if not digital_versions:
+                return None, []
+
+            source_site_url = settings.SHAREPOINT_SITE
+            source_ctx = self._get_client_context(source_site_url)
+            return source_ctx, [
+                file_info
+                for file_info in (
+                    self._get_sharepoint_file_info(
+                        source_ctx,
+                        settings.SHAREPOINT_DOCUMENT_LIBRARY,
+                        digital_version.research_cloud_path,
+                        source_site_url,
+                    )
+                    for digital_version in digital_versions
+                )
+                if file_info is not None
+            ]
+
+        if request_item.item_origin == 'FL' and request_item.identifier:
+            source_site_url = settings.SHAREPOINT_FILM_LIBRARY
+            source_ctx = self._get_client_context(source_site_url)
+            file_info = self._get_sharepoint_file_info(
+                source_ctx,
+                settings.SHAREPOINT_FILM_LIBRARY_DOCUMENT_LIBRARY,
+                '{0}.mp4'.format(request_item.identifier),
+                source_site_url,
+            )
+            return source_ctx, [file_info] if file_info is not None else []
+
+        return None, []
+
     def _get_client_context(self, site_url):
         cert_settings = {
             'client_id': settings.SHAREPOINT_CLIENT_ID,
@@ -152,15 +171,19 @@ class RequestedMaterialsSharePointService:
         return ClientContext(site_url).with_client_certificate(settings.SHAREPOINT_TENANT, **cert_settings)
 
     def _get_research_cloud_file_info(self, ctx, document_library, research_cloud_path):
-        if not research_cloud_path:
+        return self._get_sharepoint_file_info(ctx, document_library, research_cloud_path, settings.SHAREPOINT_SITE)
+
+    def _get_sharepoint_file_info(self, ctx, document_library, file_path_value, source_site_url):
+        if not file_path_value:
             return None
 
-        file_path = self._build_server_relative_path(ctx, document_library, research_cloud_path)
+        file_path = self._build_server_relative_path(ctx, document_library, file_path_value)
         try:
             sp_file = ctx.web.get_file_by_server_relative_path(file_path).get().execute_query()
             return {
                 'name': os.path.basename(file_path),
                 'server_relative_url': sp_file.properties['ServerRelativeUrl'],
+                'source_site_url': source_site_url,
             }
         except ClientRequestException as exc:
             if exc.response.status_code == 404:
@@ -218,7 +241,10 @@ class RequestedMaterialsSharePointService:
             destination_file_path,
             progress_callback=None,
     ):
-        source_file_url = self._build_absolute_url(settings.SHAREPOINT_SITE, file_info['server_relative_url'])
+        source_file_url = self._build_absolute_url(
+            file_info.get('source_site_url', settings.SHAREPOINT_SITE),
+            file_info['server_relative_url'],
+        )
         destination_file_url = self._build_absolute_url(
             settings.SHAREPOINT_REQUESTED_MATERIALS,
             destination_file_path,
