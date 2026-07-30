@@ -202,6 +202,7 @@ class ResearcherRequestViewTests(SimpleTestCase):
                     item_origin="LIB",
                     title="Book",
                     identifier="CN-1",
+                    other_identifier=None,
                     library_id="A-9",
                     quantity="",
                 ),
@@ -261,9 +262,121 @@ class ResearcherRequestViewTests(SimpleTestCase):
             item_origin="LIB",
             title="Film",
             identifier="CN-2",
+            other_identifier=None,
             library_id="A-10",
             quantity="2",
         )
         mail.send_new_request_admin.assert_called_once()
         mail.send_new_request_user.assert_called_once()
         mail.send_new_request_restricted_decision_maker.assert_not_called()
+
+    def test_post_success_with_fl_item_uses_digital_version_as_identifier(self):
+        serializer = _SerializerStub(
+            True,
+            validated_data={
+                "researcher": 1,
+                "request_date": "2026-03-06",
+                "items": [
+                    {
+                        "origin": "FL",
+                        "title": "Film",
+                        "call_number": "FL-CN-1",
+                        "digital_version": "DV-1",
+                        "ams_id": "A-11",
+                    }
+                ],
+            },
+        )
+
+        researcher = SimpleNamespace(id=1)
+        request_obj = SimpleNamespace(id=10)
+        mail = SimpleNamespace(
+            send_new_request_admin=Mock(),
+            send_new_request_user=Mock(),
+            send_new_request_restricted_decision_maker=Mock(),
+        )
+
+        with patch(
+            "catalog.views.research_request_views.request_views.ResearchRequestSerializer",
+            return_value=serializer,
+        ), patch(
+            "catalog.views.research_request_views.request_views.Researcher.objects.get",
+            return_value=researcher,
+        ), patch(
+            "catalog.views.research_request_views.request_views.Request.objects.get_or_create",
+            return_value=(request_obj, True),
+        ), patch(
+            "catalog.views.research_request_views.request_views.RequestItem.objects.get_or_create",
+            return_value=(SimpleNamespace(id=22), True),
+        ) as mock_request_item_get_or_create, patch(
+            "catalog.views.research_request_views.request_views.EmailWithTemplate",
+            return_value=mail,
+        ):
+            response = self._post({})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, "ok")
+        mock_request_item_get_or_create.assert_called_once_with(
+            request=request_obj,
+            item_origin="FL",
+            title="Film",
+            identifier="DV-1",
+            other_identifier="FL-CN-1",
+            library_id="A-11",
+            quantity="",
+        )
+
+    def test_post_success_with_fl_item_defaults_missing_digital_version_to_na(self):
+        serializer = _SerializerStub(
+            True,
+            validated_data={
+                "researcher": 1,
+                "request_date": "2026-03-06",
+                "items": [
+                    {
+                        "origin": "FL",
+                        "title": "Film",
+                        "call_number": "FL-CN-2",
+                        "ams_id": "A-12",
+                    }
+                ],
+            },
+        )
+
+        researcher = SimpleNamespace(id=1)
+        request_obj = SimpleNamespace(id=10)
+        mail = SimpleNamespace(
+            send_new_request_admin=Mock(),
+            send_new_request_user=Mock(),
+            send_new_request_restricted_decision_maker=Mock(),
+        )
+
+        with patch(
+            "catalog.views.research_request_views.request_views.ResearchRequestSerializer",
+            return_value=serializer,
+        ), patch(
+            "catalog.views.research_request_views.request_views.Researcher.objects.get",
+            return_value=researcher,
+        ), patch(
+            "catalog.views.research_request_views.request_views.Request.objects.get_or_create",
+            return_value=(request_obj, True),
+        ), patch(
+            "catalog.views.research_request_views.request_views.RequestItem.objects.get_or_create",
+            return_value=(SimpleNamespace(id=22), True),
+        ) as mock_request_item_get_or_create, patch(
+            "catalog.views.research_request_views.request_views.EmailWithTemplate",
+            return_value=mail,
+        ):
+            response = self._post({})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, "ok")
+        mock_request_item_get_or_create.assert_called_once_with(
+            request=request_obj,
+            item_origin="FL",
+            title="Film",
+            identifier="N/A",
+            other_identifier="FL-CN-2",
+            library_id="A-12",
+            quantity="",
+        )

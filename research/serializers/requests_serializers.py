@@ -269,7 +269,7 @@ class RequestItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RequestItem
-        fields = ('id', 'item_origin', 'container', 'identifier', 'library_id', 'title')
+        fields = ('id', 'item_origin', 'container', 'identifier', 'other_identifier', 'library_id', 'title')
 
 
 class RequestCreateSerializer(WritableNestedModelSerializer):
@@ -326,7 +326,7 @@ class RequestItemReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItem
         fields = ('id', 'researcher', 'request_date', 'item_origin', 'archival_unit', 'container', 'identifier',
-                  'title', 'quantity', 'served_date')
+                  'other_identifier', 'title', 'quantity', 'served_date')
 
 
 class RequestItemWriteSerializer(serializers.ModelSerializer):
@@ -338,7 +338,7 @@ class RequestItemWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RequestItem
-        fields = ('id', 'item_origin', 'container', 'identifier', 'title', 'quantity')
+        fields = ('id', 'item_origin', 'container', 'identifier', 'other_identifier', 'title', 'quantity')
 
 
 class RequestedMaterialsSharePointJobSerializer(serializers.ModelSerializer):

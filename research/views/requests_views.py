@@ -149,6 +149,7 @@ class RequestsList(generics.ListAPIView):
         'request__researcher__first_name',
         'container__archival_unit__reference_code',
         'identifier',
+        'other_identifier',
         'title',
         'container__barcode'
     ]
