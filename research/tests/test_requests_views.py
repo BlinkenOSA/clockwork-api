@@ -204,6 +204,7 @@ class RequestLibraryMLRHelperTests(TestViewsBaseClass):
     SHAREPOINT_REQUESTED_MATERIALS_DOCUMENT_LIBRARY='confidential',
     SHAREPOINT_FILM_LIBRARY='https://example.com/sites/film-library/',
     SHAREPOINT_FILM_LIBRARY_DOCUMENT_LIBRARY='Film Documents',
+    RESEARCH_ROOM_STAFF_EMAIL=['staff@example.com'],
 )
 class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
     fixtures = ['carrier_types']
