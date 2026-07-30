@@ -179,7 +179,8 @@ class DigitalRequestsList(RequestsList):
         Q(container__digital_version_exists=True) |
         Q(container__findingaidsentity__digital_version_exists=True) |
         Q(container__digital_versions__isnull=False) |
-        Q(container__findingaidsentity__digital_versions__isnull=False)
+        Q(container__findingaidsentity__digital_versions__isnull=False) |
+        (Q(item_origin='FL') & Q(identifier__startswith='HU_OSA'))
     ).distinct().order_by('-request__created_date')
 
 
