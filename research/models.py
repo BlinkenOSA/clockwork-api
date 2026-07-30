@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 from django.db import models
+from django.utils import timezone
 
 from clockwork_api.fields.email_null_field import EmailNullField
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
@@ -230,6 +231,7 @@ class RequestItem(models.Model):
 
     Additional behavior
     -------------------
+    - When status becomes Processed and prepared (``'3'``) or Uploaded (``'9'``), ``served_date`` is set if missing.
     - When status becomes Returned (``'4'``) or Uploaded (``'9'``), ``return_date`` is set if missing.
     - When status becomes Reshelved (``'5'``), ``reshelve_date`` is set if missing.
     - ``ordering`` is computed to support sorting:
@@ -249,6 +251,7 @@ class RequestItem(models.Model):
     library_id = models.IntegerField(blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
     quantity = models.CharField(max_length=200, blank=True, null=True)
+    served_date = models.DateTimeField(blank=True, null=True)
     return_date = models.DateTimeField(blank=True, null=True)
     reshelve_date = models.DateTimeField(blank=True, null=True)
     ordering = models.CharField(max_length=50, blank=True, null=True)
@@ -260,6 +263,7 @@ class RequestItem(models.Model):
         Behavior includes:
             - promotion from queue to pending when fewer than 10 pending items exist
             - promotion of the next queued item when an item is returned/uploaded
+            - auto-populating ``served_date`` when a request item is served/uploaded
             - auto-populating ``return_date`` and ``reshelve_date`` on status transitions
             - computing ``ordering`` based on origin and container/identifier
         """
@@ -274,6 +278,12 @@ class RequestItem(models.Model):
         if self.status == '1':
             if requested_items_count < 10:
                 self.status = '2'
+
+        if self.status in ('3', '9') and not self.served_date:
+            self.served_date = timezone.now()
+            update_fields = kwargs.get('update_fields')
+            if update_fields is not None:
+                kwargs['update_fields'] = set(update_fields) | {'served_date'}
 
         # If return is happening, write the return date into the record.
         if self.status == '4' or self.status == '9':

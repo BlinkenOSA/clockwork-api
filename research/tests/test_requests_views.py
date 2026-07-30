@@ -71,6 +71,7 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         item.refresh_from_db()
         self.assertEqual(item.status, '9')
+        self.assertIsNotNone(item.served_date)
         send_mail.assert_called_once()
 
     def test_request_item_status_step_previous(self):
@@ -279,7 +280,7 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
     @patch.object(RequestedMaterialsSharePointService, '_ensure_folder')
     @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
     @patch.object(RequestedMaterialsSharePointService, '_get_research_cloud_file_info')
-    def test_deliver_requested_materials_for_request_copies_shares_and_notifies(
+    def test_deliver_requested_materials_for_request_copies_and_notifies_staff_only(
             self,
             mocked_get_file_info,
             mocked_get_context,
@@ -306,13 +307,14 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
         self.assertEqual(list(self.service.get_eligible_digital_versions(self.request_item)), [matching])
         self.assertEqual(mocked_get_context.call_count, 2)
         mocked_copy_file.assert_called_once()
-        mocked_share_folder.assert_called_once_with(mocked_folder, self.researcher.email)
+        mocked_share_folder.assert_not_called()
         mocked_mailer.assert_called_once()
         mail = mocked_mailer.return_value
-        mail.send_requested_materials_shared_user.assert_called_once()
+        mail.send_requested_materials_shared_user.assert_not_called()
         mail.send_requested_materials_shared_admin.assert_called_once()
         self.assertEqual(result['copied_files'], ['test-file.mp4'])
-        self.assertEqual(result['shared_with'], self.researcher.email)
+        self.assertIsNone(result['shared_with'])
+        self.assertEqual(result['notification_emails'], {'staff': ['staff@example.com']})
 
     @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
     @patch.object(RequestedMaterialsSharePointService, '_get_research_cloud_file_info', return_value=None)
@@ -420,5 +422,6 @@ class RequestedMaterialsSharePointTaskTests(TestViewsBaseClass):
         self.job.refresh_from_db()
 
         self.assertEqual(self.request_item.status, '9')
+        self.assertIsNotNone(self.request_item.served_date)
         self.assertEqual(self.job.status, 'completed')
         mocked_deliver.assert_called_once()

@@ -326,7 +326,7 @@ class RequestItemReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItem
         fields = ('id', 'researcher', 'request_date', 'item_origin', 'archival_unit', 'container', 'identifier',
-                  'title', 'quantity')
+                  'title', 'quantity', 'served_date')
 
 
 class RequestItemWriteSerializer(serializers.ModelSerializer):

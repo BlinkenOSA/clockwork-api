@@ -106,8 +106,9 @@ class RequestedMaterialsSharePointService:
             settings.SHAREPOINT_REQUESTED_MATERIALS,
             folder.properties['ServerRelativeUrl'],
         )
-        self._report_progress(progress_callback, 'sharing_directory', 'Sharing directory...', 4)
-        self._share_folder_with_researcher(folder, request_obj.researcher.email)
+        # Temporarily disabled: keep copied materials staff-only until researcher sharing is re-enabled.
+        # self._report_progress(progress_callback, 'sharing_directory', 'Sharing directory...', 4)
+        # self._share_folder_with_researcher(folder, request_obj.researcher.email)
         self._report_progress(progress_callback, 'sending_emails', 'Sending emails...', 5)
         self._send_notifications(
             request_obj,
@@ -121,9 +122,8 @@ class RequestedMaterialsSharePointService:
             available_files=[file_info['name'] for file_info in available_files],
             copied_files=copied_files,
             existing_files=existing_files,
-            shared_with=request_obj.researcher.email,
+            shared_with=None,
             notification_emails={
-                'researcher': request_obj.researcher.email,
                 'staff': list(getattr(settings, 'RESEARCH_ROOM_STAFF_EMAIL')),
             },
         )
@@ -362,7 +362,8 @@ class RequestedMaterialsSharePointService:
                 'files': files,
             }
         )
-        mail.send_requested_materials_shared_user()
+        # Temporarily disabled: do not email the researcher while SharePoint sharing is paused.
+        # mail.send_requested_materials_shared_user()
         mail.send_requested_materials_shared_admin()
 
     def _build_server_relative_path(self, ctx, document_library, value):
