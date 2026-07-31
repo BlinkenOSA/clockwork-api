@@ -180,13 +180,10 @@ class RequestedMaterialsSharePointService:
                     progress_callback,
                     'checking_files',
                     'Checking source file at {0}.'.format(
-                        self._build_absolute_url(
+                        self._format_library_file_location(
                             source_site_url,
-                            self._build_server_relative_path(
-                                source_ctx,
-                                settings.SHAREPOINT_DOCUMENT_LIBRARY,
-                                digital_version.research_cloud_path,
-                            ),
+                            settings.SHAREPOINT_DOCUMENT_LIBRARY,
+                            digital_version.research_cloud_path,
                         )
                     ),
                     1,
@@ -208,13 +205,10 @@ class RequestedMaterialsSharePointService:
                 progress_callback,
                 'checking_files',
                 'Checking source file at {0}.'.format(
-                    self._build_absolute_url(
+                    self._format_library_file_location(
                         source_site_url,
-                        self._build_server_relative_path(
-                            source_ctx,
-                            settings.SHAREPOINT_FILM_LIBRARY_DOCUMENT_LIBRARY,
-                            '{0}.mp4'.format(request_item.identifier),
-                        ),
+                        settings.SHAREPOINT_FILM_LIBRARY_DOCUMENT_LIBRARY,
+                        '{0}.mp4'.format(request_item.identifier),
                     )
                 ),
                 1,
@@ -546,6 +540,17 @@ class RequestedMaterialsSharePointService:
 
     def _format_library_location(self, site_url, document_library):
         return self._build_absolute_url(site_url, document_library.strip('/'))
+
+    def _format_library_file_location(self, site_url, document_library, value):
+        normalized_library = document_library.strip('/')
+        normalized_value = value.strip('/')
+
+        if normalized_value.startswith(normalized_library):
+            relative_path = normalized_value
+        else:
+            relative_path = '{0}/{1}'.format(normalized_library, normalized_value)
+
+        return self._build_absolute_url(site_url, relative_path)
 
     def _copy_job_logs_indicate_error(self, logs):
         error_markers = ('error', 'failed', 'exception')
