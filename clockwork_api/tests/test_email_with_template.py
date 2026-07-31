@@ -93,7 +93,7 @@ class EmailWithTemplateTests(SimpleTestCase):
             "new_request_restricted_decision_admin": "Decision about requesting restricted content!",
             "request_delivered_user": "Requested items are prepared",
             "requested_materials_shared_user": "Requested digital materials are now available",
-            "requested_materials_shared_admin": "Requested digital materials were shared",
+            "requested_materials_shared_admin": "Requested digital materials were prepared",
         }
 
         for template_name, expected in cases.items():

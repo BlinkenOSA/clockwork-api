@@ -444,6 +444,21 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
             progress_callback=None,
         )
 
+    def test_build_copy_job_progress_info_keeps_only_progress_fields(self):
+        copy_job_info = SimpleNamespace(
+            JobId='job-123',
+            JobQueueUri='https://queue.example.com/job-123',
+            EncryptionKey='secret-key',
+            SourceListItemUniqueIds=[],
+        )
+
+        progress_info = self.service._build_copy_job_progress_info(copy_job_info)
+
+        self.assertEqual(progress_info.JobId, 'job-123')
+        self.assertEqual(progress_info.JobQueueUri, 'https://queue.example.com/job-123')
+        self.assertEqual(progress_info.EncryptionKey, 'secret-key')
+        self.assertFalse(hasattr(progress_info, 'SourceListItemUniqueIds'))
+
 
 @override_settings(
     SHAREPOINT_SITE='https://example.com/sites/researchcloud/',

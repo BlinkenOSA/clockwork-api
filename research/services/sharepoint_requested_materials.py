@@ -42,6 +42,8 @@ class RequestedMaterialsSharePointService:
     """
 
     INVALID_FOLDER_CHARS_RE = re.compile(r'[\"*:<>?/\\\\|]')
+    STEP_DISPLAY_PAUSE_SECONDS = 3
+    COPY_DETAILS_PAUSE_SECONDS = 5
 
     def deliver_requested_materials_for_request_item(self, request_item, progress_callback=None):
         request_obj = request_item.request
@@ -49,15 +51,35 @@ class RequestedMaterialsSharePointService:
         if not request_obj.researcher.email:
             raise RequestedMaterialsSharePointError('Researcher email address is missing.')
 
-        self._report_progress(progress_callback, 'checking_files', 'Checking files...', 1)
-        source_ctx, available_files = self._get_available_source_files(request_item)
+        requested_materials_library_path = self._format_library_location(
+            settings.SHAREPOINT_REQUESTED_MATERIALS,
+            settings.SHAREPOINT_REQUESTED_MATERIALS_DOCUMENT_LIBRARY,
+        )
+
+        self._report_progress(
+            progress_callback,
+            'checking_files',
+            'Checking source files for request item {0}.'.format(request_item.id),
+            1,
+            pause_seconds=self.STEP_DISPLAY_PAUSE_SECONDS,
+        )
+        source_ctx, available_files = self._get_available_source_files(
+            request_item,
+            progress_callback=progress_callback,
+        )
 
         if not available_files:
             return self._build_result()
 
         requested_materials_ctx = self._get_client_context(settings.SHAREPOINT_REQUESTED_MATERIALS)
         folder_name = self._sanitize_folder_name(request_obj.researcher.name)
-        self._report_progress(progress_callback, 'creating_directory', 'Creating directory...', 2)
+        self._report_progress(
+            progress_callback,
+            'creating_directory',
+            'Creating directory "{0}" in {1}.'.format(folder_name, requested_materials_library_path),
+            2,
+            pause_seconds=self.STEP_DISPLAY_PAUSE_SECONDS,
+        )
         folder, folder_created = self._ensure_folder(
             requested_materials_ctx,
             settings.SHAREPOINT_REQUESTED_MATERIALS_DOCUMENT_LIBRARY,
@@ -66,7 +88,13 @@ class RequestedMaterialsSharePointService:
 
         copied_files = []
         existing_files = []
-        self._report_progress(progress_callback, 'copying_files', 'Copying files...', 3)
+        self._report_progress(
+            progress_callback,
+            'copying_files',
+            'Preparing to copy {0} file(s) into {1}.'.format(len(available_files), requested_materials_library_path),
+            3,
+            pause_seconds=self.STEP_DISPLAY_PAUSE_SECONDS,
+        )
         for file_info in available_files:
             copied = self._copy_file_to_requested_materials(
                 source_ctx,
@@ -82,8 +110,14 @@ class RequestedMaterialsSharePointService:
             self._report_progress(
                 progress_callback,
                 'copying_files',
-                'Copying files... ({0}/{1})'.format(len(copied_files) + len(existing_files), len(available_files)),
+                'Processed {0}/{1} file(s). Copied: {2}. Already present: {3}.'.format(
+                    len(copied_files) + len(existing_files),
+                    len(available_files),
+                    ', '.join(copied_files) if copied_files else 'none',
+                    ', '.join(existing_files) if existing_files else 'none',
+                ),
                 3,
+                pause_seconds=self.STEP_DISPLAY_PAUSE_SECONDS,
             )
 
         folder_url = self._build_absolute_url(
@@ -93,7 +127,13 @@ class RequestedMaterialsSharePointService:
         # Temporarily disabled: keep copied materials staff-only until researcher sharing is re-enabled.
         # self._report_progress(progress_callback, 'sharing_directory', 'Sharing directory...', 4)
         # self._share_folder_with_researcher(folder, request_obj.researcher.email)
-        self._report_progress(progress_callback, 'sending_emails', 'Sending emails...', 5)
+        self._report_progress(
+            progress_callback,
+            'sending_emails',
+            'Sending notification emails to Research Room staff.',
+            5,
+            pause_seconds=self.STEP_DISPLAY_PAUSE_SECONDS,
+        )
         self._send_notifications(
             request_obj,
             folder_url,
@@ -126,7 +166,7 @@ class RequestedMaterialsSharePointService:
             research_cloud_path__exact=''
         ).distinct()
 
-    def _get_available_source_files(self, request_item):
+    def _get_available_source_files(self, request_item, progress_callback=None):
         if request_item.item_origin == 'FA':
             digital_versions = self.get_eligible_digital_versions(request_item)
             if not digital_versions:
@@ -134,23 +174,51 @@ class RequestedMaterialsSharePointService:
 
             source_site_url = settings.SHAREPOINT_SITE
             source_ctx = self._get_client_context(source_site_url)
-            return source_ctx, [
-                file_info
-                for file_info in (
-                    self._get_sharepoint_file_info(
-                        source_ctx,
-                        settings.SHAREPOINT_DOCUMENT_LIBRARY,
-                        digital_version.research_cloud_path,
-                        source_site_url,
-                    )
-                    for digital_version in digital_versions
+            available_files = []
+            for digital_version in digital_versions:
+                self._report_progress(
+                    progress_callback,
+                    'checking_files',
+                    'Checking source file at {0}.'.format(
+                        self._build_absolute_url(
+                            source_site_url,
+                            self._build_server_relative_path(
+                                source_ctx,
+                                settings.SHAREPOINT_DOCUMENT_LIBRARY,
+                                digital_version.research_cloud_path,
+                            ),
+                        )
+                    ),
+                    1,
                 )
-                if file_info is not None
-            ]
+                file_info = self._get_sharepoint_file_info(
+                    source_ctx,
+                    settings.SHAREPOINT_DOCUMENT_LIBRARY,
+                    digital_version.research_cloud_path,
+                    source_site_url,
+                )
+                if file_info is not None:
+                    available_files.append(file_info)
+            return source_ctx, available_files
 
         if request_item.item_origin == 'FL' and request_item.identifier:
             source_site_url = settings.SHAREPOINT_FILM_LIBRARY
             source_ctx = self._get_client_context(source_site_url)
+            self._report_progress(
+                progress_callback,
+                'checking_files',
+                'Checking source file at {0}.'.format(
+                    self._build_absolute_url(
+                        source_site_url,
+                        self._build_server_relative_path(
+                            source_ctx,
+                            settings.SHAREPOINT_FILM_LIBRARY_DOCUMENT_LIBRARY,
+                            '{0}.mp4'.format(request_item.identifier),
+                        ),
+                    )
+                ),
+                1,
+            )
             file_info = self._get_sharepoint_file_info(
                 source_ctx,
                 settings.SHAREPOINT_FILM_LIBRARY_DOCUMENT_LIBRARY,
@@ -184,6 +252,7 @@ class RequestedMaterialsSharePointService:
                 'name': os.path.basename(file_path),
                 'server_relative_url': sp_file.properties['ServerRelativeUrl'],
                 'source_site_url': source_site_url,
+                'display_location': self._build_absolute_url(source_site_url, file_path),
             }
         except ClientRequestException as exc:
             if exc.response.status_code == 404:
@@ -216,7 +285,21 @@ class RequestedMaterialsSharePointService:
             progress_callback=None,
     ):
         destination_file_path = '/'.join([folder.properties['ServerRelativeUrl'].rstrip('/'), file_info['name']])
+        destination_file_url = self._build_absolute_url(
+            settings.SHAREPOINT_REQUESTED_MATERIALS,
+            destination_file_path,
+        )
         if self._destination_file_exists(destination_ctx, destination_file_path):
+            self._report_progress(
+                progress_callback,
+                'copying_files',
+                'Skipping "{0}" because it already exists at {1}.'.format(
+                    file_info['name'],
+                    destination_file_url,
+                ),
+                3,
+                pause_seconds=self.STEP_DISPLAY_PAUSE_SECONDS,
+            )
             return False
 
         try:
@@ -256,8 +339,13 @@ class RequestedMaterialsSharePointService:
         self._report_progress(
             progress_callback,
             'copying_files',
-            'Copying {0} to {1}'.format(file_info['name'], destination_file_url),
+            'Copying "{0}" from {1} to {2}.'.format(
+                file_info['name'],
+                file_info.get('display_location', source_file_url),
+                destination_file_url,
+            ),
             3,
+            pause_seconds=self.COPY_DETAILS_PAUSE_SECONDS,
         )
         copy_job_info = self._create_copy_job(source_ctx, source_file_url, destination_folder_url)
         self._wait_for_copy_job(
@@ -274,9 +362,7 @@ class RequestedMaterialsSharePointService:
         options = SharePointCopyMigrationOptions()
         return_type = ClientResult(ctx, ClientValueCollection(SharePointCopyMigrationInfo))
         payload = {
-            'exportObjectUris': {
-                'results': [source_file_url],
-            },
+            'exportObjectUris': [source_file_url],
             'destinationUri': destination_folder_url,
             'options': options,
         }
@@ -307,8 +393,9 @@ class RequestedMaterialsSharePointService:
             max_attempts=180,
             poll_interval_seconds=2,
     ):
+        progress_copy_job_info = self._build_copy_job_progress_info(copy_job_info)
         for _ in range(max_attempts):
-            progress = source_ctx.site.get_copy_job_progress(copy_job_info).execute_query().value
+            progress = source_ctx.site.get_copy_job_progress(progress_copy_job_info).execute_query().value
             job_state = getattr(progress, 'JobState', None)
             logs = getattr(progress, 'Logs', None) or []
 
@@ -451,9 +538,14 @@ class RequestedMaterialsSharePointService:
             'notification_emails': notification_emails or {},
         }
 
-    def _report_progress(self, progress_callback, current_step, message, progress_current):
+    def _report_progress(self, progress_callback, current_step, message, progress_current, pause_seconds=0):
         if callable(progress_callback):
             progress_callback(current_step, message, progress_current)
+        if pause_seconds:
+            time.sleep(pause_seconds)
+
+    def _format_library_location(self, site_url, document_library):
+        return self._build_absolute_url(site_url, document_library.strip('/'))
 
     def _copy_job_logs_indicate_error(self, logs):
         error_markers = ('error', 'failed', 'exception')
@@ -475,3 +567,11 @@ class RequestedMaterialsSharePointService:
 
     def _sanitize_folder_name(self, folder_name):
         return self.INVALID_FOLDER_CHARS_RE.sub('_', folder_name).strip()
+
+    def _build_copy_job_progress_info(self, copy_job_info):
+        progress_info = SharePointCopyMigrationInfo()
+        for key in ('JobId', 'JobQueueUri', 'EncryptionKey'):
+            value = getattr(copy_job_info, key, None)
+            if value is not None:
+                progress_info.set_property(key, value, False)
+        return progress_info
