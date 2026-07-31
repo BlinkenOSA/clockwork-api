@@ -1,8 +1,8 @@
 from django.urls.conf import path, re_path
 
-from research.views.requests_views import RequestsList, RequestsListForPrint, \
+from research.views.requests_views import RequestsList, DigitalRequestsList, RequestsListForPrint, \
     RequestSeriesSelect, RequestContainerSelect, RequestsCreate, RequestItemStatusStep, RequestItemRetrieveUpdate, \
-    RequestLibraryMLR
+    RequestLibraryMLR, RequestRequestedMaterialsSharePoint, RequestedMaterialsSharePointJobDetail
 from research.views.researcher_views import ResearcherList, ResearcherDetail, ResearcherSelectList, \
     ResearcherCountrySelectList, ResearcherNationalitySelectList, ResearcherActivate, \
     ResearcherCountryActiveSelectList, ResearcherNationalityActiveSelectList
@@ -54,7 +54,15 @@ urlpatterns = [
     path('visits/check-out/<int:pk>', ResearcherVisitsCheckOut.as_view(), name='researcher-visits-check-out'),
 
     path('requests', RequestsList.as_view(), name='requests-list'),
+    path('requests/digital', DigitalRequestsList.as_view(), name='requests-digital-list'),
     path('requests/create/', RequestsCreate.as_view(), name='requests-create'),
+
+    # Content Sharing Endpoints
+    path('request_item/<int:request_item_id>/requested-materials-sharepoint/', RequestRequestedMaterialsSharePoint.as_view(),
+         name='request-item-requested-materials-sharepoint'),
+    path('requested-materials-sharepoint-jobs/<int:pk>/', RequestedMaterialsSharePointJobDetail.as_view(),
+         name='requested-materials-sharepoint-job-detail'),
+
     path('requests/print/', RequestsListForPrint.as_view(), name='requests-list-for-print'),
     re_path(r'requests/(?P<action>["next"|"previous"]+)/(?P<request_item_id>[0-9]+)/$', RequestItemStatusStep.as_view(),
             name='request-item-status-change'),

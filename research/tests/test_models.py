@@ -1,6 +1,7 @@
 import datetime
 
 from django.test import TestCase
+from django.utils import timezone
 
 from archival_unit.models import ArchivalUnit
 from container.models import Container
@@ -34,6 +35,47 @@ class ResearchModelsTests(TestCase):
 
         self.assertEqual(queued.status, '2')
         self.assertIsNotNone(pending.return_date)
+
+    def test_request_item_served_date_is_set_when_status_is_served(self):
+        researcher = Researcher.objects.create(first_name='Ada', last_name='Lovelace', email='ada@example.com')
+        request = Request.objects.create(researcher=researcher, request_date=datetime.datetime.now())
+        item = RequestItem.objects.create(request=request, item_origin='L', status='2')
+
+        self.assertIsNone(item.served_date)
+
+        item.status = '3'
+        item.save()
+        item.refresh_from_db()
+
+        self.assertIsNotNone(item.served_date)
+
+    def test_request_item_served_date_is_persisted_with_status_update_fields(self):
+        researcher = Researcher.objects.create(first_name='Ada', last_name='Lovelace', email='ada@example.com')
+        request = Request.objects.create(researcher=researcher, request_date=datetime.datetime.now())
+        item = RequestItem.objects.create(request=request, item_origin='L', status='2')
+
+        item.status = '9'
+        item.save(update_fields=['status'])
+        item.refresh_from_db()
+
+        self.assertIsNotNone(item.served_date)
+
+    def test_request_item_served_date_is_not_overwritten(self):
+        researcher = Researcher.objects.create(first_name='Ada', last_name='Lovelace', email='ada@example.com')
+        request = Request.objects.create(researcher=researcher, request_date=datetime.datetime.now())
+        served_date = timezone.now() - datetime.timedelta(days=1)
+        item = RequestItem.objects.create(
+            request=request,
+            item_origin='L',
+            status='3',
+            served_date=served_date,
+        )
+
+        item.status = '9'
+        item.save()
+        item.refresh_from_db()
+
+        self.assertEqual(item.served_date, served_date)
 
     def test_request_item_ordering_for_finding_aids(self):
         researcher = Researcher.objects.create(first_name='Ada', last_name='Lovelace', email='ada@example.com')

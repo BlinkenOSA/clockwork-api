@@ -6,7 +6,7 @@ from rest_framework import serializers
 from container.models import Container
 from finding_aids.models import FindingAidsEntity
 from mlr.models import MLREntity
-from research.models import RequestItem, Request, RequestItemPart
+from research.models import RequestItem, Request, RequestItemPart, RequestedMaterialsSharePointJob
 
 
 class RequestItemPartSerializer(serializers.ModelSerializer):
@@ -203,7 +203,7 @@ class RequestListSerializer(serializers.ModelSerializer):
         Returns True if the linked container has a digital version.
         """
         if obj.container:
-            return obj.container.digital_version_exists
+            return obj.container.has_digital_version
         else:
             return False
 
@@ -269,7 +269,7 @@ class RequestItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RequestItem
-        fields = ('id', 'item_origin', 'container', 'identifier', 'library_id', 'title')
+        fields = ('id', 'item_origin', 'container', 'identifier', 'other_identifier', 'library_id', 'title')
 
 
 class RequestCreateSerializer(WritableNestedModelSerializer):
@@ -326,7 +326,7 @@ class RequestItemReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItem
         fields = ('id', 'researcher', 'request_date', 'item_origin', 'archival_unit', 'container', 'identifier',
-                  'title', 'quantity')
+                  'other_identifier', 'title', 'quantity', 'served_date')
 
 
 class RequestItemWriteSerializer(serializers.ModelSerializer):
@@ -338,4 +338,41 @@ class RequestItemWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RequestItem
-        fields = ('id', 'item_origin', 'container', 'identifier', 'title', 'quantity')
+        fields = ('id', 'item_origin', 'container', 'identifier', 'other_identifier', 'title', 'quantity')
+
+
+class RequestedMaterialsSharePointJobSerializer(serializers.ModelSerializer):
+    """
+    Serializer for requested-materials SharePoint delivery jobs.
+    """
+
+    request_id = serializers.IntegerField(source='request_item.request.id', read_only=True)
+    request_item_id = serializers.IntegerField(source='request_item.id', read_only=True)
+    progress_percent = serializers.SerializerMethodField()
+
+    def get_progress_percent(self, obj):
+        if obj.status == 'completed':
+            return 100
+        if obj.progress_total:
+            return int((obj.progress_current / obj.progress_total) * 100)
+        return 0
+
+    class Meta:
+        model = RequestedMaterialsSharePointJob
+        fields = (
+            'id',
+            'request_id',
+            'request_item_id',
+            'status',
+            'current_step',
+            'message',
+            'progress_current',
+            'progress_total',
+            'progress_percent',
+            'celery_task_id',
+            'result',
+            'error_message',
+            'created_date',
+            'started_date',
+            'finished_date',
+        )

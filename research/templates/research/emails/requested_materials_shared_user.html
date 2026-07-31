@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br>
+
+        <h2>Your requested digital materials are now available.</h2>
+
+        <p>Dear {{ researcher.first_name }},</p>
+
+        <p>
+            The digital materials for your request dated {{ request.request_date }} have been copied to our
+            requested materials SharePoint area and shared with your email address for view-only access.
+        </p>
+
+        <p>
+            <strong>Shared folder:</strong>
+            <a href="{{ folder_url }}">{{ folder_url }}</a>
+        </p>
+
+        <p>
+            <strong>Files:</strong>
+            <ul>
+                {% for file in files %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+            </ul>
+        </p>
+
+        <p>
+            Regards,<br/>
+            Blinken OSA Archivum - AMS
+        </p>
+    </body>
+</html>

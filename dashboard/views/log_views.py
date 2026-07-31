@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework.generics import ListAPIView
 
 from accession.models import Accession
@@ -128,7 +129,10 @@ class DigitizationLog(ListAPIView):
 
     queryset = (
         Container.objects
-        .filter(digital_version_creation_date__isnull=False)
+        .filter(
+            Q(digital_version_exists=True) |
+            Q(digital_version_creation_date__isnull=False)
+        )
         .order_by(
             '-digital_version_creation_date',
             'archival_unit__reference_code',

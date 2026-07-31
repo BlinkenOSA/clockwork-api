@@ -10,5 +10,6 @@ include(
     'settings_components/rest_framework.py',
     'settings_components/email.py',
     'settings_components/production.py',
-    optional('settings_components/local.py')
+    optional('settings_components/local.py'),
+    optional('settings_components/sharepoint.py')
 )

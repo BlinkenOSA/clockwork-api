@@ -108,6 +108,7 @@ venv.bak/
 
 # Local config
 /clockwork_api/settings_components/local.py
+/clockwork_api/settings_components/sharepoint.py
 
 .DS_STORE
 
@@ -127,3 +128,5 @@ finding_aids/management/commands/populate*.py
 finding_aids/management/commands/json
 
 /digitization/management/commands/tapelogs
+
+selfsigncert.pem

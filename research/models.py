@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 from django.db import models
+from django.utils import timezone
 
 from clockwork_api.fields.email_null_field import EmailNullField
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
@@ -170,6 +171,49 @@ class Request(models.Model):
         db_table = 'research_requests'
 
 
+class RequestedMaterialsSharePointJob(models.Model):
+    """
+    Tracks asynchronous requested-materials SharePoint delivery jobs.
+    """
+
+    id = models.AutoField(primary_key=True)
+    request_item = models.ForeignKey('RequestItem', on_delete=models.CASCADE, related_name='requested_materials_jobs')
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('running', 'Running'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
+
+    STEP_CHOICES = [
+        ('queued', 'Queued'),
+        ('checking_files', 'Checking files'),
+        ('creating_directory', 'Creating directory'),
+        ('copying_files', 'Copying files'),
+        ('sharing_directory', 'Sharing directory'),
+        ('sending_emails', 'Sending emails'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ]
+    current_step = models.CharField(max_length=30, choices=STEP_CHOICES, default='queued')
+    message = models.TextField(blank=True, null=True)
+    progress_current = models.IntegerField(default=0)
+    progress_total = models.IntegerField(default=5)
+
+    celery_task_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    result = models.JSONField(blank=True, null=True)
+    error_message = models.TextField(blank=True, null=True)
+
+    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    started_date = models.DateTimeField(blank=True, null=True)
+    finished_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'research_requested_materials_sharepoint_jobs'
+
+
 class RequestItem(models.Model):
     """
     Represents a single requested item within a research request.
@@ -187,6 +231,7 @@ class RequestItem(models.Model):
 
     Additional behavior
     -------------------
+    - When status becomes Processed and prepared (``'3'``) or Uploaded (``'9'``), ``served_date`` is set if missing.
     - When status becomes Returned (``'4'``) or Uploaded (``'9'``), ``return_date`` is set if missing.
     - When status becomes Reshelved (``'5'``), ``reshelve_date`` is set if missing.
     - ``ordering`` is computed to support sorting:
@@ -203,9 +248,11 @@ class RequestItem(models.Model):
     item_origin = models.CharField(max_length=3, choices=ORIGIN)
     container = models.ForeignKey('container.Container', blank=True, null=True, on_delete=models.CASCADE)
     identifier = models.CharField(max_length=100, blank=True, null=True)
+    other_identifier = models.CharField(max_length=100, blank=True, null=True)
     library_id = models.IntegerField(blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
     quantity = models.CharField(max_length=200, blank=True, null=True)
+    served_date = models.DateTimeField(blank=True, null=True)
     return_date = models.DateTimeField(blank=True, null=True)
     reshelve_date = models.DateTimeField(blank=True, null=True)
     ordering = models.CharField(max_length=50, blank=True, null=True)
@@ -217,6 +264,7 @@ class RequestItem(models.Model):
         Behavior includes:
             - promotion from queue to pending when fewer than 10 pending items exist
             - promotion of the next queued item when an item is returned/uploaded
+            - auto-populating ``served_date`` when a request item is served/uploaded
             - auto-populating ``return_date`` and ``reshelve_date`` on status transitions
             - computing ``ordering`` based on origin and container/identifier
         """
@@ -231,6 +279,12 @@ class RequestItem(models.Model):
         if self.status == '1':
             if requested_items_count < 10:
                 self.status = '2'
+
+        if self.status in ('3', '9') and not self.served_date:
+            self.served_date = timezone.now()
+            update_fields = kwargs.get('update_fields')
+            if update_fields is not None:
+                kwargs['update_fields'] = set(update_fields) | {'served_date'}
 
         # If return is happening, write the return date into the record.
         if self.status == '4' or self.status == '9':
@@ -321,4 +375,3 @@ class RequestItemPart(models.Model):
 
     class Meta:
         db_table = 'research_request_items_parts'
-

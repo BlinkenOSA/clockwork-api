@@ -2,6 +2,7 @@ import datetime
 import json
 
 from clockwork_api.http import get
+from django.db.models import Q
 from requests.exceptions import RequestException
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
@@ -18,9 +19,11 @@ from clockwork_api.mailer.email_with_template import EmailWithTemplate
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.pagination import DropDownResultSetPagination
 from container.models import Container
-from research.models import RequestItem, Request
+from research.models import RequestItem, Request, RequestedMaterialsSharePointJob
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
-    RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer
+    RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer, \
+    RequestedMaterialsSharePointJobSerializer
+from research.tasks import deliver_requested_materials_sharepoint_job
 from django_filters import rest_framework as filters
 from hashids import Hashids
 
@@ -146,6 +149,7 @@ class RequestsList(generics.ListAPIView):
         'request__researcher__first_name',
         'container__archival_unit__reference_code',
         'identifier',
+        'other_identifier',
         'title',
         'container__barcode'
     ]
@@ -160,6 +164,26 @@ class RequestsList(generics.ListAPIView):
     serializer_class = RequestListSerializer
 
 
+class DigitalRequestsList(RequestsList):
+    """
+    Lists only research request items whose linked container has a digital version.
+
+    The filtering mirrors ``Container.has_digital_version`` by including:
+        - container-level digital-version flags
+        - finding-aids digital-version flags on entities in the container
+        - direct digital-version records on the container
+        - digital-version records on finding-aids entities in the container
+    """
+
+    queryset = RequestItem.objects.filter(
+        Q(container__digital_version_exists=True) |
+        Q(container__findingaidsentity__digital_version_exists=True) |
+        Q(container__digital_versions__isnull=False) |
+        Q(container__findingaidsentity__digital_versions__isnull=False) |
+        (Q(item_origin='FL') & Q(identifier__startswith='HU_OSA'))
+    ).distinct().order_by('-request__created_date')
+
+
 class RequestsCreate(CreateAPIView):
     """
     Creates a new research request with nested request items.
@@ -171,6 +195,43 @@ class RequestsCreate(CreateAPIView):
 
     serializer_class = RequestCreateSerializer
     queryset = Request.objects.all()
+
+
+class RequestRequestedMaterialsSharePoint(APIView):
+    """
+    Starts a background requested-materials SharePoint delivery job for a request item.
+
+    POST:
+        Creates a delivery job record and enqueues a Celery task. The Admin UI
+        can poll the returned job id for step-by-step progress updates.
+    """
+
+    def post(self, request, *args, **kwargs):
+        request_item = get_object_or_404(RequestItem, pk=self.kwargs['request_item_id'])
+        job = RequestedMaterialsSharePointJob.objects.create(
+            request_item=request_item,
+            status='pending',
+            current_step='queued',
+            message='Requested materials delivery queued.',
+            progress_current=0,
+            progress_total=5,
+        )
+        async_result = deliver_requested_materials_sharepoint_job.delay(job.id)
+        job.celery_task_id = async_result.id
+        job.save(update_fields=['celery_task_id'])
+        return Response(
+            RequestedMaterialsSharePointJobSerializer(job).data,
+            status=status.HTTP_202_ACCEPTED,
+        )
+
+
+class RequestedMaterialsSharePointJobDetail(generics.RetrieveAPIView):
+    """
+    Returns the current status of a requested-materials SharePoint delivery job.
+    """
+
+    queryset = RequestedMaterialsSharePointJob.objects.all()
+    serializer_class = RequestedMaterialsSharePointJobSerializer
 
 
 class RequestItemRetrieveUpdate(MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):

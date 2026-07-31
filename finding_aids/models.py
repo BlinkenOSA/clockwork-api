@@ -10,6 +10,7 @@ from model_clone import CloneMixin
 
 from clockwork_api.mixins.detect_protected_mixin import DetectProtectedMixin
 from clockwork_api.services.ark import ensure_ark
+from digitization.models import DigitalVersion
 
 
 class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
@@ -263,6 +264,24 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
             else:
                 self.time_start = datetime.timedelta(0)
                 self.duration = self.time_end
+
+    @property
+    def has_digital_version(self):
+        """
+        Indicates whether the finding aids entity has an associated digital version.
+
+        A digital version is considered present if:
+            - One or more associated digital version records exist.
+
+        This property provides a unified view across container-level and
+        finding-aid-level digital version indicators.
+        """
+        if self.digital_version_exists:
+            return True
+        if DigitalVersion.objects.filter(
+                finding_aids_entity=self).exists():
+            return True
+        return False
 
     def save(self, **kwargs):
         """

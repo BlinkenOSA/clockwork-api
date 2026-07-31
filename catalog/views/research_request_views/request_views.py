@@ -140,11 +140,18 @@ class ResearcherRequestView(APIView):
 
                 # Library/Film Library Item
                 else:
+                    identifier = item.get('call_number', '')
+                    other_identifier = None
+                    if item['origin'] == 'FL':
+                        identifier = item.get('digital_version') or 'N/A'
+                        other_identifier = item.get('call_number', '')
+
                     request_item, created = RequestItem.objects.get_or_create(
                         request=request,
                         item_origin=item['origin'],
                         title=item['title'],
-                        identifier=item['call_number'],
+                        identifier=identifier,
+                        other_identifier=other_identifier,
                         library_id=item['ams_id'],
                         quantity=item['volume'] if 'volume' in item.keys() else ''
                     )
