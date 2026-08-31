@@ -1,3 +1,5 @@
+import os
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -95,3 +97,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # Default timeout (seconds) for outbound HTTP requests made by the app.
 REQUESTS_TIMEOUT = 5
 
+# Maximum number of pending request items allowed per researcher and origin.
+REQUEST_ITEM_PENDING_LIMIT = int(os.environ.get("REQUEST_ITEM_PENDING_LIMIT", 10))

@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -224,7 +225,7 @@ class RequestItem(models.Model):
     Queueing rules
     --------------
     The save logic enforces a simple per-researcher, per-origin limit:
-        - at most 10 items can be in status ``'2'`` (Pending) at a time
+        - at most ``REQUEST_ITEM_PENDING_LIMIT`` items can be in status ``'2'`` (Pending) at a time
         - items start in ``'1'`` (In Queue) and are promoted to ``'2'`` when a slot is free
         - when an item is returned (status ``'4'``) or uploaded (status ``'9'``),
           the next queued item is promoted to pending (if any)
@@ -257,27 +258,32 @@ class RequestItem(models.Model):
     reshelve_date = models.DateTimeField(blank=True, null=True)
     ordering = models.CharField(max_length=50, blank=True, null=True)
 
+    @staticmethod
+    def get_pending_limit():
+        return getattr(settings, 'REQUEST_ITEM_PENDING_LIMIT', 10)
+
     def save(self, **kwargs):
         """
         Overrides save to enforce queue rules and derive dates/order keys.
 
         Behavior includes:
-            - promotion from queue to pending when fewer than 10 pending items exist
+            - promotion from queue to pending when fewer than ``REQUEST_ITEM_PENDING_LIMIT`` pending items exist
             - promotion of the next queued item when an item is returned/uploaded
             - auto-populating ``served_date`` when a request item is served/uploaded
             - auto-populating ``return_date`` and ``reshelve_date`` on status transitions
             - computing ``ordering`` based on origin and container/identifier
         """
         researcher = self.request.researcher
+        pending_limit = self.get_pending_limit()
         requested_items_count = RequestItem.objects.filter(
             request__researcher=researcher,
             item_origin=self.item_origin,
             status='2'
         ).count()
 
-        # Check if there are one free slots from 10 for the newly created item. If yes, change status to 2.
+        # Promote queued items when the configured pending limit has free capacity.
         if self.status == '1':
-            if requested_items_count < 10:
+            if requested_items_count < pending_limit:
                 self.status = '2'
 
         if self.status in ('3', '9') and not self.served_date:
@@ -288,7 +294,7 @@ class RequestItem(models.Model):
 
         # If return is happening, write the return date into the record.
         if self.status == '4' or self.status == '9':
-            if requested_items_count < 10:
+            if requested_items_count < pending_limit:
                 requested_items_next_in_queue = RequestItem.objects.filter(
                     request__researcher=researcher,
                     item_origin=self.item_origin,
