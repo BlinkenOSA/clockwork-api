@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import QuerySet
 from django.db.models import Count, IntegerField, OuterRef, Subquery, Value
 from django.db.models.query_utils import Q
@@ -148,6 +149,26 @@ class ArchivalUnitSelectList(ListAllowedArchivalUnitMixin, generics.ListAPIView)
     queryset = annotate_archival_unit_select_counts(
         ArchivalUnit.objects.all().order_by('fonds', 'subfonds', 'series')
     )
+
+    def get_queryset(self) -> QuerySet[ArchivalUnit]:
+        """Hide the unprocessed-materials fonds unless explicitly requested."""
+        unprocessed = self.request.query_params.get('unprocessed')
+
+        # Unprocessed mode exposes only the configured holding fonds and its
+        # descendants. The regular filter backend can then select a level,
+        # such as all of its series with ``level=S``.
+        if unprocessed is not None and unprocessed.lower() not in ('0', 'false', 'no'):
+            queryset = ArchivalUnit.objects.filter(
+                fonds=settings.UNPROCESSED_MATERIALS_FONDS
+            )
+        else:
+            queryset = super().get_queryset().exclude(
+                fonds=settings.UNPROCESSED_MATERIALS_FONDS
+            )
+
+        return annotate_archival_unit_select_counts(
+            queryset.order_by('fonds', 'subfonds', 'series')
+        )
 
 
 class ArchivalUnitSelectByParentList(generics.ListAPIView):

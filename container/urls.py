@@ -9,7 +9,7 @@ based and barcode-based access patterns.
 from django.urls import re_path, path
 
 from container.views import ContainerList, ContainerDetail, ContainerDetailByBarcode, \
-    ContainerCreate, ContainerPreCreate, ContainerPublish, ContainerPublishAll
+    ContainerCreate, ContainerPreCreate, ContainerPublish, ContainerPublishAll, ContainerMove
 
 app_name = 'container'
 
@@ -22,6 +22,9 @@ urlpatterns = [
 
     # Create a new container
     path('create/', ContainerCreate.as_view(), name='container-create'),
+
+    # Move a container to the end of another series
+    path('move/', ContainerMove.as_view(), name='container-move'),
 
     # Retrieve or update a container by primary key
     path('<int:pk>/', ContainerDetail.as_view(), name='container-detail'),

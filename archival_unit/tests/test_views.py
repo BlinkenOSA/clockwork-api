@@ -1,3 +1,4 @@
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -111,3 +112,42 @@ class ArchivalUnitViewTest(TestViewsBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         returned_ids = {item['id'] for item in response.data}
         self.assertEqual(returned_ids, {series_allowed.id})
+
+    @override_settings(UNPROCESSED_MATERIALS_FONDS=999)
+    def test_select_hides_unprocessed_fonds_unless_requested(self):
+        unprocessed_fonds = make_fonds(
+            fonds=999,
+            uuid='5d9b702d-f3e4-411e-ab45-4de0c3e91be0',
+            title='Unprocessed materials',
+        )
+        unprocessed_subfonds = ArchivalUnit.objects.create(
+            fonds=999,
+            subfonds=1,
+            level='SF',
+            title='Unprocessed audiovisual materials',
+            parent=unprocessed_fonds,
+        )
+        unprocessed_series = ArchivalUnit.objects.create(
+            fonds=999,
+            subfonds=1,
+            series=1,
+            level='S',
+            title='Unprocessed recordings',
+            parent=unprocessed_subfonds,
+        )
+
+        response = self.client.get(
+            reverse('archival_unit-v1:archival_unit-select-list')
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual({item['id'] for item in response.data}, {self.fonds.id})
+
+        response = self.client.get(
+            reverse('archival_unit-v1:archival_unit-select-list'),
+            {'unprocessed': 'true', 'level': 'S'},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            {item['id'] for item in response.data},
+            {unprocessed_series.id},
+        )

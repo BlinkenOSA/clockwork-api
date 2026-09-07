@@ -2,6 +2,7 @@ import json
 import datetime
 from rest_framework import serializers
 
+from archival_unit.models import ArchivalUnit
 from clockwork_api.mixins.user_data_serializer_mixin import UserDataSerializerMixin
 from container.models import Container
 from controlled_list.models import CarrierType
@@ -60,6 +61,34 @@ class ContainerWriteSerializer(UserDataSerializerMixin, serializers.ModelSeriali
     class Meta:
         model = Container
         exclude = ('container_no', 'digital_version_creation_date')
+
+
+class ContainerMoveSerializer(serializers.Serializer):
+    """Validate the container and series involved in a move operation."""
+
+    container = serializers.PrimaryKeyRelatedField(queryset=Container.objects.all())
+    source_series = serializers.PrimaryKeyRelatedField(
+        queryset=ArchivalUnit.objects.filter(level='S')
+    )
+    destination_series = serializers.PrimaryKeyRelatedField(
+        queryset=ArchivalUnit.objects.filter(level='S')
+    )
+
+    def validate(self, attrs):
+        source_series = attrs['source_series']
+        destination_series = attrs['destination_series']
+        container = attrs['container']
+
+        if source_series == destination_series:
+            raise serializers.ValidationError(
+                {'destination_series': 'The destination series must differ from the source series.'}
+            )
+        if container.archival_unit_id != source_series.id:
+            raise serializers.ValidationError(
+                {'container': 'The container does not belong to the source series.'}
+            )
+
+        return attrs
 
 
 class ContainerListSerializer(serializers.ModelSerializer):

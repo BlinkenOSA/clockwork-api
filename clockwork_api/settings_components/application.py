@@ -99,3 +99,6 @@ REQUESTS_TIMEOUT = 5
 
 # Maximum number of pending request items allowed per researcher and origin.
 REQUEST_ITEM_PENDING_LIMIT = int(os.environ.get("REQUEST_ITEM_PENDING_LIMIT", 10))
+
+# Fonds reserved for containers whose final archival series is not known yet.
+UNPROCESSED_MATERIALS_FONDS = int(os.environ.get("UNPROCESSED_MATERIALS_FONDS", 999))

@@ -1,6 +1,9 @@
+from django.db import transaction
 from django.db.models import Count, IntegerField, OuterRef, Subquery, Value, F
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,7 +13,7 @@ from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from container.models import Container
 from container.serializers import ContainerReadSerializer, ContainerWriteSerializer, \
-    ContainerListSerializer
+    ContainerListSerializer, ContainerMoveSerializer
 from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
 
@@ -178,6 +181,98 @@ class ContainerDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpd
         AuditLogMixin.log_audit_action(user=self.request.user, action='DELETE', instance=instance)
         instance.delete()
         containers.update(container_no=F('container_no') - 1)
+
+
+class ContainerMove(APIView):
+    """Move a container to the end of another series and compact its source."""
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = ContainerMoveSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        container_id = serializer.validated_data['container'].id
+        source_series = serializer.validated_data['source_series']
+        destination_series = serializer.validated_data['destination_series']
+
+        # Lock the series rows first so concurrent move operations acquire
+        # locks in a predictable order.
+        list(ArchivalUnit.objects.select_for_update().filter(
+            id__in=sorted((source_series.id, destination_series.id))
+        ).order_by('id'))
+
+        source_containers = list(
+            Container.objects.select_for_update().filter(
+                archival_unit_id=source_series.id
+            ).order_by('container_no', 'id')
+        )
+        destination_containers = list(
+            Container.objects.select_for_update().filter(
+                archival_unit_id=destination_series.id
+            ).order_by('container_no', 'id')
+        )
+
+        moved_container = next(
+            (item for item in source_containers if item.id == container_id),
+            None
+        )
+        if moved_container is None:
+            raise ValidationError({'container': 'The container does not belong to the source series.'})
+
+        source_remaining = [
+            item for item in source_containers if item.id != moved_container.id
+        ]
+        destination_container_no = max(
+            (item.container_no for item in destination_containers),
+            default=0
+        ) + 1
+
+        # Move every source row to a unique temporary number first. This
+        # prevents intermediate collisions with the (series, container_no)
+        # uniqueness constraint while final numbers are assigned.
+        highest_number = max(
+            (item.container_no for item in source_containers),
+            default=0
+        )
+        temporary_base = highest_number + len(source_containers) + 1
+        for offset, item in enumerate(source_containers):
+            Container.objects.filter(pk=item.id).update(
+                container_no=temporary_base + offset
+            )
+
+        for container_no, item in enumerate(source_remaining, start=1):
+            Container.objects.filter(pk=item.id).update(container_no=container_no)
+
+        Container.objects.filter(pk=moved_container.id).update(
+            archival_unit_id=destination_series.id,
+            container_no=destination_container_no,
+            user_updated=request.user.username,
+            date_updated=timezone.now(),
+        )
+
+        # Finding-aid records duplicate their series and reference code, so
+        # refresh them after all affected container numbers have settled.
+        affected_ids = [item.id for item in source_containers]
+        finding_aids_entities = FindingAidsEntity.objects.select_for_update().select_related(
+            'container__archival_unit'
+        ).filter(container_id__in=affected_ids)
+        for entity in finding_aids_entities:
+            entity.archival_unit = entity.container.archival_unit
+            entity.user_updated = request.user.username
+            entity.date_updated = timezone.now()
+            entity.save()
+
+        moved_container.refresh_from_db()
+        AuditLogMixin.log_audit_action(
+            user=request.user,
+            action='UPDATE',
+            instance=moved_container,
+            changed_fields=['archival_unit', 'container_no'],
+        )
+        return Response(
+            ContainerReadSerializer(moved_container).data,
+            status=status.HTTP_200_OK
+        )
 
 
 class ContainerPublishAll(APIView):
