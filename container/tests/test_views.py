@@ -1,8 +1,10 @@
 from unittest.mock import patch
 
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from archival_unit.models import ArchivalUnit
 from archival_unit.tests.helpers import make_fonds, make_subfonds, make_series
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from container.models import Container
@@ -65,6 +67,41 @@ class ContainerViewsTest(TestViewsBaseClass):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 0)
+
+    @override_settings(UNPROCESSED_MATERIALS_FONDS=999)
+    def test_list_allows_unprocessed_series_for_restricted_user(self):
+        unprocessed_fonds = make_fonds(
+            fonds=999,
+            uuid='b4d53b2e-d71c-4538-97fe-f8d12b21c623',
+            title='Unprocessed materials',
+        )
+        unprocessed_subfonds = ArchivalUnit.objects.create(
+            parent=unprocessed_fonds,
+            fonds=999,
+            subfonds=1,
+            uuid='8c521d5e-8d42-44d7-bcc0-a92957413a6f',
+            title='Unprocessed audiovisual materials',
+            level='SF',
+        )
+        unprocessed_series = ArchivalUnit.objects.create(
+            parent=unprocessed_subfonds,
+            fonds=999,
+            subfonds=1,
+            series=1,
+            uuid='da89e365-3b40-45cc-a044-9c94d469fd17',
+            title='Unprocessed recordings',
+            level='S',
+        )
+        unprocessed_container = make_container(unprocessed_series, self.carrier_type)
+        self.user_profile.allowed_archival_units.add(self.series)
+
+        response = self.client.get(
+            reverse('container-v1:container-list', kwargs={'series_id': unprocessed_series.id})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['id'], unprocessed_container.id)
 
     def test_move_container_between_series_and_renumber(self):
         source_second = make_container(self.series, self.carrier_type)

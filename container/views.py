@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, IntegerField, OuterRef, Subquery, Value, F
 from django.db.models.functions import Coalesce
@@ -136,9 +137,13 @@ class ContainerList(generics.ListAPIView):
 
             user = self.request.user
             if user.user_profile.allowed_archival_units.count() > 0:
-                if user.user_profile.allowed_archival_units.filter(id=archival_unit_id).count() > 0:
-                    allowed_archival_unit = user.user_profile.allowed_archival_units.get(id=archival_unit_id)
-                    return annotate_counts(Container.objects.filter(archival_unit_id=allowed_archival_unit.id))
+                requested_archival_unit = ArchivalUnit.objects.filter(id=archival_unit_id).first()
+                is_unprocessed = (
+                    requested_archival_unit and
+                    requested_archival_unit.fonds == settings.UNPROCESSED_MATERIALS_FONDS
+                )
+                if user.user_profile.allowed_archival_units.filter(id=archival_unit_id).exists() or is_unprocessed:
+                    return annotate_counts(Container.objects.filter(archival_unit_id=archival_unit_id))
                 else:
                     return Container.objects.none()
             else:
