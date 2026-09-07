@@ -279,7 +279,7 @@ class RequestItem(models.Model):
             request__researcher=researcher,
             item_origin=self.item_origin,
             status='2'
-        ).count()
+        ).exclude(pk=self.pk).count()
 
         # Promote queued items when the configured pending limit has free capacity.
         if self.status == '1':
