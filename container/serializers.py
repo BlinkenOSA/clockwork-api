@@ -1,5 +1,6 @@
 import json
 import datetime
+from django.conf import settings
 from rest_framework import serializers
 
 from archival_unit.models import ArchivalUnit
@@ -79,6 +80,14 @@ class ContainerMoveSerializer(serializers.Serializer):
         destination_series = attrs['destination_series']
         container = attrs['container']
 
+        if source_series.fonds != settings.UNPROCESSED_MATERIALS_FONDS:
+            raise serializers.ValidationError(
+                {'source_series': 'The source series must belong to the unprocessed-materials fonds.'}
+            )
+        if destination_series.fonds == settings.UNPROCESSED_MATERIALS_FONDS:
+            raise serializers.ValidationError(
+                {'destination_series': 'The destination must be a regular archival series.'}
+            )
         if source_series == destination_series:
             raise serializers.ValidationError(
                 {'destination_series': 'The destination series must differ from the source series.'}

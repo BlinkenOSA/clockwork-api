@@ -12,6 +12,7 @@ from archival_unit.models import ArchivalUnit
 from archival_unit.serializers import ArchivalUnitSelectSerializer, ArchivalUnitReadSerializer, \
     ArchivalUnitWriteSerializer, ArchivalUnitFondsSerializer, ArchivalUnitSeriesSerializer, \
     ArchivalUnitPreCreateSerializer
+from accounts.permissions import accessible_unprocessed_series
 from clockwork_api.mixins.allowed_archival_unit_mixin import ListAllowedArchivalUnitMixin
 from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
@@ -32,6 +33,18 @@ def annotate_archival_unit_select_counts(queryset: QuerySet[ArchivalUnit]) -> Qu
         container_count_value=Coalesce(Subquery(container_count, output_field=IntegerField()), Value(0)),
         folder_count_value=Coalesce(Subquery(folder_count, output_field=IntegerField()), Value(0))
     )
+
+
+class UnprocessedArchivalUnitAccessMixin:
+    """Restrict direct HU OSA 999 series access to the dedicated allowlist."""
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_superuser:
+            return queryset
+        return queryset.exclude(
+            fonds=settings.UNPROCESSED_MATERIALS_FONDS
+        ) | queryset.filter(pk__in=accessible_unprocessed_series(self.request.user))
 
 
 class ArchivalUnitFilterClass(filters.FilterSet):
@@ -114,7 +127,8 @@ class ArchivalUnitList(AuditLogMixin, MethodSerializerMixin, generics.ListCreate
     filterset_class = ArchivalUnitFilterClass
 
 
-class ArchivalUnitDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class ArchivalUnitDetail(UnprocessedArchivalUnitAccessMixin, AuditLogMixin, MethodSerializerMixin,
+                         generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieves, updates, or deletes a single archival unit.
 
@@ -154,13 +168,10 @@ class ArchivalUnitSelectList(ListAllowedArchivalUnitMixin, generics.ListAPIView)
         """Hide the unprocessed-materials fonds unless explicitly requested."""
         unprocessed = self.request.query_params.get('unprocessed')
 
-        # Unprocessed mode exposes only the configured holding fonds and its
-        # descendants. The regular filter backend can then select a level,
-        # such as all of its series with ``level=S``.
+        # Unprocessed mode exposes only series explicitly assigned to the
+        # current user within the configured holding fonds.
         if unprocessed is not None and unprocessed.lower() not in ('0', 'false', 'no'):
-            queryset = ArchivalUnit.objects.filter(
-                fonds=settings.UNPROCESSED_MATERIALS_FONDS
-            )
+            queryset = accessible_unprocessed_series(self.request.user)
         else:
             queryset = super().get_queryset().exclude(
                 fonds=settings.UNPROCESSED_MATERIALS_FONDS
@@ -200,6 +211,22 @@ class ArchivalUnitSelectByParentList(generics.ListAPIView):
         """
         parent_id = self.kwargs.get('parent_id', None)
         user = self.request.user
+
+        if parent_id:
+            parent_unit = ArchivalUnit.objects.get(pk=parent_id)
+            if parent_unit.fonds == settings.UNPROCESSED_MATERIALS_FONDS:
+                allowed_unprocessed = accessible_unprocessed_series(user)
+                if parent_unit.level == 'F':
+                    return annotate_archival_unit_select_counts(
+                        ArchivalUnit.objects.filter(
+                            pk__in=allowed_unprocessed.values_list('parent_id', flat=True)
+                        )
+                    )
+                if parent_unit.level == 'SF':
+                    return annotate_archival_unit_select_counts(
+                        allowed_unprocessed.filter(parent=parent_unit)
+                    )
+                return ArchivalUnit.objects.none()
 
         # If the user has assigned archival units, apply restrictions
         allowed_qs = user.user_profile.allowed_archival_units.all()

@@ -4,12 +4,17 @@ from django.db.models import Count, IntegerField, OuterRef, Subquery, Value, F
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from rest_framework import generics, status
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from archival_unit.models import ArchivalUnit
+from accounts.permissions import (
+    accessible_unprocessed_series,
+    can_access_unprocessed_series,
+    is_unprocessed_series,
+)
 from clockwork_api.mixins.audit_log_mixin import AuditLogMixin
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from container.models import Container
@@ -17,6 +22,27 @@ from container.serializers import ContainerReadSerializer, ContainerWriteSeriali
     ContainerListSerializer, ContainerMoveSerializer
 from digitization.models import DigitalVersion
 from finding_aids.models import FindingAidsEntity
+
+
+class UnprocessedContainerAccessMixin:
+    """Restrict containers in the holding fonds to the dedicated allowlist."""
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        accessible_series = accessible_unprocessed_series(self.request.user)
+        return queryset.exclude(
+            archival_unit__fonds=settings.UNPROCESSED_MATERIALS_FONDS
+        ) | queryset.filter(archival_unit__in=accessible_series)
+
+    def perform_update(self, serializer):
+        archival_unit = serializer.validated_data.get(
+            'archival_unit',
+            serializer.instance.archival_unit,
+        )
+        if is_unprocessed_series(archival_unit) and not can_access_unprocessed_series(
+                self.request.user, archival_unit):
+            raise PermissionDenied('You are not allowed to access this unprocessed series.')
+        super().perform_update(serializer)
 
 
 class ContainerPreCreate(APIView):
@@ -38,6 +64,9 @@ class ContainerPreCreate(APIView):
         """
         archival_unit_id = self.kwargs.get('pk', None)
         archival_unit = get_object_or_404(ArchivalUnit, pk=archival_unit_id)
+        if is_unprocessed_series(archival_unit) and not can_access_unprocessed_series(
+                self.request.user, archival_unit):
+            raise PermissionDenied('You are not allowed to access this unprocessed series.')
         container = Container.objects.filter(archival_unit=archival_unit).order_by('container_no').reverse().first()
         if container:
             response = {
@@ -61,6 +90,13 @@ class ContainerCreate(AuditLogMixin, generics.CreateAPIView):
     """
 
     serializer_class = ContainerWriteSerializer
+
+    def perform_create(self, serializer):
+        archival_unit = serializer.validated_data['archival_unit']
+        if is_unprocessed_series(archival_unit) and not can_access_unprocessed_series(
+                self.request.user, archival_unit):
+            raise PermissionDenied('You are not allowed to access this unprocessed series.')
+        super().perform_create(serializer)
 
 
 class ContainerList(generics.ListAPIView):
@@ -136,23 +172,23 @@ class ContainerList(generics.ListAPIView):
                 )
 
             user = self.request.user
-            if user.user_profile.allowed_archival_units.count() > 0:
-                requested_archival_unit = ArchivalUnit.objects.filter(id=archival_unit_id).first()
-                is_unprocessed = (
-                    requested_archival_unit and
-                    requested_archival_unit.fonds == settings.UNPROCESSED_MATERIALS_FONDS
-                )
-                if user.user_profile.allowed_archival_units.filter(id=archival_unit_id).exists() or is_unprocessed:
+            requested_archival_unit = ArchivalUnit.objects.filter(id=archival_unit_id).first()
+            if is_unprocessed_series(requested_archival_unit):
+                if can_access_unprocessed_series(user, requested_archival_unit):
                     return annotate_counts(Container.objects.filter(archival_unit_id=archival_unit_id))
-                else:
-                    return Container.objects.none()
+                return Container.objects.none()
+            if user.user_profile.allowed_archival_units.count() > 0:
+                if user.user_profile.allowed_archival_units.filter(id=archival_unit_id).exists():
+                    return annotate_counts(Container.objects.filter(archival_unit_id=archival_unit_id))
+                return Container.objects.none()
             else:
                 return annotate_counts(Container.objects.filter(archival_unit_id=archival_unit_id))
         else:
             return Container.objects.none()
 
 
-class ContainerDetail(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateDestroyAPIView):
+class ContainerDetail(UnprocessedContainerAccessMixin, AuditLogMixin, MethodSerializerMixin,
+                      generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieves, updates, or deletes a container by primary key.
 
@@ -199,6 +235,15 @@ class ContainerMove(APIView):
         container_id = serializer.validated_data['container'].id
         source_series = serializer.validated_data['source_series']
         destination_series = serializer.validated_data['destination_series']
+
+        for series in (source_series, destination_series):
+            if is_unprocessed_series(series) and not can_access_unprocessed_series(request.user, series):
+                raise PermissionDenied('You are not allowed to access this unprocessed series.')
+
+        allowed_archival_units = request.user.user_profile.allowed_archival_units
+        if (not request.user.is_superuser and allowed_archival_units.exists() and
+                not allowed_archival_units.filter(pk=destination_series.pk).exists()):
+            raise PermissionDenied('You are not allowed to access the destination series.')
 
         # Lock the series rows first so concurrent move operations acquire
         # locks in a predictable order.
@@ -337,7 +382,8 @@ class ContainerPublish(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class ContainerDetailByBarcode(AuditLogMixin, MethodSerializerMixin, generics.RetrieveUpdateAPIView):
+class ContainerDetailByBarcode(UnprocessedContainerAccessMixin, AuditLogMixin, MethodSerializerMixin,
+                               generics.RetrieveUpdateAPIView):
     """
     Retrieves or updates a container by barcode.
 

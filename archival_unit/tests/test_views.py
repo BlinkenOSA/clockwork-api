@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from django.test import override_settings
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -151,3 +152,44 @@ class ArchivalUnitViewTest(TestViewsBaseClass):
             {item['id'] for item in response.data},
             {unprocessed_series.id},
         )
+
+        self.user.is_superuser = False
+        self.user.save(update_fields=['is_superuser'])
+        self.user.groups.add(Group.objects.create(name='Unprocessed Materials'))
+
+        second_series = ArchivalUnit.objects.create(
+            fonds=999,
+            subfonds=1,
+            series=2,
+            level='S',
+            title='Other unprocessed recordings',
+            parent=unprocessed_subfonds,
+        )
+        response = self.client.get(
+            reverse('archival_unit-v1:archival_unit-select-list'),
+            {'unprocessed': 'true', 'level': 'S'},
+        )
+        self.assertEqual(
+            {item['id'] for item in response.data},
+            {unprocessed_series.id, second_series.id},
+        )
+
+        self.user_profile.allowed_unprocessed_series.add(unprocessed_series)
+        response = self.client.get(
+            reverse('archival_unit-v1:archival_unit-select-list'),
+            {'unprocessed': 'true', 'level': 'S'},
+        )
+        self.assertEqual({item['id'] for item in response.data}, {unprocessed_series.id})
+        self.assertNotIn(second_series.id, {item['id'] for item in response.data})
+
+        self.user.groups.clear()
+        response = self.client.get(
+            reverse('archival_unit-v1:archival_unit-select-list'),
+            {'unprocessed': 'true', 'level': 'S'},
+        )
+        self.assertEqual(response.data, [])
+
+        response = self.client.get(
+            reverse('archival_unit-v1:archival_unit-detail', kwargs={'pk': unprocessed_series.pk})
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
