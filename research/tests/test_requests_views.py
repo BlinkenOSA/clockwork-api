@@ -125,6 +125,58 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(response.data['results'][0]['id'], digital_item.id)
 
+    def test_requests_list_only_returns_items_for_approved_researchers(self):
+        approved_item = RequestItem.objects.create(request=self.request, item_origin='L')
+        excluded_items = []
+
+        for researcher_status in ('new', 'suspended'):
+            researcher = Researcher.objects.create(
+                first_name=researcher_status.title(),
+                last_name='Researcher',
+                email=f'{researcher_status}@example.com',
+                status=researcher_status,
+            )
+            request = Request.objects.create(researcher=researcher, request_date=datetime.datetime.now())
+            excluded_items.append(RequestItem.objects.create(request=request, item_origin='L'))
+
+        response = self.client.get(reverse('research-v1:requests-list'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result_ids = {result['id'] for result in response.data['results']}
+        self.assertIn(approved_item.id, result_ids)
+        for excluded_item in excluded_items:
+            self.assertNotIn(excluded_item.id, result_ids)
+
+    def test_digital_requests_list_only_returns_items_for_approved_researchers(self):
+        approved_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FA',
+            container=self.container,
+        )
+        excluded_items = []
+
+        for researcher_status in ('new', 'suspended'):
+            researcher = Researcher.objects.create(
+                first_name=researcher_status.title(),
+                last_name='Researcher',
+                email=f'digital-{researcher_status}@example.com',
+                status=researcher_status,
+            )
+            request = Request.objects.create(researcher=researcher, request_date=datetime.datetime.now())
+            excluded_items.append(RequestItem.objects.create(
+                request=request,
+                item_origin='FA',
+                container=self.container,
+            ))
+
+        response = self.client.get(reverse('research-v1:requests-digital-list'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result_ids = {result['id'] for result in response.data['results']}
+        self.assertIn(approved_item.id, result_ids)
+        for excluded_item in excluded_items:
+            self.assertNotIn(excluded_item.id, result_ids)
+
     @patch('research.views.requests_views.deliver_requested_materials_sharepoint_job.delay')
     def test_request_requested_materials_sharepoint_creates_job(self, mocked_delay):
         mocked_delay.return_value = SimpleNamespace(id='celery-123')
