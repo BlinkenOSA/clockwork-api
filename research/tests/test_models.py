@@ -1,6 +1,6 @@
 import datetime
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from archival_unit.models import ArchivalUnit
@@ -35,6 +35,35 @@ class ResearchModelsTests(TestCase):
 
         self.assertEqual(queued.status, '2')
         self.assertIsNotNone(pending.return_date)
+
+    @override_settings(REQUEST_ITEM_PENDING_LIMIT=6)
+    def test_request_item_uses_configurable_pending_limit_for_new_items(self):
+        researcher = Researcher.objects.create(first_name='Ada', last_name='Lovelace', email='ada-limit@example.com')
+        request = Request.objects.create(researcher=researcher, request_date=datetime.datetime.now())
+
+        for _ in range(6):
+            RequestItem.objects.create(request=request, item_origin='L', status='2')
+
+        queued = RequestItem.objects.create(request=request, item_origin='L', status='1')
+
+        self.assertEqual(queued.status, '1')
+
+    @override_settings(REQUEST_ITEM_PENDING_LIMIT=6)
+    def test_request_item_promotes_from_queue_using_configurable_pending_limit(self):
+        researcher = Researcher.objects.create(first_name='Ada', last_name='Lovelace', email='ada-promote@example.com')
+        request = Request.objects.create(researcher=researcher, request_date=datetime.datetime.now())
+
+        pending_items = [
+            RequestItem.objects.create(request=request, item_origin='L', status='2')
+            for _ in range(6)
+        ]
+        queued = RequestItem.objects.create(request=request, item_origin='L', status='1')
+
+        pending_items[0].status = '4'
+        pending_items[0].save()
+        queued.refresh_from_db()
+
+        self.assertEqual(queued.status, '2')
 
     def test_request_item_served_date_is_set_when_status_is_served(self):
         researcher = Researcher.objects.create(first_name='Ada', last_name='Lovelace', email='ada@example.com')

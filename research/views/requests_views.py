@@ -141,7 +141,7 @@ class RequestsList(generics.ListAPIView):
         - Ordering over operational workflow fields
     """
 
-    queryset = RequestItem.objects.all().order_by('-request__created_date')
+    queryset = RequestItem.objects.filter(request__researcher__status='approved').order_by('-request__created_date')
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_class = RequestFilterClass
     search_fields = [
@@ -176,11 +176,14 @@ class DigitalRequestsList(RequestsList):
     """
 
     queryset = RequestItem.objects.filter(
-        Q(container__digital_version_exists=True) |
-        Q(container__findingaidsentity__digital_version_exists=True) |
-        Q(container__digital_versions__isnull=False) |
-        Q(container__findingaidsentity__digital_versions__isnull=False) |
-        (Q(item_origin='FL') & Q(identifier__startswith='HU_OSA'))
+        (
+            Q(container__digital_version_exists=True) |
+            Q(container__findingaidsentity__digital_version_exists=True) |
+            Q(container__digital_versions__isnull=False) |
+            Q(container__findingaidsentity__digital_versions__isnull=False) |
+            (Q(item_origin='FL') & Q(identifier__startswith='HU_OSA'))
+        ) &
+        Q(request__researcher__status='approved')
     ).distinct().order_by('-request__created_date')
 
 

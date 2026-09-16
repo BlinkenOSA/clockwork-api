@@ -1,9 +1,10 @@
 from django.apps import apps
 from django.contrib.auth.models import User, Group
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from rest_framework.authtoken.models import Token
 
 from accounts.apps import AccountsConfig
+from accounts.admin import UserProfileInlineForm
 from accounts.models import UserProfile
 from accounts.serializers import CurrentUserSerializer
 from archival_unit.models import ArchivalUnit
@@ -25,6 +26,56 @@ class UserProfileTests(TestCase):
 
         self.assertEqual(profile.assigned_archival_units(), 1)
         self.assertEqual(str(profile), 'alice')
+
+    @override_settings(UNPROCESSED_MATERIALS_FONDS=999)
+    def test_admin_limits_unprocessed_choices_to_configured_fonds_series(self):
+        unprocessed_fonds = ArchivalUnit.objects.create(
+            fonds=999,
+            level='F',
+            title='Unprocessed materials',
+        )
+        unprocessed_subfonds = ArchivalUnit.objects.create(
+            fonds=999,
+            subfonds=1,
+            level='SF',
+            title='Unprocessed audiovisual materials',
+            parent=unprocessed_fonds,
+        )
+        unprocessed_series = ArchivalUnit.objects.create(
+            fonds=999,
+            subfonds=1,
+            series=1,
+            level='S',
+            title='Unprocessed series',
+            parent=unprocessed_subfonds,
+        )
+        regular_fonds = ArchivalUnit.objects.create(
+            fonds=206,
+            level='F',
+            title='Regular fonds',
+        )
+        regular_subfonds = ArchivalUnit.objects.create(
+            fonds=206,
+            subfonds=1,
+            level='SF',
+            title='Regular subfonds',
+            parent=regular_fonds,
+        )
+        ArchivalUnit.objects.create(
+            fonds=206,
+            subfonds=1,
+            series=1,
+            level='S',
+            title='Regular series',
+            parent=regular_subfonds,
+        )
+
+        form = UserProfileInlineForm()
+
+        self.assertEqual(
+            list(form.fields['allowed_unprocessed_series'].queryset),
+            [unprocessed_series],
+        )
 
 
 class AuthTokenSignalTests(TestCase):

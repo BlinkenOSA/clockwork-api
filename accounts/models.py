@@ -24,6 +24,10 @@ class UserProfile(models.Model):
           to access. The available choices are restricted to units whose
           level is ``"S"`` (Series level).
 
+      allowed_unprocessed_series (ManyToMany[ArchivalUnit]):
+          Series within the configured unprocessed-materials fonds that the
+          user may access through the dedicated workflow.
+
     Methods:
       assigned_archival_units():
           Returns the number of archival units assigned to this user.
@@ -33,6 +37,13 @@ class UserProfile(models.Model):
     """
     user = models.OneToOneField(User, unique=True, verbose_name='user', related_name='user_profile', on_delete=CASCADE)
     allowed_archival_units = models.ManyToManyField(ArchivalUnit, limit_choices_to={'level': 'S'}, blank=True)
+    allowed_unprocessed_series = models.ManyToManyField(
+        ArchivalUnit,
+        blank=True,
+        help_text='Leave empty to allow access to every series in the unprocessed-materials fonds.',
+        related_name='unprocessed_materials_users',
+        verbose_name='allowed unprocessed series',
+    )
 
     def assigned_archival_units(self) -> int:
         """
