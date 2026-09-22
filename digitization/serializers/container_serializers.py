@@ -1,5 +1,6 @@
 import json
 import datetime
+import math
 from rest_framework import serializers
 from container.models import Container
 from controlled_list.models import CarrierType
@@ -43,26 +44,38 @@ class DigitizationContainerLogSerializer(serializers.ModelSerializer):
         Extracts a HH:MM:SS duration from container technical metadata.
 
         The duration is derived by:
-            1. Parsing digital_version_technical_metadata as JSON
-            2. Finding the first stream with codec_type == 'video'
+            1. Parsing technical_metadata as JSON
+            2. Finding the first video or audio stream with a duration
             3. Converting the stream duration (seconds) to HH:MM:SS
 
         Returns None when:
             - no technical metadata is present
-            - no video stream duration is available
+            - no video or audio stream duration is available
             - the metadata cannot be interpreted as expected
         """
         tech_md = obj.technical_metadata
         if isinstance(tech_md, str):
-            tech_md = json.loads(tech_md)
-            for stream in tech_md['streams']:
-                if (stream.get('codec_type') == 'video' and stream.get('duration')) or \
-                   (stream.get('codec_type') == 'audio' and stream.get('duration')):
-                    seconds = float(stream.get('duration'))
-                    total_seconds = datetime.timedelta(seconds=seconds).total_seconds()
-                    hours, remainder = divmod(total_seconds, 60 * 60)
-                    minutes, seconds = divmod(remainder, 60)
-                    return "%02d:%02d:%02d" % (hours, minutes, seconds)
+            try:
+                tech_md = json.loads(tech_md)
+            except json.JSONDecodeError:
+                return None
+
+        if not isinstance(tech_md, dict) or not isinstance(tech_md.get('streams'), list):
+            return None
+
+        for stream in tech_md['streams']:
+            if not isinstance(stream, dict) or stream.get('codec_type') not in ('video', 'audio'):
+                continue
+            try:
+                seconds = float(stream.get('duration'))
+                if not math.isfinite(seconds) or seconds < 0:
+                    continue
+                total_seconds = datetime.timedelta(seconds=seconds).total_seconds()
+            except (TypeError, ValueError, OverflowError):
+                continue
+            hours, remainder = divmod(total_seconds, 60 * 60)
+            minutes, seconds = divmod(remainder, 60)
+            return "%02d:%02d:%02d" % (hours, minutes, seconds)
 
     def get_barcode(self, obj):
         """

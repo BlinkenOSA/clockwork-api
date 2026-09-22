@@ -33,6 +33,18 @@ class DigitizationContainerSerializerTests(TestCase):
         self.assertEqual(data['container_no'], 'HU OSA 206-3-1:1')
         self.assertEqual(data['duration'], '00:15:05')
 
+    def test_log_serializer_ignores_missing_or_invalid_streams(self):
+        for metadata in (
+            '{"format": {}}',
+            '{"streams": null}',
+            '{"streams": [{"codec_type": "video", "duration": "unknown"}]}',
+            'not json',
+        ):
+            with self.subTest(metadata=metadata):
+                self.digital_version.technical_metadata = metadata
+                data = DigitizationContainerLogSerializer(self.digital_version).data
+                self.assertIsNone(data['duration'])
+
     def test_data_serializer_parses_json_or_false(self):
         digital_version = make_digital_version_container(
             container=self.container,
