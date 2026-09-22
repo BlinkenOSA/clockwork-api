@@ -23,10 +23,9 @@ class DigitizationContainerList(ListAPIView):
 
     Ordering behavior:
         - Supports DRF ordering by:
-            - barcode
-            - date_updated
-            - digital_version_exists
-            - digital_version_creation_date
+            - creation_date
+            - available_research_cloud
+            - level
         - Provides custom ordering for:
             - container_no (orders by archival unit hierarchy + container number)
             - carrier_type (orders by carrier_type__type)
@@ -39,7 +38,7 @@ class DigitizationContainerList(ListAPIView):
     """
 
     filter_backends = (SearchFilter, OrderingFilter)
-    ordering_fields = ('creation_date',)
+    ordering_fields = ('creation_date', 'available_research_cloud', 'level')
     search_fields = ('container__archival_unit__reference_code', 'container__barcode')
     serializer_class = DigitizationContainerLogSerializer
 
