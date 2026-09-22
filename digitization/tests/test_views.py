@@ -86,6 +86,33 @@ class DigitizationViewsTests(TestViewsBaseClass):
         ids = [row['id'] for row in response.data['results']]
         self.assertIn(self.digital_version.id, ids)
 
+    def test_container_list_orders_by_research_cloud_and_level(self):
+        make_digital_version_container(
+            container=self.container,
+            level='A',
+            available_research_cloud=True,
+        )
+        make_digital_version_container(
+            container=self.container,
+            level='A',
+            available_research_cloud=False,
+        )
+        url = reverse('digitization-v1:digitization-list')
+
+        for ordering, field, expected in (
+            ('available_research_cloud', 'available_research_cloud', [False, False, True]),
+            ('-available_research_cloud', 'available_research_cloud', [True, False, False]),
+            ('level', 'level', ['A', 'A', 'M']),
+            ('-level', 'level', ['M', 'A', 'A']),
+        ):
+            with self.subTest(ordering=ordering):
+                response = self.client.get(url, {'ordering': ordering})
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(
+                    [row[field] for row in response.data['results']],
+                    expected,
+                )
+
     def test_container_detail_returns_metadata_field(self):
         response = self.client.get(
             reverse('digitization-v1:digitization-detail', kwargs={'pk': self.digital_version.id})
