@@ -113,6 +113,25 @@ class DigitizationViewsTests(TestViewsBaseClass):
                     expected,
                 )
 
+    def test_container_list_with_metadata_without_streams(self):
+        version = make_digital_version_container(
+            container=self.container,
+            level='A',
+            available_research_cloud=True,
+            technical_metadata='{"format": {}}',
+        )
+
+        response = self.client.get(
+            reverse('digitization-v1:digitization-list'),
+            {'limit': 100, 'offset': 0, 'ordering': 'available_research_cloud', 'search': ''},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        rows = {row['id']: row for row in response.data['results']}
+        self.assertIn(version.id, rows)
+        self.assertIsNone(rows[version.id]['duration'])
+        self.assertEqual(rows[self.digital_version.id]['duration'], '00:15:05')
+
     def test_container_detail_returns_metadata_field(self):
         response = self.client.get(
             reverse('digitization-v1:digitization-detail', kwargs={'pk': self.digital_version.id})
