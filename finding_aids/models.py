@@ -140,7 +140,7 @@ class FindingAidsEntity(CloneMixin, DetectProtectedMixin, models.Model):
     date_updated = models.DateTimeField(blank=True, null=True, db_index=True)
 
     # Clone fields
-    _clone_excluded_fields = ['id', 'uuid', 'legacy_id', 'archival_reference_code', 'old_id', 'catalog_id',
+    _clone_excluded_fields = ['id', 'uuid', 'ark', 'legacy_id', 'archival_reference_code', 'old_id', 'catalog_id',
                               'published', 'missing']
     _clone_linked_m2m_fields = ['genre', 'spatial_coverage_country', 'spatial_coverage_place',
                                 'subject_person', 'subject_corporation', 'subject_keyword']
