@@ -82,6 +82,11 @@ class RestrictedRequestsList(generics.ListAPIView):
             finding_aids_entity__access_rights__statement='Restricted',
             request_item__request__request_date__gte='2025-01-01'
         )
+        .select_related(
+            'finding_aids_entity__access_rights',
+            'request_item__request__researcher',
+            'request_item__restriction',
+        )
         .order_by('-request_item__request__created_date')
     )
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)

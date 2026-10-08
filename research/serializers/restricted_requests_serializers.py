@@ -25,6 +25,14 @@ class RestrictedRequestsListSerializer(serializers.ModelSerializer):
         read_only=True,
         source='request_item.request.researcher'
     )
+    researcher_id = serializers.IntegerField(
+        source='request_item.request.researcher_id',
+        read_only=True,
+    )
+    researcher_email = serializers.EmailField(
+        source='request_item.request.researcher.email',
+        read_only=True,
+    )
     research_subject = serializers.SerializerMethodField()
     motivation = serializers.SerializerMethodField()
 
@@ -83,6 +91,8 @@ class RestrictedRequestsListSerializer(serializers.ModelSerializer):
             'reference_code',
             'request_date',
             'researcher',
+            'researcher_id',
+            'researcher_email',
             'research_subject',
             'motivation',
             'is_restricted',

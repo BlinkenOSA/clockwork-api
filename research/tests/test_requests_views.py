@@ -4,23 +4,26 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.test import override_settings
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from archival_unit.models import ArchivalUnit
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
 from container.models import Container
-from controlled_list.models import CarrierType
+from controlled_list.models import AccessRight, CarrierType, PrimaryType
 from digitization.models import DigitalVersion
+from finding_aids.models import FindingAidsEntity
 from office365.runtime.client_request_exception import ClientRequestException
-from research.models import Researcher, Request, RequestItem, RequestedMaterialsSharePointJob
+from research.models import Researcher, Request, RequestItem, RequestItemPart, RequestedMaterialsSharePointJob
 from research.services.sharepoint_requested_materials import RequestedMaterialsSharePointService
 from research.tasks import deliver_requested_materials_sharepoint_job
 from research.views.requests_views import RequestLibraryMLR
 
 
 class ResearchRequestsViewsTests(TestViewsBaseClass):
-    fixtures = ['carrier_types']
+    fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):
         super().setUp()
@@ -124,6 +127,103 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(response.data['results'][0]['id'], digital_item.id)
+        self.assertEqual(response.data['results'][0]['researcher_id'], self.researcher.id)
+
+    def test_digital_requests_list_uses_bounded_query_count(self):
+        finding_aids_entity = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            title='Requested folder',
+            date_from='2020-01-01',
+            primary_type=PrimaryType.objects.first(),
+        )
+        for _ in range(5):
+            request_item = RequestItem.objects.create(
+                request=self.request,
+                item_origin='FA',
+                container=self.container,
+            )
+            RequestItemPart.objects.create(
+                request_item=request_item,
+                finding_aids_entity=finding_aids_entity,
+            )
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(reverse('research-v1:requests-digital-list'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
+        self.assertTrue(all(item['research_allowed'] for item in response.data['results']))
+        self.assertLessEqual(len(queries), 12)
+
+    def test_digital_requests_list_preserves_restriction_approval_state(self):
+        restricted_entity = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            title='Restricted folder',
+            date_from='2020-01-01',
+            primary_type=PrimaryType.objects.first(),
+            access_rights=AccessRight.objects.get(statement='Restricted'),
+        )
+        waiting_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FA',
+            container=self.container,
+        )
+        approved_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FA',
+            container=self.container,
+        )
+        RequestItemPart.objects.create(
+            request_item=waiting_item,
+            finding_aids_entity=restricted_entity,
+            status='new',
+        )
+        RequestItemPart.objects.create(
+            request_item=approved_item,
+            finding_aids_entity=restricted_entity,
+            status='approved',
+        )
+
+        response = self.client.get(reverse('research-v1:requests-digital-list'))
+
+        results = {item['id']: item for item in response.data['results']}
+        self.assertFalse(results[waiting_item.id]['research_allowed'])
+        self.assertTrue(results[approved_item.id]['research_allowed'])
+
+    def test_digital_requests_list_includes_part_level_digital_version(self):
+        part_only_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FA',
+        )
+        finding_aids_entity = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            title='Requested digitized folder',
+            date_from='2020-01-01',
+            primary_type=PrimaryType.objects.first(),
+        )
+        RequestItemPart.objects.create(
+            request_item=part_only_item,
+            finding_aids_entity=finding_aids_entity,
+        )
+        DigitalVersion.objects.create(
+            finding_aids_entity=finding_aids_entity,
+            level='A',
+            available_research_cloud=True,
+            research_cloud_path='HU OSA 394/part-only.mp4',
+        )
+
+        response = self.client.get(reverse('research-v1:requests-digital-list'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result = next(result for result in response.data['results'] if result['id'] == part_only_item.id)
+        self.assertTrue(result['has_digital_version'])
+        self.assertEqual(result['digital_version_barcode'], finding_aids_entity.archival_reference_code)
 
     def test_requests_list_only_returns_items_for_approved_researchers(self):
         approved_item = RequestItem.objects.create(request=self.request, item_origin='L')
@@ -146,6 +246,37 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
         self.assertIn(approved_item.id, result_ids)
         for excluded_item in excluded_items:
             self.assertNotIn(excluded_item.id, result_ids)
+
+    def test_restricted_requests_list_includes_researcher_filter_fields(self):
+        restricted_entity = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            title='Restricted folder',
+            date_from='2020-01-01',
+            primary_type=PrimaryType.objects.first(),
+            access_rights=AccessRight.objects.get(statement='Restricted'),
+        )
+        request_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FA',
+            container=self.container,
+        )
+        request_item_part = RequestItemPart.objects.create(
+            request_item=request_item,
+            finding_aids_entity=restricted_entity,
+        )
+
+        response = self.client.get(
+            reverse('research-v1:restricted-requests-list'),
+            {'researcher': self.researcher.id},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['id'], request_item_part.id)
+        self.assertEqual(response.data['results'][0]['researcher_id'], self.researcher.id)
+        self.assertEqual(response.data['results'][0]['researcher_email'], self.researcher.email)
 
     def test_digital_requests_list_only_returns_items_for_approved_researchers(self):
         approved_item = RequestItem.objects.create(
@@ -232,6 +363,37 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
         self.assertEqual(response.data['request_item_id'], request_item.id)
         self.assertEqual(response.data['progress_percent'], 60)
 
+    @patch('research.views.requests_views.RequestedMaterialsSharePointService.share_requested_materials_for_request')
+    def test_share_requested_materials_marks_request_as_shared(self, mocked_share):
+        request_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FA',
+            container=self.container,
+            status='9',
+        )
+        RequestedMaterialsSharePointJob.objects.create(
+            request_item=request_item,
+            status='completed',
+            current_step='completed',
+        )
+        mocked_share.return_value = {'folder_url': 'https://example.com/shared'}
+
+        response = self.client.post(
+            reverse(
+                'research-v1:request-requested-materials-sharepoint-share',
+                kwargs={'request_id': request_item.request_id},
+            )
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.request.refresh_from_db()
+        self.assertIsNotNone(self.request.requested_materials_shared_date)
+        self.assertEqual(
+            response.data['requested_materials_shared_date'],
+            self.request.requested_materials_shared_date,
+        )
+        mocked_share.assert_called_once()
+
 
 class RequestLibraryMLRHelperTests(TestViewsBaseClass):
     def setUp(self):
@@ -259,7 +421,7 @@ class RequestLibraryMLRHelperTests(TestViewsBaseClass):
     RESEARCH_ROOM_STAFF_EMAIL=['staff@example.com'],
 )
 class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
-    fixtures = ['carrier_types']
+    fixtures = ['carrier_types', 'primary_types', 'access_rights']
 
     def setUp(self):
         super().setUp()
@@ -329,6 +491,34 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
 
         self.assertEqual(digital_versions, [matching])
 
+    def test_get_eligible_digital_versions_includes_requested_part_entity(self):
+        part_only_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FA',
+        )
+        finding_aids_entity = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            title='Requested digitized folder',
+            date_from='2020-01-01',
+            primary_type=PrimaryType.objects.first(),
+        )
+        RequestItemPart.objects.create(
+            request_item=part_only_item,
+            finding_aids_entity=finding_aids_entity,
+        )
+        matching = DigitalVersion.objects.create(
+            finding_aids_entity=finding_aids_entity,
+            level='A',
+            available_research_cloud=True,
+            research_cloud_path='HU OSA 394/part-only.mp4',
+        )
+
+        digital_versions = list(self.service.get_eligible_digital_versions(part_only_item))
+
+        self.assertEqual(digital_versions, [matching])
+
     @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
     @patch.object(RequestedMaterialsSharePointService, '_get_sharepoint_file_info')
     def test_get_available_source_files_uses_film_library_for_film_library_item(
@@ -359,20 +549,16 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
             'https://example.com/sites/film-library/',
         )
 
-    @patch('research.services.sharepoint_requested_materials.EmailWithTemplate')
-    @patch.object(RequestedMaterialsSharePointService, '_share_folder_with_researcher')
     @patch.object(RequestedMaterialsSharePointService, '_copy_file_to_requested_materials', return_value=True)
     @patch.object(RequestedMaterialsSharePointService, '_ensure_folder')
     @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
     @patch.object(RequestedMaterialsSharePointService, '_get_sharepoint_file_info')
-    def test_deliver_requested_materials_for_request_copies_and_notifies_staff_only(
+    def test_prepare_requested_materials_copies_without_sharing_or_notifying(
             self,
             mocked_get_file_info,
             mocked_get_context,
             mocked_ensure_folder,
             mocked_copy_file,
-            mocked_share_folder,
-            mocked_mailer,
     ):
         matching = DigitalVersion.objects.create(
             container=self.container,
@@ -387,21 +573,15 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
         mocked_folder = type('FolderStub', (), {'properties': {'ServerRelativeUrl': '/sites/osa-researchcloud-requests/confidential/Lovelace, Ada'}})()
         mocked_ensure_folder.return_value = (mocked_folder, True)
 
-        result = self.service.deliver_requested_materials_for_request_item(self.request_item)
+        result = self.service.prepare_requested_materials_for_request_item(self.request_item)
 
         self.assertEqual(list(self.service.get_eligible_digital_versions(self.request_item)), [matching])
         self.assertEqual(mocked_get_context.call_count, 2)
         mocked_copy_file.assert_called_once()
-        mocked_share_folder.assert_not_called()
-        mocked_mailer.assert_called_once()
-        mail = mocked_mailer.return_value
-        mail.send_requested_materials_shared_user.assert_not_called()
-        mail.send_requested_materials_shared_admin.assert_called_once()
         self.assertEqual(result['copied_files'], ['test-file.mp4'])
         self.assertIsNone(result['shared_with'])
-        self.assertEqual(result['notification_emails'], {'staff': ['staff@example.com']})
+        self.assertEqual(result['notification_emails'], {})
 
-    @patch('research.services.sharepoint_requested_materials.EmailWithTemplate')
     @patch.object(RequestedMaterialsSharePointService, '_copy_file_to_requested_materials', return_value=True)
     @patch.object(RequestedMaterialsSharePointService, '_ensure_folder')
     @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
@@ -412,7 +592,6 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
             mocked_get_context,
             mocked_ensure_folder,
             mocked_copy_file,
-            mocked_mailer,
     ):
         film_item = RequestItem.objects.create(
             request=self.request,
@@ -430,7 +609,7 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
         mocked_folder = type('FolderStub', (), {'properties': {'ServerRelativeUrl': '/sites/requested-materials/confidential/Lovelace, Ada'}})()
         mocked_ensure_folder.return_value = (mocked_folder, False)
 
-        result = self.service.deliver_requested_materials_for_request_item(film_item)
+        result = self.service.prepare_requested_materials_for_request_item(film_item)
 
         self.assertEqual(result['copied_files'], ['HU_OSA_FILM_001.mp4'])
         self.assertEqual(mocked_get_context.call_count, 2)
@@ -449,7 +628,6 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
             mocked_get_file_info.return_value,
             progress_callback=None,
         )
-        mocked_mailer.return_value.send_requested_materials_shared_admin.assert_called_once()
 
     @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
     @patch.object(RequestedMaterialsSharePointService, '_get_sharepoint_file_info', return_value=None)
@@ -463,12 +641,39 @@ class RequestedMaterialsSharePointServiceTests(TestViewsBaseClass):
             research_cloud_path='HU OSA 394/test-file.mp4',
         )
 
-        result = self.service.deliver_requested_materials_for_request_item(self.request_item)
+        result = self.service.prepare_requested_materials_for_request_item(self.request_item)
 
         mocked_get_file_info.assert_called_once()
         self.assertEqual(result['copied_files_count'], 0)
         self.assertEqual(result['available_files_count'], 0)
         self.assertEqual(mocked_get_context.call_count, 1)
+
+    @patch('research.services.sharepoint_requested_materials.EmailWithTemplate')
+    @patch.object(RequestedMaterialsSharePointService, '_share_folder_with_researcher')
+    @patch.object(RequestedMaterialsSharePointService, '_ensure_folder')
+    @patch.object(RequestedMaterialsSharePointService, '_get_client_context')
+    def test_share_requested_materials_shares_directory_and_sends_emails(
+            self, mocked_get_context, mocked_ensure_folder, mocked_share_folder, mocked_mailer
+    ):
+        folder = type('FolderStub', (), {
+            'properties': {'ServerRelativeUrl': '/sites/requested-materials/confidential/Lovelace, Ada'}
+        })()
+        mocked_ensure_folder.return_value = (folder, False)
+        RequestedMaterialsSharePointJob.objects.create(
+            request_item=self.request_item,
+            status='completed',
+            current_step='completed',
+            result={'available_files': ['test-file.mp4']},
+        )
+
+        result = self.service.share_requested_materials_for_request(self.request)
+
+        mocked_share_folder.assert_called_once_with(folder, self.researcher.email)
+        mail = mocked_mailer.return_value
+        mail.send_requested_materials_shared_user.assert_called_once()
+        mail.send_requested_materials_shared_admin.assert_called_once()
+        self.assertEqual(result['files'], ['test-file.mp4'])
+        self.assertEqual(result['shared_with'], self.researcher.email)
 
     @patch.object(RequestedMaterialsSharePointService, '_copy_file_via_sharepoint_job')
     @patch.object(RequestedMaterialsSharePointService, '_destination_file_exists', return_value=False)
@@ -566,8 +771,8 @@ class RequestedMaterialsSharePointTaskTests(TestViewsBaseClass):
             current_step='queued',
         )
 
-    @patch('research.tasks.RequestedMaterialsSharePointService.deliver_requested_materials_for_request_item', return_value={})
-    def test_successful_job_sets_request_item_status_to_uploaded(self, mocked_deliver):
+    @patch('research.tasks.RequestedMaterialsSharePointService.prepare_requested_materials_for_request_item', return_value={})
+    def test_successful_job_sets_request_item_status_to_uploaded(self, mocked_prepare):
         deliver_requested_materials_sharepoint_job(self.job.id)
 
         self.request_item.refresh_from_db()
@@ -576,4 +781,4 @@ class RequestedMaterialsSharePointTaskTests(TestViewsBaseClass):
         self.assertEqual(self.request_item.status, '9')
         self.assertIsNotNone(self.request_item.served_date)
         self.assertEqual(self.job.status, 'completed')
-        mocked_deliver.assert_called_once()
+        mocked_prepare.assert_called_once()

@@ -9,6 +9,7 @@ from clockwork_api.mailer.email_with_template import EmailWithTemplate
 @override_settings(
     RESEARCH_ROOM_STAFF_EMAIL=["staff1@example.com", "staff2@example.com"],
     RESTRICTED_DECISION_MAKER_EMAIL=["decision@example.com"],
+    REPLY_EMAIL="research-room@example.com",
 )
 class EmailWithTemplateTests(SimpleTestCase):
     def _mailer(self):
@@ -40,6 +41,7 @@ class EmailWithTemplateTests(SimpleTestCase):
             body="<p>hello</p>",
             from_email="no-reply <blinken-osa-ams@ceu.edu>",
             to=["user@example.com"],
+            reply_to=["research-room@example.com"],
         )
         self.assertEqual(message.content_subtype, "html")
         message.send.assert_called_once_with()
@@ -92,7 +94,7 @@ class EmailWithTemplateTests(SimpleTestCase):
             "new_request_restricted_decision_user": "Decision about requesting restricted content!",
             "new_request_restricted_decision_admin": "Decision about requesting restricted content!",
             "request_delivered_user": "Requested items are prepared",
-            "requested_materials_shared_user": "Requested digital materials are now available",
+            "requested_materials_shared_user": "Access to Requested Archival Materials",
             "requested_materials_shared_admin": "Requested digital materials were prepared",
         }
 

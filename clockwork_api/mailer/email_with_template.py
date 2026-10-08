@@ -28,6 +28,7 @@ class EmailWithTemplate:
     Configuration is controlled via Django settings:
         - RESEARCH_ROOM_STAFF_EMAIL
         - RESTRICTED_DECISION_MAKER_EMAIL
+        - REPLY_EMAIL
     """
 
     def __init__(self, researcher, context):
@@ -47,6 +48,7 @@ class EmailWithTemplate:
             settings,
             'RESTRICTED_DECISION_MAKER_EMAIL'
         )
+        self.reply_email = getattr(settings, 'REPLY_EMAIL', '')
 
         self.researcher = researcher
         self.template = ""
@@ -176,7 +178,8 @@ class EmailWithTemplate:
             subject=self._get_subject(),
             body=message,
             from_email="no-reply <blinken-osa-ams@ceu.edu>",
-            to=to_address
+            to=to_address,
+            reply_to=[self.reply_email] if self.reply_email else [],
         )
 
         mail.content_subtype = "html"
@@ -228,7 +231,7 @@ class EmailWithTemplate:
             return "Requested items are prepared"
 
         if self.template == 'requested_materials_shared_user':
-            return "Requested digital materials are now available"
+            return "Access to Requested Archival Materials"
 
         if self.template == 'requested_materials_shared_admin':
             return "Requested digital materials were prepared"

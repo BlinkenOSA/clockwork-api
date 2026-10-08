@@ -60,12 +60,13 @@ def build_error_email_logging(extra_loggers=None):
 
 EMAIL_BACKEND = os.environ.get(
     "DJANGO_EMAIL_BACKEND",
-    "django_o365mail.EmailBackend",
+    "clockwork_api.mailer.o365_backend.EmailBackend",
 )
 DEFAULT_FROM_EMAIL = os.environ.get(
     "DJANGO_DEFAULT_FROM_EMAIL",
     "no-reply <blinken-osa-ams@ceu.edu>",
 )
+REPLY_EMAIL = os.environ.get("REPLY-EMAIL", "")
 SERVER_EMAIL = os.environ.get("DJANGO_SERVER_EMAIL", DEFAULT_FROM_EMAIL)
 EMAIL_SUBJECT_PREFIX = os.environ.get(
     "DJANGO_EMAIL_SUBJECT_PREFIX",

@@ -6,10 +6,8 @@ from django.core.management import BaseCommand, CommandError
 from requests.auth import HTTPBasicAuth
 
 from archival_unit.models import ArchivalUnit
-from finding_aids.indexers.finding_aids_new_catalog_indexer import FindingAidsNewCatalogIndexer
 from finding_aids.indexers.finding_aids_semantic_indexer import FindingAidsSemanticIndexer
 from finding_aids.models import FindingAidsEntity
-from isad.indexers.isad_new_catalog_indexer import ISADNewCatalogIndexer
 from isad.indexers.isad_semantic_indexer import ISADSemanticIndexer
 
 
@@ -213,7 +211,6 @@ class Command(BaseCommand):
             self._print_dry_run(indexer.doc["id"], semantic_text)
         else:
             vector = embedding_client.embed_document(semantic_text)
-            print(len(vector))
             indexer.doc["semantic_vector"] = vector
             self._send_to_solr(solr_url, indexer.doc, auth, indexer.doc["id"])
 
@@ -241,7 +238,6 @@ class Command(BaseCommand):
             self._print_dry_run(indexer.doc["id"], semantic_text)
         else:
             vector = embedding_client.embed_document(semantic_text)
-            print(len(vector))
             indexer.doc["semantic_vector"] = vector
             self._send_to_solr(solr_url, indexer.doc, auth, indexer.doc["id"])
 

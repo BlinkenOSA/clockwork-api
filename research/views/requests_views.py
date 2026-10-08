@@ -2,7 +2,9 @@ import datetime
 import json
 
 from clockwork_api.http import get
-from django.db.models import Q
+from django.db.models import Count, Exists, IntegerField, OuterRef, Prefetch, Q, Subquery, Value
+from django.db.models.functions import Coalesce
+from django.utils import timezone
 from requests.exceptions import RequestException
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
@@ -19,13 +21,79 @@ from clockwork_api.mailer.email_with_template import EmailWithTemplate
 from clockwork_api.mixins.method_serializer_mixin import MethodSerializerMixin
 from clockwork_api.pagination import DropDownResultSetPagination
 from container.models import Container
+from digitization.models import DigitalVersion
+from finding_aids.models import FindingAidsEntity
+from mlr.models import MLREntity, MLREntityLocation
 from research.models import RequestItem, Request, RequestedMaterialsSharePointJob
+from research.models import RequestItemPart
 from research.serializers.requests_serializers import RequestListSerializer, ContainerListSerializer, \
     RequestCreateSerializer, RequestItemWriteSerializer, RequestItemReadSerializer, \
     RequestedMaterialsSharePointJobSerializer
+from research.services import RequestedMaterialsSharePointError, RequestedMaterialsSharePointService
 from research.tasks import deliver_requested_materials_sharepoint_job
 from django_filters import rest_framework as filters
 from hashids import Hashids
+
+
+def request_list_queryset(queryset):
+    """Add list-page flags and load the relationships used by the serializer."""
+    container_entities = FindingAidsEntity.objects.filter(container_id=OuterRef('container_id'))
+    requested_entities = FindingAidsEntity.objects.filter(
+        requestitempart__request_item_id=OuterRef('pk')
+    )
+    request_parts = RequestItemPart.objects.filter(request_item_id=OuterRef('pk'))
+
+    def part_count(parts_queryset):
+        return Coalesce(
+            Subquery(
+                parts_queryset.order_by().values('request_item_id').annotate(
+                    total=Count('id')
+                ).values('total')[:1],
+                output_field=IntegerField(),
+            ),
+            Value(0),
+        )
+
+    queryset = queryset.annotate(
+        container_entity_has_digital=Exists(container_entities.filter(
+            Q(digital_version_exists=True) | Q(digital_versions__isnull=False)
+        )),
+        container_has_digital_record=Exists(
+            DigitalVersion.objects.filter(container_id=OuterRef('container_id'))
+        ),
+        requested_entity_has_digital=Exists(requested_entities.filter(
+            Q(digital_version_exists=True) | Q(digital_versions__isnull=False)
+        )),
+        container_has_restricted_content=Exists(
+            container_entities.filter(access_rights__statement='Restricted')
+        ),
+        request_part_count=part_count(request_parts),
+        unrestricted_request_part_count=part_count(
+            request_parts.filter(finding_aids_entity__access_rights__statement='Not restricted')
+        ),
+        new_request_part_count=part_count(request_parts.filter(status='new')),
+        approved_request_part_count=part_count(
+            request_parts.filter(status__in=('approved', 'approved_on_site'))
+        ),
+        rejected_request_part_count=part_count(request_parts.filter(status='rejected')),
+    )
+
+    prefetched_request_parts = RequestItemPart.objects.select_related(
+        'finding_aids_entity__access_rights'
+    ).prefetch_related('finding_aids_entity__digital_versions')
+    mlr_records = MLREntity.objects.select_related('carrier_type').prefetch_related(
+        Prefetch('locations', queryset=MLREntityLocation.objects.select_related('building'))
+    )
+
+    return queryset.select_related(
+        'request__researcher',
+        'container__carrier_type',
+        'container__archival_unit',
+    ).prefetch_related(
+        Prefetch('requestitempart_set', queryset=prefetched_request_parts),
+        'requested_materials_jobs',
+        Prefetch('container__archival_unit__mlrentity_set', queryset=mlr_records),
+    )
 
 
 class RequestFilterClass(filters.FilterSet):
@@ -141,7 +209,9 @@ class RequestsList(generics.ListAPIView):
         - Ordering over operational workflow fields
     """
 
-    queryset = RequestItem.objects.filter(request__researcher__status='approved').order_by('-request__created_date')
+    queryset = request_list_queryset(
+        RequestItem.objects.filter(request__researcher__status='approved')
+    ).order_by('-request__created_date')
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_class = RequestFilterClass
     search_fields = [
@@ -173,18 +243,18 @@ class DigitalRequestsList(RequestsList):
         - finding-aids digital-version flags on entities in the container
         - direct digital-version records on the container
         - digital-version records on finding-aids entities in the container
+        - flags or records on finding-aids entities linked through requested parts
     """
 
-    queryset = RequestItem.objects.filter(
-        (
-            Q(container__digital_version_exists=True) |
-            Q(container__findingaidsentity__digital_version_exists=True) |
-            Q(container__digital_versions__isnull=False) |
-            Q(container__findingaidsentity__digital_versions__isnull=False) |
-            (Q(item_origin='FL') & Q(identifier__startswith='HU_OSA'))
-        ) &
-        Q(request__researcher__status='approved')
-    ).distinct().order_by('-request__created_date')
+    queryset = request_list_queryset(
+        RequestItem.objects.filter(request__researcher__status='approved')
+    ).filter(
+        Q(container__digital_version_exists=True) |
+        Q(container_entity_has_digital=True) |
+        Q(container_has_digital_record=True) |
+        Q(requested_entity_has_digital=True) |
+        (Q(item_origin='FL') & Q(identifier__startswith='HU_OSA'))
+    ).order_by('-request__created_date')
 
 
 class RequestsCreate(CreateAPIView):
@@ -202,10 +272,10 @@ class RequestsCreate(CreateAPIView):
 
 class RequestRequestedMaterialsSharePoint(APIView):
     """
-    Starts a background requested-materials SharePoint delivery job for a request item.
+    Starts a background job that prepares a request item's files in SharePoint.
 
     POST:
-        Creates a delivery job record and enqueues a Celery task. The Admin UI
+        Creates a preparation job record and enqueues a Celery task. The Admin UI
         can poll the returned job id for step-by-step progress updates.
     """
 
@@ -215,9 +285,9 @@ class RequestRequestedMaterialsSharePoint(APIView):
             request_item=request_item,
             status='pending',
             current_step='queued',
-            message='Requested materials delivery queued.',
+            message='Requested materials preparation queued.',
             progress_current=0,
-            progress_total=5,
+            progress_total=3,
         )
         async_result = deliver_requested_materials_sharepoint_job.delay(job.id)
         job.celery_task_id = async_result.id
@@ -228,9 +298,51 @@ class RequestRequestedMaterialsSharePoint(APIView):
         )
 
 
+class RequestRequestedMaterialsSharePointShare(APIView):
+    """
+    Shares the prepared directory and sends the request notification emails.
+    """
+
+    def post(self, request, *args, **kwargs):
+        request_obj = get_object_or_404(
+            Request.objects.select_related('researcher'),
+            pk=self.kwargs['request_id'],
+        )
+
+        if request_obj.requested_materials_shared_date:
+            return Response({
+                'request_id': request_obj.id,
+                'requested_materials_shared_date': request_obj.requested_materials_shared_date,
+                'already_shared': True,
+            })
+
+        if not RequestedMaterialsSharePointJob.objects.filter(
+                request_item__request=request_obj,
+                status='completed',
+        ).exists():
+            return Response(
+                {'detail': 'Prepare at least one requested digital material before sharing the directory.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            result = RequestedMaterialsSharePointService().share_requested_materials_for_request(request_obj)
+        except RequestedMaterialsSharePointError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        request_obj.requested_materials_shared_date = timezone.now()
+        request_obj.save(update_fields=['requested_materials_shared_date'])
+        return Response({
+            'request_id': request_obj.id,
+            'requested_materials_shared_date': request_obj.requested_materials_shared_date,
+            'already_shared': False,
+            'result': result,
+        })
+
+
 class RequestedMaterialsSharePointJobDetail(generics.RetrieveAPIView):
     """
-    Returns the current status of a requested-materials SharePoint delivery job.
+    Returns the current status of a requested-materials SharePoint preparation job.
     """
 
     queryset = RequestedMaterialsSharePointJob.objects.all()
@@ -277,8 +389,8 @@ class RequestsListForPrint(generics.ListAPIView):
         Returns:
             A queryset of pending (status='2') request items ordered by request date.
         """
-        return RequestItem.objects.filter(
-            status='2'
+        return request_list_queryset(
+            RequestItem.objects.filter(status='2')
         ).order_by('request__request_date')
 
 
