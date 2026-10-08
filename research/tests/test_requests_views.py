@@ -247,6 +247,37 @@ class ResearchRequestsViewsTests(TestViewsBaseClass):
         for excluded_item in excluded_items:
             self.assertNotIn(excluded_item.id, result_ids)
 
+    def test_restricted_requests_list_includes_researcher_filter_fields(self):
+        restricted_entity = FindingAidsEntity.objects.create(
+            archival_unit=self.series,
+            container=self.container,
+            folder_no=1,
+            title='Restricted folder',
+            date_from='2020-01-01',
+            primary_type=PrimaryType.objects.first(),
+            access_rights=AccessRight.objects.get(statement='Restricted'),
+        )
+        request_item = RequestItem.objects.create(
+            request=self.request,
+            item_origin='FA',
+            container=self.container,
+        )
+        request_item_part = RequestItemPart.objects.create(
+            request_item=request_item,
+            finding_aids_entity=restricted_entity,
+        )
+
+        response = self.client.get(
+            reverse('research-v1:restricted-requests-list'),
+            {'researcher': self.researcher.id},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['id'], request_item_part.id)
+        self.assertEqual(response.data['results'][0]['researcher_id'], self.researcher.id)
+        self.assertEqual(response.data['results'][0]['researcher_email'], self.researcher.email)
+
     def test_digital_requests_list_only_returns_items_for_approved_researchers(self):
         approved_item = RequestItem.objects.create(
             request=self.request,
