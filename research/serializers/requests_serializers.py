@@ -1,11 +1,9 @@
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
 from container.models import Container
 from finding_aids.models import FindingAidsEntity
-from mlr.models import MLREntity
 from research.models import RequestItem, Request, RequestItemPart, RequestedMaterialsSharePointJob
 
 
@@ -34,7 +32,10 @@ class RequestItemPartSerializer(serializers.ModelSerializer):
         """
         Returns True if the linked finding aids entity is restricted.
         """
-        return obj.finding_aids_entity.access_rights.statement == 'Restricted'
+        return bool(
+            obj.finding_aids_entity.access_rights and
+            obj.finding_aids_entity.access_rights.statement == 'Restricted'
+        )
 
     def get_is_missing(self, obj):
         """
@@ -45,6 +46,53 @@ class RequestItemPartSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItemPart
         fields = ['finding_aids_entity', 'reference_code', 'is_restricted', 'is_missing', 'status']
+
+
+class RequestItemListSerializer(serializers.ListSerializer):
+    """Batch the cross-request status lookup used by the MLR column."""
+
+    def to_representation(self, data):
+        items = list(data.all() if hasattr(data, 'all') else data)
+        container_ids = {item.container_id for item in items if item.item_origin == 'FA' and item.container_id}
+        identifiers = {
+            item.identifier for item in items
+            if item.item_origin != 'FA' and item.identifier
+        }
+
+        candidate_filter = Q()
+        if container_ids:
+            candidate_filter |= Q(item_origin='FA', container_id__in=container_ids)
+        if identifiers:
+            candidate_filter |= ~Q(item_origin='FA') & Q(identifier__in=identifiers)
+
+        archival_items = {}
+        library_items = {}
+        if candidate_filter.children:
+            candidates = RequestItem.objects.filter(candidate_filter).values(
+                'id', 'item_origin', 'container_id', 'identifier', 'status'
+            )
+            for candidate in candidates:
+                if candidate['item_origin'] == 'FA':
+                    archival_items.setdefault(candidate['container_id'], []).append(candidate)
+                else:
+                    library_items.setdefault(candidate['identifier'], []).append(candidate)
+
+        status_cache = {}
+        for item in items:
+            candidates = (
+                archival_items.get(item.container_id, [])
+                if item.item_origin == 'FA'
+                else library_items.get(item.identifier, [])
+            )
+            statuses = {candidate['status'] for candidate in candidates if candidate['id'] != item.id}
+            status_cache[item.id] = {
+                'pending': bool(statuses.intersection({'1', '2'})),
+                'in_use': '3' in statuses,
+                'returned': '4' in statuses,
+            }
+
+        self.child.other_request_statuses = status_cache
+        return super().to_representation(items)
 
 
 class RequestListSerializer(serializers.ModelSerializer):
@@ -72,15 +120,20 @@ class RequestListSerializer(serializers.ModelSerializer):
     research_allowed
         True if the set of parts permits research (based on restriction statuses).
     has_digital_version / digital_version_barcode
-        Derived from the linked container when applicable.
+        Derived from the linked container or specifically requested finding-aids entities.
     parts
         Serialized list of :class:`RequestItemPart` entries linked to the request item.
     """
 
     researcher = serializers.SlugRelatedField(slug_field='name', read_only=True, source='request.researcher')
+    researcher_id = serializers.IntegerField(source='request.researcher_id', read_only=True)
     researcher_email = serializers.SlugRelatedField(slug_field='email', read_only=True, source='request.researcher')
     created_date = serializers.SlugRelatedField(slug_field='created_date', read_only=True, source='request')
     request_date = serializers.SlugRelatedField(slug_field='request_date', read_only=True, source='request')
+    requested_materials_shared_date = serializers.DateTimeField(
+        source='request.requested_materials_shared_date',
+        read_only=True,
+    )
     carrier_type = serializers.SlugRelatedField(slug_field='type', read_only=True, source='container.carrier_type')
     archival_reference_number = serializers.SerializerMethodField()
     mlr = serializers.SerializerMethodField()
@@ -88,6 +141,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     research_allowed = serializers.SerializerMethodField()
     has_digital_version = serializers.SerializerMethodField()
     digital_version_barcode = serializers.SerializerMethodField()
+    requested_materials_prepared = serializers.SerializerMethodField()
     parts = RequestItemPartSerializer(source='requestitempart_set', many=True)
 
     def get_mlr(self, obj):
@@ -109,40 +163,43 @@ class RequestListSerializer(serializers.ModelSerializer):
             - Checks other request items with the same identifier for usage/return state.
             - Otherwise returns ``'Library Record'``.
         """
-        appears_in_another_request = False
+        status_info = getattr(self, 'other_request_statuses', {}).get(obj.id)
+        if status_info is None:
+            if obj.item_origin == 'FA':
+                matching_items = RequestItem.objects.filter(
+                    item_origin='FA', container=obj.container
+                ).exclude(id=obj.id)
+            else:
+                matching_items = RequestItem.objects.filter(
+                    identifier=obj.identifier
+                ).exclude(id=obj.id).exclude(item_origin='FA')
+            statuses = set(matching_items.values_list('status', flat=True))
+            status_info = {
+                'pending': bool(statuses.intersection({'1', '2'})),
+                'in_use': '3' in statuses,
+                'returned': '4' in statuses,
+            }
 
-        if obj.item_origin == 'FA':
-            same_archival_request = RequestItem.objects.filter(
-                item_origin='FA', container=obj.container).exclude(id=obj.id)
-            if same_archival_request.filter(Q(status='1') | Q(status='2')).exists():
-                appears_in_another_request = True
-            if same_archival_request.filter(status='3').exists():
-                return 'Currently used'
-            if same_archival_request.filter(status='4').exists():
-                return 'Waiting to be reshelved'
-
-        else:
-            same_library_request = RequestItem.objects.filter(
-                identifier=obj.identifier).exclude(id=obj.id, item_origin='FA')
-            if same_library_request.filter(Q(status='1') | Q(status='2')).exists():
-                appears_in_another_request = True
-            if same_library_request.filter(status='3').exists():
-                return 'Currently used'
-            if same_library_request.filter(status='4').exists():
-                return 'Waiting to be reshelved'
+        appears_in_another_request = status_info['pending']
+        if status_info['in_use']:
+            return 'Currently used'
+        if status_info['returned']:
+            return 'Waiting to be reshelved'
 
         if obj.item_origin == 'FA':
             if obj.container:
                 series = obj.container.archival_unit
                 carrier_type = obj.container.carrier_type
-                try:
-                    mlr = MLREntity.objects.get(series=series, carrier_type=carrier_type)
+                mlr = next((
+                    record for record in series.mlrentity_set.all()
+                    if record.carrier_type_id == carrier_type.id
+                ), None)
+                if mlr:
                     return {
                         'locations': mlr.get_locations(),
                         'another_request': appears_in_another_request
                     }
-                except ObjectDoesNotExist:
-                    return ''
+                return ''
             else:
                 return ''
 
@@ -152,10 +209,13 @@ class RequestListSerializer(serializers.ModelSerializer):
         """
         Returns True if any Finding Aids entities in the requested container is restricted.
         """
+        annotated_value = getattr(obj, 'container_has_restricted_content', None)
+        if annotated_value is not None:
+            return annotated_value
         return FindingAidsEntity.objects.filter(
             container=obj.container,
             access_rights__statement='Restricted'
-        ).count() > 0
+        ).exists()
 
     def get_research_allowed(self, obj):
         """
@@ -173,13 +233,29 @@ class RequestListSerializer(serializers.ModelSerializer):
         bool
             True if research should be allowed, otherwise False.
         """
-        count_total = obj.requestitempart_set.count()
-        count_not_restricted = obj.requestitempart_set.filter(
-            finding_aids_entity__access_rights__statement='Not restricted'
-        ).count()
-        count_new = obj.requestitempart_set.filter(Q(status='new')).count()
-        count_approved = obj.requestitempart_set.filter(Q(status='approved') | Q(status='approved_on_site')).count()
-        count_rejected = obj.requestitempart_set.filter(Q(status='rejected')).count()
+        annotated_counts = (
+            'request_part_count',
+            'unrestricted_request_part_count',
+            'new_request_part_count',
+            'approved_request_part_count',
+            'rejected_request_part_count',
+        )
+        if all(hasattr(obj, field) for field in annotated_counts):
+            count_total = obj.request_part_count
+            count_not_restricted = obj.unrestricted_request_part_count
+            count_new = obj.new_request_part_count
+            count_approved = obj.approved_request_part_count
+            count_rejected = obj.rejected_request_part_count
+        else:
+            count_total = obj.requestitempart_set.count()
+            count_not_restricted = obj.requestitempart_set.filter(
+                finding_aids_entity__access_rights__statement='Not restricted'
+            ).count()
+            count_new = obj.requestitempart_set.filter(status='new').count()
+            count_approved = obj.requestitempart_set.filter(
+                status__in=('approved', 'approved_on_site')
+            ).count()
+            count_rejected = obj.requestitempart_set.filter(status='rejected').count()
 
         # If all the records are not restricted
         if count_not_restricted == count_total:
@@ -200,22 +276,45 @@ class RequestListSerializer(serializers.ModelSerializer):
 
     def get_has_digital_version(self, obj):
         """
-        Returns True if the linked container has a digital version.
+        Returns True if the linked container or one of the specifically
+        requested finding-aids entities has a digital version.
         """
-        if obj.container:
-            return obj.container.has_digital_version
-        else:
-            return False
+        if obj.container and obj.container.digital_version_exists:
+            return True
+        annotation_names = (
+            'container_entity_has_digital',
+            'container_has_digital_record',
+            'requested_entity_has_digital',
+        )
+        annotated_values = [getattr(obj, name, None) for name in annotation_names]
+        if all(value is not None for value in annotated_values):
+            return any(annotated_values)
+
+        return bool(obj.container and obj.container.has_digital_version) or FindingAidsEntity.objects.filter(
+            requestitempart__request_item=obj,
+        ).filter(
+            Q(digital_version_exists=True) | Q(digital_versions__isnull=False)
+        ).exists()
 
     def get_digital_version_barcode(self, obj):
         """
-        Returns the container barcode when a digital version exists.
+        Returns the container barcode when available. For a part-level-only
+        digital version, returns the finding-aids reference code instead.
         """
-        if obj.container:
-            if obj.container.has_digital_version:
-                return obj.container.barcode
-            else:
-                return None
+        if obj.container and self.get_has_digital_version(obj):
+            return obj.container.barcode
+
+        reference_codes = {
+            part.finding_aids_entity.archival_reference_code
+            for part in obj.requestitempart_set.all()
+            if part.finding_aids_entity.digital_version_exists or
+            bool(list(part.finding_aids_entity.digital_versions.all()))
+        }
+
+        return ', '.join(sorted(filter(None, reference_codes))) or None
+
+    def get_requested_materials_prepared(self, obj):
+        return any(job.status == 'completed' for job in obj.requested_materials_jobs.all())
 
     def get_archival_reference_number(self, obj):
         """
@@ -239,6 +338,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestItem
         fields = '__all__'
+        list_serializer_class = RequestItemListSerializer
 
 
 class ContainerListSerializer(serializers.ModelSerializer):
@@ -343,7 +443,7 @@ class RequestItemWriteSerializer(serializers.ModelSerializer):
 
 class RequestedMaterialsSharePointJobSerializer(serializers.ModelSerializer):
     """
-    Serializer for requested-materials SharePoint delivery jobs.
+    Serializer for requested-materials SharePoint preparation jobs.
     """
 
     request_id = serializers.IntegerField(source='request_item.request.id', read_only=True)

@@ -228,7 +228,7 @@ class EmailWithTemplate:
             return "Requested items are prepared"
 
         if self.template == 'requested_materials_shared_user':
-            return "Requested digital materials are now available"
+            return "Access to Requested Archival Materials"
 
         if self.template == 'requested_materials_shared_admin':
             return "Requested digital materials were prepared"

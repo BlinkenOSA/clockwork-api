@@ -45,11 +45,8 @@ class RequestedMaterialsSharePointService:
     STEP_DISPLAY_PAUSE_SECONDS = 3
     COPY_DETAILS_PAUSE_SECONDS = 5
 
-    def deliver_requested_materials_for_request_item(self, request_item, progress_callback=None):
+    def prepare_requested_materials_for_request_item(self, request_item, progress_callback=None):
         request_obj = request_item.request
-
-        if not request_obj.researcher.email:
-            raise RequestedMaterialsSharePointError('Researcher email address is missing.')
 
         requested_materials_library_path = self._format_library_location(
             settings.SHAREPOINT_REQUESTED_MATERIALS,
@@ -124,21 +121,6 @@ class RequestedMaterialsSharePointService:
             settings.SHAREPOINT_REQUESTED_MATERIALS,
             folder.properties['ServerRelativeUrl'],
         )
-        # Temporarily disabled: keep copied materials staff-only until researcher sharing is re-enabled.
-        # self._report_progress(progress_callback, 'sharing_directory', 'Sharing directory...', 4)
-        # self._share_folder_with_researcher(folder, request_obj.researcher.email)
-        self._report_progress(
-            progress_callback,
-            'sending_emails',
-            'Sending notification emails to Research Room staff.',
-            5,
-            pause_seconds=self.STEP_DISPLAY_PAUSE_SECONDS,
-        )
-        self._send_notifications(
-            request_obj,
-            folder_url,
-            copied_files or existing_files,
-        )
 
         return self._build_result(
             folder_created=folder_created,
@@ -147,17 +129,63 @@ class RequestedMaterialsSharePointService:
             copied_files=copied_files,
             existing_files=existing_files,
             shared_with=None,
-            notification_emails={
-                'staff': list(getattr(settings, 'RESEARCH_ROOM_STAFF_EMAIL')),
-            },
+            notification_emails={},
         )
 
+    def share_requested_materials_for_request(self, request_obj):
+        if not request_obj.researcher.email:
+            raise RequestedMaterialsSharePointError('Researcher email address is missing.')
+
+        requested_materials_ctx = self._get_client_context(settings.SHAREPOINT_REQUESTED_MATERIALS)
+        folder_name = self._sanitize_folder_name(request_obj.researcher.name)
+        folder, _ = self._ensure_folder(
+            requested_materials_ctx,
+            settings.SHAREPOINT_REQUESTED_MATERIALS_DOCUMENT_LIBRARY,
+            folder_name,
+        )
+        folder_url = self._build_absolute_url(
+            settings.SHAREPOINT_REQUESTED_MATERIALS,
+            folder.properties['ServerRelativeUrl'],
+        )
+        files = self._get_prepared_file_names(request_obj)
+
+        self._share_folder_with_researcher(folder, request_obj.researcher.email)
+        self._send_notifications(request_obj, folder_url, files)
+
+        return {
+            'folder_url': folder_url,
+            'files': files,
+            'shared_with': request_obj.researcher.email,
+            'notification_emails': {
+                'researcher': [request_obj.researcher.email],
+                'staff': list(getattr(settings, 'RESEARCH_ROOM_STAFF_EMAIL', [])),
+            },
+        }
+
+    def _get_prepared_file_names(self, request_obj):
+        files = []
+        for request_item in request_obj.requestitem_set.all():
+            job = request_item.requested_materials_jobs.filter(status='completed').order_by('-finished_date').first()
+            if not job or not job.result:
+                continue
+            for file_name in job.result.get('available_files', []):
+                if file_name not in files:
+                    files.append(file_name)
+        return files
+
     def get_eligible_digital_versions(self, request_item):
-        if request_item.item_origin != 'FA' or not request_item.container_id:
+        if request_item.item_origin != 'FA':
             return DigitalVersion.objects.none()
 
+        source_filter = Q(finding_aids_entity__requestitempart__request_item=request_item)
+        if request_item.container_id:
+            source_filter |= (
+                Q(container_id=request_item.container_id) |
+                Q(finding_aids_entity__container_id=request_item.container_id)
+            )
+
         return DigitalVersion.objects.filter(
-            Q(container_id=request_item.container_id) | Q(finding_aids_entity__container_id=request_item.container_id),
+            source_filter,
             level='A',
             available_research_cloud=True,
         ).exclude(
@@ -469,8 +497,7 @@ class RequestedMaterialsSharePointService:
                 'files': files,
             }
         )
-        # Temporarily disabled: do not email the researcher while SharePoint sharing is paused.
-        # mail.send_requested_materials_shared_user()
+        mail.send_requested_materials_shared_user()
         mail.send_requested_materials_shared_admin()
 
     def _build_server_relative_path(self, ctx, document_library, value):

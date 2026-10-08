@@ -34,7 +34,7 @@ def deliver_requested_materials_sharepoint_job(job_id):
         job.save(update_fields=['current_step', 'message', 'progress_current'])
 
     try:
-        result = RequestedMaterialsSharePointService().deliver_requested_materials_for_request_item(
+        result = RequestedMaterialsSharePointService().prepare_requested_materials_for_request_item(
             job.request_item,
             progress_callback=update_progress,
         )
@@ -42,7 +42,7 @@ def deliver_requested_materials_sharepoint_job(job_id):
         job.request_item.save(update_fields=['status'])
         job.status = 'completed'
         job.current_step = 'completed'
-        job.message = 'Requested materials delivery completed.'
+        job.message = 'Requested materials preparation completed.'
         job.progress_current = job.progress_total
         job.result = result
         job.finished_date = timezone.now()
@@ -53,7 +53,7 @@ def deliver_requested_materials_sharepoint_job(job_id):
     except RequestedMaterialsSharePointError as exc:
         job.status = 'failed'
         job.current_step = 'failed'
-        job.message = 'Requested materials delivery failed.'
+        job.message = 'Requested materials preparation failed.'
         job.error_message = str(exc)
         job.finished_date = timezone.now()
         job.save(update_fields=[
@@ -63,7 +63,7 @@ def deliver_requested_materials_sharepoint_job(job_id):
     except Exception as exc:
         job.status = 'failed'
         job.current_step = 'failed'
-        job.message = 'Requested materials delivery failed.'
+        job.message = 'Requested materials preparation failed.'
         job.error_message = str(exc)
         job.finished_date = timezone.now()
         job.save(update_fields=[

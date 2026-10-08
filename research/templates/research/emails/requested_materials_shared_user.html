@@ -3,31 +3,32 @@
     <body>
         <br>
 
-        <h2>Your requested digital materials are now available.</h2>
+        <h2>Access to Requested Archival Materials</h2>
 
         <p>Dear {{ researcher.first_name }},</p>
 
         <p>
-            The digital materials for your request dated {{ request.request_date }} have been copied to our
-            requested materials SharePoint area and shared with your email address for view-only access.
+            Thank you for your interest in our holdings.
+            You can access the non-downloadable viewing copy of the requested documents in the following folder:
         </p>
 
         <p>
-            <strong>Shared folder:</strong>
             <a href="{{ folder_url }}">{{ folder_url }}</a>
         </p>
 
         <p>
-            <strong>Files:</strong>
-            <ul>
-                {% for file in files %}
-                    <li>{{ file }}</li>
-                {% endfor %}
-            </ul>
+            (Please note that the verification code email may land in your spam folder.)<br/>
+            For audio/video materials, please be aware that a single audio/video file may contain multiple catalog
+            items and may not begin with the specific item you requested. You can check the order and duration
+            of items in the Catalog. <br/>
+            By default, materials remain available in your folder for one month.
+            You may request an extension by email at archivum@ceu.edu.
+            If you request more than 6 items, the next batch will only be uploaded once you confirm that your folder
+            can be emptied.
         </p>
 
         <p>
-            Regards,<br/>
+            Best regards,<br/>
             Blinken OSA Archivum - AMS
         </p>
     </body>

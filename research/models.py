@@ -167,6 +167,7 @@ class Request(models.Model):
     researcher = models.ForeignKey('Researcher', on_delete=models.PROTECT)
     created_date = models.DateTimeField(blank=True, auto_now_add=True)
     request_date = models.DateTimeField(blank=True, null=True)
+    requested_materials_shared_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         db_table = 'research_requests'
@@ -174,7 +175,7 @@ class Request(models.Model):
 
 class RequestedMaterialsSharePointJob(models.Model):
     """
-    Tracks asynchronous requested-materials SharePoint delivery jobs.
+    Tracks asynchronous requested-materials SharePoint preparation jobs.
     """
 
     id = models.AutoField(primary_key=True)

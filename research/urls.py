@@ -2,7 +2,8 @@ from django.urls.conf import path, re_path
 
 from research.views.requests_views import RequestsList, DigitalRequestsList, RequestsListForPrint, \
     RequestSeriesSelect, RequestContainerSelect, RequestsCreate, RequestItemStatusStep, RequestItemRetrieveUpdate, \
-    RequestLibraryMLR, RequestRequestedMaterialsSharePoint, RequestedMaterialsSharePointJobDetail
+    RequestLibraryMLR, RequestRequestedMaterialsSharePoint, RequestRequestedMaterialsSharePointShare, \
+    RequestedMaterialsSharePointJobDetail
 from research.views.researcher_views import ResearcherList, ResearcherDetail, ResearcherSelectList, \
     ResearcherCountrySelectList, ResearcherNationalitySelectList, ResearcherActivate, \
     ResearcherCountryActiveSelectList, ResearcherNationalityActiveSelectList
@@ -60,6 +61,9 @@ urlpatterns = [
     # Content Sharing Endpoints
     path('request_item/<int:request_item_id>/requested-materials-sharepoint/', RequestRequestedMaterialsSharePoint.as_view(),
          name='request-item-requested-materials-sharepoint'),
+    path('requests/<int:request_id>/requested-materials-sharepoint-share/',
+         RequestRequestedMaterialsSharePointShare.as_view(),
+         name='request-requested-materials-sharepoint-share'),
     path('requested-materials-sharepoint-jobs/<int:pk>/', RequestedMaterialsSharePointJobDetail.as_view(),
          name='requested-materials-sharepoint-job-detail'),
 
