@@ -15,7 +15,8 @@ from container.models import Container
 class ResearcherRegistrationStatisticsViewsTests(TestViewsBaseClass):
     def setUp(self):
         super().setUp()
-        now = timezone.now()
+        # Keep fixtures stable across calendar boundaries.
+        now = timezone.datetime(2026, 11, 5, 12)
 
         self.old_researcher = Researcher.objects.create(
             first_name='Old',
@@ -68,28 +69,26 @@ class ResearcherRegistrationStatisticsViewsTests(TestViewsBaseClass):
             self.assertIn({'month': month, 'total': total}, response.data['by_month'])
 
     def test_filters_by_date_interval(self):
-        response = self.client.get(
-            reverse('research-v1:researcher-registration-statistics'),
-            {
-                'date_from': (timezone.now() - timedelta(days=6)).date().isoformat(),
-                'date_to': (timezone.now() - timedelta(days=2)).date().isoformat(),
-            }
-        )
+        for date_to, expected_months in (
+            ('2026-10-31', [{'month': '2026-10', 'total': 1}]),
+            ('2026-11-03', [
+                {'month': '2026-10', 'total': 1},
+                {'month': '2026-11', 'total': 0},
+            ]),
+        ):
+            with self.subTest(date_to=date_to):
+                response = self.client.get(
+                    reverse('research-v1:researcher-registration-statistics'),
+                    {'date_from': '2026-10-30', 'date_to': date_to}
+                )
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['total'], 1)
-        self.assertEqual(
-            response.data['by_occupation'],
-            [
-                {'occupation': 'other', 'total': 1},
-            ]
-        )
-        self.assertEqual(
-            response.data['by_month'],
-            [
-                {'month': self.mid_researcher.date_created.strftime('%Y-%m'), 'total': 1},
-            ]
-        )
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.data['total'], 1)
+                self.assertEqual(
+                    response.data['by_occupation'],
+                    [{'occupation': 'other', 'total': 1}]
+                )
+                self.assertEqual(response.data['by_month'], expected_months)
 
     def test_returns_monthly_totals_for_each_month_in_requested_range(self):
         self.old_researcher.date_created = timezone.datetime(2026, 1, 15)
@@ -135,7 +134,8 @@ class ResearcherRegistrationStatisticsViewsTests(TestViewsBaseClass):
 class ResearcherVisitStatisticsViewsTests(TestViewsBaseClass):
     def setUp(self):
         super().setUp()
-        now = timezone.now()
+        # Keep fixtures stable across calendar boundaries.
+        now = timezone.datetime(2026, 11, 5, 12)
 
         self.researcher = Researcher.objects.create(
             first_name='Visit',
@@ -177,23 +177,23 @@ class ResearcherVisitStatisticsViewsTests(TestViewsBaseClass):
             self.assertIn({'month': month, 'total': total}, response.data['by_month'])
 
     def test_filters_visits_by_date_interval(self):
-        response = self.client.get(
-            reverse('research-v1:researcher-visit-statistics'),
-            {
-                'date_from': (timezone.now() - timedelta(days=6)).date().isoformat(),
-                'date_to': (timezone.now() - timedelta(days=2)).date().isoformat(),
-            }
-        )
+        for date_to, expected_months in (
+            ('2026-10-31', [{'month': '2026-10', 'total': 1}]),
+            ('2026-11-03', [
+                {'month': '2026-10', 'total': 1},
+                {'month': '2026-11', 'total': 0},
+            ]),
+        ):
+            with self.subTest(date_to=date_to):
+                response = self.client.get(
+                    reverse('research-v1:researcher-visit-statistics'),
+                    {'date_from': '2026-10-30', 'date_to': date_to}
+                )
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['total_visits'], 1)
-        self.assertEqual(response.data['total_hours'], 2.0)
-        self.assertEqual(
-            response.data['by_month'],
-            [
-                {'month': self.mid_visit.check_in.strftime('%Y-%m'), 'total': 1},
-            ]
-        )
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.data['total_visits'], 1)
+                self.assertEqual(response.data['total_hours'], 2.0)
+                self.assertEqual(response.data['by_month'], expected_months)
 
     def test_returns_monthly_visit_totals_for_each_month_in_requested_range(self):
         self.old_visit.check_in = timezone.datetime(2026, 1, 15, 9, 0)

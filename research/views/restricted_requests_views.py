@@ -74,7 +74,7 @@ class RestrictedRequestsList(generics.ListAPIView):
     Features:
         - Filtering via RestrictedRequestFilterClass
         - Search by researcher name and container identifiers
-        - Ordering by researcher last name, status, and request date
+        - Ordering by researcher last name, status, planned visit, and submission date
     """
 
     queryset = (
@@ -101,6 +101,7 @@ class RestrictedRequestsList(generics.ListAPIView):
         'request_item__request__researcher__last_name',
         'status',
         'request_item__request__request_date',
+        'request_item__request__created_date',
     ]
     serializer_class = RestrictedRequestsListSerializer
 
