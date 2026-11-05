@@ -19,6 +19,7 @@ class RestrictedRequestsListSerializer(serializers.ModelSerializer):
     reference_code = serializers.SerializerMethodField()
     catalog_link = serializers.SerializerMethodField()
     request_date = serializers.SerializerMethodField()
+    created_date = serializers.DateTimeField(source='request_item.request.created_date', read_only=True)
     is_restricted = serializers.SerializerMethodField()
     researcher = serializers.SlugRelatedField(
         slug_field='name',
@@ -90,6 +91,7 @@ class RestrictedRequestsListSerializer(serializers.ModelSerializer):
             'catalog_link',
             'reference_code',
             'request_date',
+            'created_date',
             'researcher',
             'researcher_id',
             'researcher_email',

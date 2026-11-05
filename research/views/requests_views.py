@@ -228,6 +228,7 @@ class RequestsList(generics.ListAPIView):
         'status',
         'item_origin',
         'request__request_date',
+        'request__created_date',
         'ordering',
         'reshelve_date'
     ]
