@@ -1,20 +1,28 @@
 import re
 
 import requests
+from requests.auth import HTTPBasicAuth
 from django.conf import settings
 from django.core.management import BaseCommand, CommandError
-from requests.auth import HTTPBasicAuth
 
 from archival_unit.models import ArchivalUnit
+from clockwork_api.semantic_solr import get_semantic_solr_auth
 from finding_aids.indexers.finding_aids_semantic_indexer import FindingAidsSemanticIndexer
 from finding_aids.models import FindingAidsEntity
 from isad.indexers.isad_semantic_indexer import ISADSemanticIndexer
 
 
 class EmbeddingClient:
-    def __init__(self, base_url, timeout):
+    def __init__(self, base_url, timeout, *, username=None, password=None):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        if username is None:
+            username = getattr(settings, "SEMANTIC_EMBEDDING_USERNAME", "")
+        if password is None:
+            password = getattr(settings, "SEMANTIC_EMBEDDING_PASSWORD", "")
+        if bool(username) != bool(password):
+            raise ValueError("Embedding service authentication requires both a username and a password.")
+        self.auth = HTTPBasicAuth(username, password) if username and password else None
 
     def embed_document(self, text):
         response = requests.post(
@@ -24,6 +32,7 @@ class EmbeddingClient:
                 "type": "document",
             },
             timeout=self.timeout,
+            auth=self.auth,
         )
         response.raise_for_status()
         payload = response.json()
@@ -90,6 +99,14 @@ class Command(BaseCommand):
             help="Base URL for the embedding service. The command posts to <base>/embed.",
         )
         parser.add_argument(
+            "--embedding-username",
+            help="Embedding service HTTP Basic Authentication username (defaults to Django settings).",
+        )
+        parser.add_argument(
+            "--embedding-password",
+            help="Embedding service HTTP Basic Authentication password (defaults to Django settings).",
+        )
+        parser.add_argument(
             "--embedding-timeout",
             default=getattr(settings, "SEMANTIC_EMBEDDING_TIMEOUT", 30),
             type=int,
@@ -101,20 +118,33 @@ class Command(BaseCommand):
             help="Solr catalog core URL.",
         )
         parser.add_argument(
+            "--solr-username",
+            help="Solr HTTP Basic Authentication username (defaults to Django settings).",
+        )
+        parser.add_argument(
+            "--solr-password",
+            help="Solr HTTP Basic Authentication password (defaults to Django settings).",
+        )
+        parser.add_argument(
             "--dry-run",
             action="store_true",
             help="Print generated semantic text without calling embeddings or Solr.",
         )
 
     def handle(self, *args, **options):
+        auth = self._get_solr_auth(options)
+        try:
+            embedding_client = EmbeddingClient(
+                base_url=options["embedding_base_url"],
+                timeout=options["embedding_timeout"],
+                username=options.get("embedding_username"),
+                password=options.get("embedding_password"),
+            )
+        except ValueError as exc:
+            raise CommandError(str(exc)) from exc
         archival_unit = self._get_archival_unit(options)
-        embedding_client = EmbeddingClient(
-            base_url=options["embedding_base_url"],
-            timeout=options["embedding_timeout"],
-        )
 
         solr_url = options["solr_url"].rstrip("/")
-        auth = self._get_solr_auth()
 
         series_context = self._get_series_context(archival_unit)
 
@@ -157,12 +187,11 @@ class Command(BaseCommand):
         except ArchivalUnit.DoesNotExist as exc:
             raise CommandError("No archival unit found for the requested hierarchy.") from exc
 
-    def _get_solr_auth(self):
-        username = getattr(settings, "SOLR_USERNAME", None)
-        password = getattr(settings, "SOLR_PASSWORD", None)
-        if username and password:
-            return HTTPBasicAuth(username, password)
-        return None
+    def _get_solr_auth(self, options):
+        try:
+            return get_semantic_solr_auth(options.get("solr_username"), options.get("solr_password"))
+        except ValueError as exc:
+            raise CommandError(str(exc)) from exc
 
     def _get_series_context(self, archival_unit):
         series_unit = archival_unit if archival_unit.level == "S" else None
@@ -203,7 +232,11 @@ class Command(BaseCommand):
             self.stdout.write("Skipping unpublished ISAD(G): %s" % isad.reference_code)
             return 0
 
-        indexer = ISADSemanticIndexer(isad.id)
+        indexer = ISADSemanticIndexer(
+            isad.id, solr_url=solr_url,
+            solr_username=auth.username if auth else "",
+            solr_password=auth.password if auth else "",
+        )
         indexer.create_solr_document()
         semantic_text = self._build_isad_semantic_text(isad, series_context)
 
@@ -230,7 +263,11 @@ class Command(BaseCommand):
             self.stdout.write("Skipping unpublished FindingAidsEntity: %s" % finding_aids_entity.archival_reference_code)
             return 0
 
-        indexer = FindingAidsSemanticIndexer(finding_aids_entity.id)
+        indexer = FindingAidsSemanticIndexer(
+            finding_aids_entity.id, solr_url=solr_url,
+            solr_username=auth.username if auth else "",
+            solr_password=auth.password if auth else "",
+        )
         indexer.create_solr_document()
         semantic_text = self._build_finding_aids_semantic_text(finding_aids_entity, series_context)
 

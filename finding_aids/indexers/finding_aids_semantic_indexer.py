@@ -2,10 +2,10 @@ import urllib
 
 import pysolr
 from clockwork_api.http import get, post
+from clockwork_api.semantic_solr import get_semantic_solr_auth, get_semantic_solr_url
 from django.conf import settings
 from hashids import Hashids
 from langdetect import detect, LangDetectException
-from requests.auth import HTTPBasicAuth
 
 from digitization.models import DigitalVersion
 from finding_aids.generators.digital_version_identifier_generator import DigitalVersionIdentifierGenerator
@@ -30,26 +30,31 @@ class FindingAidsSemanticIndexer:
     The resulting Solr document is stored in `self.doc`.
     """
 
-    def __init__(self, finding_aids_entity_id, load_record=True, document_id=None):
+    def __init__(
+        self, finding_aids_entity_id, load_record=True, document_id=None,
+        *, solr_url=None, solr_username=None, solr_password=None,
+    ):
         """
         Initializes the indexer and prepares Solr connectivity.
 
         Args:
             finding_aids_entity_id: Primary key of the FindingAidsEntity to index.
+            solr_url: Optional full Solr core URL.
+            solr_username: Optional HTTP Basic Authentication username.
+            solr_password: Optional HTTP Basic Authentication password.
 
         Side effects:
             - loads the FindingAidsEntity with related objects needed for indexing
-            - prepares a pysolr client using SOLR_URL and SOLR_CORE_CATALOG_NEW settings
+            - prepares a pysolr client using semantic settings or explicit overrides
         """
         self.finding_aids_entity_id = finding_aids_entity_id
         self.finding_aids_entity = None
         self.document_id = document_id
         self.hashids = Hashids(salt="osacontent", min_length=10)
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG_NEW", "catalog")
-        self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url, auth=HTTPBasicAuth(
-                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
-            ))
+        self.solr_url = (solr_url if solr_url is not None else get_semantic_solr_url()).rstrip("/")
+        self.solr_auth = get_semantic_solr_auth(solr_username, solr_password)
+        self.solr = pysolr.Solr(self.solr_url, auth=self.solr_auth)
         self.locales = ['en', 'hu', 'ru', 'pl']
         self.doc = {}
         if load_record:
@@ -95,9 +100,7 @@ class FindingAidsSemanticIndexer:
         if hasattr(self.finding_aids_entity.archival_unit, 'isad'):
             if self.finding_aids_entity.archival_unit.isad.published:
                 self.create_solr_document()
-                r = post("%s/update/json/docs/" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
-                    getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
-                ))
+                r = post("%s/update/json/docs/" % self.solr_url, json=self.doc, auth=self.solr_auth)
                 if r.status_code == 200:
                     print('Record successfully indexed: %s' % self.finding_aids_entity.archival_reference_code)
                 else:
@@ -110,9 +113,7 @@ class FindingAidsSemanticIndexer:
         This is typically called after one or more `index()` calls to
         make the updates visible.
         """
-        r = post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
-                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
-            ))
+        r = post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=self.solr_auth)
         print(r.text)
 
     def delete(self):
