@@ -34,3 +34,14 @@ python manage.py index_finding_aids_entities_meilisearch --target catalog --fond
 ```
 
 Use `--target ams` for dashboard indexing.
+
+LCSH endpoint tests mock Library of Congress responses so normal test runs do not
+depend on that service. To run the separate live checks explicitly:
+
+```sh
+RUN_LCSH_LIVE_TESTS=1 python manage.py test authority.tests.test_lcsh_live
+```
+
+These checks require network access and may fail if LoC is unavailable or blocks
+the runner. Upstream HTTP failures and request errors are logged by
+`authority.views.lcsh_views` at warning level.
