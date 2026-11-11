@@ -85,6 +85,25 @@ Prefer the environment-backed settings above to keep the password out of
 shell history and process arguments. With those configured, omit the two
 credential flags. The embedding service does not receive Solr credentials.
 
+Solr updates and the final commit use a dedicated 60-second timeout, independent
+of the application's `REQUESTS_TIMEOUT`. Timeouts, connection failures, and HTTP
+408, 429, 500, 502, 503, or 504 responses are retried up to five times, with
+exponential delays starting at one second and capped at 30 seconds. Each retry
+is logged to stderr with the document ID (or commit). The same document and
+embedding are reused, so retries replace the same Solr ID without generating
+another embedding. Other HTTP errors fail immediately; exhausting retries stops
+the command with the failed document ID or commit in the error.
+
+Override these defaults with `SEMANTIC_SOLR_TIMEOUT` and
+`SEMANTIC_SOLR_MAX_RETRIES` in the environment or Django settings, or per run:
+
+```shell
+python manage.py index_semantic_catalog_slice --all \
+  --solr-timeout 120 --solr-max-retries 8
+```
+
+The timeout must be positive. Set `--solr-max-retries 0` to disable retries.
+
 ### Embedding service URL and authentication
 
 Clockwork reads these environment variables for `index_semantic_catalog_slice`.
