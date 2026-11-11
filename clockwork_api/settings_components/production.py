@@ -73,6 +73,13 @@ RESTRICTED_DECISION_MAKER_EMAIL = ['example@example.com']
 
 CATALOG_URL = 'https://catalog.archivum.org/catalog'
 
+# The embedder can be behind Apache Basic Auth, independently of Solr auth.
+SEMANTIC_EMBEDDING_BASE_URL = os.environ.get(
+    "SEMANTIC_EMBEDDING_BASE_URL", "http://localhost:8000",
+)
+SEMANTIC_EMBEDDING_USERNAME = os.environ.get("SEMANTIC_EMBEDDING_USERNAME", "")
+SEMANTIC_EMBEDDING_PASSWORD = os.environ.get("SEMANTIC_EMBEDDING_PASSWORD", "")
+
 # User-Agent used for Wikidata and Wikipedia requests. Override in the
 # environment for deployments that need a contact address.
 WIKIDATA_USER_AGENT = os.environ.get(

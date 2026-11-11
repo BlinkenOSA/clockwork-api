@@ -2,6 +2,7 @@ import json
 from unittest.mock import Mock, patch
 
 from django.test import TestCase
+from requests.exceptions import ConnectionError, Timeout
 
 from authority.views.lcsh_views import LCSHMixin
 from authority.views.viaf_views import VIAFMixin
@@ -33,6 +34,33 @@ class LCSHMixinTests(TestCase):
             data = mixin.get_lcshlinks("Human Rights", "subject")
 
         self.assertEqual(data[0]["lcsh_id"], "http://id.loc.gov/authorities/subjects/sh1")
+        mock_session.close.assert_called_once_with()
+
+    def test_upstream_http_errors_are_logged(self):
+        for status_code in (403, 429, 500, 503):
+            with self.subTest(status_code=status_code):
+                mock_session = Mock()
+                mock_session.get.return_value = Mock(status_code=status_code)
+                with patch('authority.views.lcsh_views.Session', return_value=mock_session):
+                    with self.assertLogs('authority.views.lcsh_views', level='WARNING') as logs:
+                        data = LCSHMixin().get_lcshlinks('Horror', 'genre')
+                self.assertEqual(data, [])
+                self.assertIn('HTTP %s' % status_code, logs.output[0])
+                self.assertIn('genre', logs.output[0])
+                self.assertIn('Horror', logs.output[0])
+                mock_session.close.assert_called_once_with()
+
+    def test_request_errors_are_logged(self):
+        for error in (Timeout('timed out'), ConnectionError('connection failed')):
+            with self.subTest(error=error):
+                mock_session = Mock()
+                mock_session.get.side_effect = error
+                with patch('authority.views.lcsh_views.Session', return_value=mock_session):
+                    with self.assertLogs('authority.views.lcsh_views', level='WARNING') as logs:
+                        data = LCSHMixin().get_lcshlinks('Human Rights', 'subject')
+                self.assertEqual(data, [])
+                self.assertIn(str(error), logs.output[0])
+                mock_session.close.assert_called_once_with()
 
 
 class WikidataMixinTests(TestCase):

@@ -1,9 +1,9 @@
 import pysolr
 from clockwork_api.http import post
+from clockwork_api.semantic_solr import get_semantic_solr_auth, get_semantic_solr_url
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from hashids import Hashids
-from requests.auth import HTTPBasicAuth
 
 from isad.models import Isad
 
@@ -27,7 +27,7 @@ class ISADSemanticIndexer:
     Indexing is performed only when ``isad.published`` is True.
     """
 
-    def __init__(self, isad_id):
+    def __init__(self, isad_id, *, solr_url=None, solr_username=None, solr_password=None):
         """
         Initializes the catalog indexer for a specific ISAD record.
 
@@ -35,14 +35,17 @@ class ISADSemanticIndexer:
         ----------
         isad_id : int
             Primary key of the ISAD record to be indexed.
+        solr_url : str, optional
+            Full Solr core URL, overriding the configured semantic destination.
+        solr_username, solr_password : str, optional
+            HTTP Basic Authentication credentials, overriding Django settings.
         """
         self.isad_id = isad_id
         self.isad = self._get_isad(isad_id)
         self.solr_core = getattr(settings, "SOLR_CORE_CATALOG_NEW", "catalog")
-        self.solr_url = "%s/%s" % (getattr(settings, "SOLR_URL", "http://localhost:8983/solr"), self.solr_core)
-        self.solr = pysolr.Solr(self.solr_url, auth=HTTPBasicAuth(
-                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
-            ))
+        self.solr_url = (solr_url if solr_url is not None else get_semantic_solr_url()).rstrip("/")
+        self.solr_auth = get_semantic_solr_auth(solr_username, solr_password)
+        self.solr = pysolr.Solr(self.solr_url, auth=self.solr_auth)
         self.doc = {}
 
     def get_solr_document(self):
@@ -85,9 +88,7 @@ class ISADSemanticIndexer:
         """
         if self.isad.published:
             self.create_solr_document()
-            r = post("%s/update/json/docs" % self.solr_url, json=self.doc, auth=HTTPBasicAuth(
-                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
-            ))
+            r = post("%s/update/json/docs" % self.solr_url, json=self.doc, auth=self.solr_auth)
             if r.status_code == 200:
                 print('Record successfully indexed: %s' % self.isad.reference_code)
             else:
@@ -102,9 +103,7 @@ class ISADSemanticIndexer:
         This uses an explicit commit request to Solr. Some deployment setups may
         rely on auto-commit; others may require manual commits after batches.
         """
-        r = post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=HTTPBasicAuth(
-                getattr(settings, "SOLR_USERNAME"), getattr(settings, "SOLR_PASSWORD")
-            ))
+        r = post("%s/update/" % self.solr_url, params={'commit': 'true'}, json={}, auth=self.solr_auth)
         print(r.text)
 
     def delete(self):

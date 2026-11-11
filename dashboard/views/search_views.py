@@ -109,11 +109,11 @@ class DashboardSearchView(APIView):
 
     def _get_index(self):
         meilisearch_url = getattr(settings, 'MEILISEARCH_URL', '')
-        meilisearch_api_key = getattr(settings, 'MEILISEARCH_API_KEY', '')
+        meilisearch_api_key = getattr(settings, 'MEILISEARCH_AMS_API_KEY', '')
         index_name = getattr(
             settings,
-            'MEILISEARCH_DASHBOARD_SEARCH_INDEX',
-            getattr(settings, 'MEILISEARCH_INDEX', 'catalog')
+            'MEILISEARCH_AMS_INDEX',
+            getattr(settings, 'MEILISEARCH_DASHBOARD_SEARCH_INDEX', 'ams')
         )
 
         client = meilisearch.Client(meilisearch_url, meilisearch_api_key)
