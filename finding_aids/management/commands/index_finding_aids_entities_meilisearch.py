@@ -1,9 +1,7 @@
-import time
-
 from django.core.management import BaseCommand
 
 from archival_unit.models import ArchivalUnit
-from finding_aids.indexers.finding_aids_meilisearch_indexer import FindingMeilisearchIndexer
+from finding_aids.indexers.finding_aids_meilisearch_indexer import FindingAidsMeilisearchIndexer
 from finding_aids.models import FindingAidsEntity
 
 
@@ -13,12 +11,16 @@ class Command(BaseCommand):
         parser.add_argument('--subfonds', dest='subfonds', help='Subfonds Number')
         parser.add_argument('--series', dest='series', help='Series Number')
         parser.add_argument('--all', dest='all', help='Index everything.')
+        parser.add_argument(
+            '--target', choices=('ams', 'catalog'), default='ams',
+            help='Meilisearch destination (default: ams).',
+        )
 
     def handle(self, *args, **options):
         if options['all']:
             for archival_unit in ArchivalUnit.objects.all():
                 for fa in FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False).iterator():
-                    indexer = FindingMeilisearchIndexer(fa.id)
+                    indexer = FindingAidsMeilisearchIndexer(fa.id, target=options['target'])
                     print("Indexing: %s" % fa.archival_reference_code)
                     indexer.index()
         else:
@@ -27,6 +29,6 @@ class Command(BaseCommand):
                                                      series=options['series'])
             finding_aids_entities = FindingAidsEntity.objects.filter(archival_unit=archival_unit, is_template=False)
             for fa in finding_aids_entities.iterator():
-                indexer = FindingMeilisearchIndexer(fa.id)
+                indexer = FindingAidsMeilisearchIndexer(fa.id, target=options['target'])
                 print("Indexing: %s" % fa.archival_reference_code)
                 indexer.index()

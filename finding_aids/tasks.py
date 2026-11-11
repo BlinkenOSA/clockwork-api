@@ -1,9 +1,6 @@
-# Create your tasks here
-import meilisearch
 from celery import shared_task
-from django.conf import settings
 
-from finding_aids.indexers.finding_aids_meilisearch_indexer import FindingMeilisearchIndexer
+from finding_aids.indexers.finding_aids_meilisearch_indexer import FindingAidsMeilisearchIndexer
 from finding_aids.indexers.finding_aids_new_catalog_indexer import FindingAidsNewCatalogIndexer
 from finding_aids.models import FindingAidsEntity
 
@@ -50,34 +47,27 @@ def index_catalog_finding_aids_entity_remove(finding_aids_entity_id, document_id
     indexer.delete()
 
 
-def _get_meilisearch_index():
-    meilisearch_url = getattr(settings, 'MEILISEARCH_URL', '')
-    meilisearch_api_key = getattr(settings, 'MEILISEARCH_API_KEY', '')
-    index_name = getattr(settings, 'MEILISEARCH_INDEX', 'catalog')
-    client = meilisearch.Client(meilisearch_url, meilisearch_api_key)
-    return client.index(index_name)
-
-
 @shared_task
-def index_meilisearch_finding_aids_entity(finding_aids_entity_id):
+def index_meilisearch_finding_aids_entity(finding_aids_entity_id, target="ams"):
     """
-    Indexes a finding aids entity in Meilisearch.
+    Indexes a finding aids entity in the selected Meilisearch target.
     """
     try:
-        indexer = FindingMeilisearchIndexer(finding_aids_entity_id)
+        indexer = FindingAidsMeilisearchIndexer(finding_aids_entity_id, target=target)
     except FindingAidsEntity.DoesNotExist:
         return
     indexer.index()
 
 
 @shared_task
-def index_meilisearch_finding_aids_entity_remove(finding_aids_entity_id, document_id=None):
+def index_meilisearch_finding_aids_entity_remove(finding_aids_entity_id, document_id=None, target="ams"):
     """
-    Removes a finding aids entity in Meilisearch.
+    Removes a finding aids entity from the selected Meilisearch target.
     """
-    indexer = FindingMeilisearchIndexer(
+    indexer = FindingAidsMeilisearchIndexer(
         finding_aids_entity_id,
         load_record=False,
         document_id=document_id,
+        target=target,
     )
     indexer.delete()

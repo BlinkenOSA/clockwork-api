@@ -4,6 +4,7 @@ import meilisearch
 import pysolr
 from clockwork_api.http import get
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.html import strip_tags
 from hashids import Hashids
 from langdetect import detect, LangDetectException
@@ -14,20 +15,32 @@ from finding_aids.generators.digital_version_identifier_generator import Digital
 from finding_aids.models import FindingAidsEntity
 
 
-class FindingMeilisearchIndexer:
+class FindingAidsMeilisearchIndexer:
     """
-    Class to index Finding Aids records to Solr for the catalog.
+    Index Finding Aids records in the AMS or catalog Meilisearch index.
+
+    ``target`` selects MEILISEARCH_AMS_API_KEY / MEILISEARCH_AMS_INDEX or
+    MEILISEARCH_CATALOG_API_KEY / MEILISEARCH_CATALOG_INDEX.
     """
 
-    def __init__(self, finding_aids_entity_id, load_record=True, document_id=None):
+    def __init__(self, finding_aids_entity_id, load_record=True, document_id=None, target="ams"):
+        if target not in ("ams", "catalog"):
+            raise ValueError("Meilisearch target must be 'ams' or 'catalog'.")
+        self.target = target
         self.finding_aids_entity_id = finding_aids_entity_id
         self.finding_aids_entity = None
         self.document_id = document_id
         self.hashids = Hashids(salt="osacontent", min_length=10)
 
         self.meilisearch_url = getattr(settings, "MEILISEARCH_URL", "")
-        self.meilisearch_api_key = getattr(settings, "MEILISEARCH_API_KEY", "")
-        self.meilisearch_index = getattr(settings, "MEILISEARCH_INDEX", "meilisearch")
+        api_key_setting = "MEILISEARCH_%s_API_KEY" % target.upper()
+        index_setting = "MEILISEARCH_%s_INDEX" % target.upper()
+        self.meilisearch_api_key = getattr(settings, api_key_setting, "")
+        self.meilisearch_index = getattr(settings, index_setting, "ams" if target == "ams" else "")
+        if target == "catalog" and (not self.meilisearch_api_key or not self.meilisearch_index):
+            raise ImproperlyConfigured(
+                "Catalog indexing requires %s and %s." % (api_key_setting, index_setting)
+            )
 
         self.client = meilisearch.Client(self.meilisearch_url, self.meilisearch_api_key)
         self.meilisearch_index = self.client.index(self.meilisearch_index)
