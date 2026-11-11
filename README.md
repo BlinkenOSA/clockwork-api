@@ -56,6 +56,22 @@ retains its default of `http://localhost:8983/solr/catalog`. Set both semantic
 credentials to empty strings for an unauthenticated local instance; a partial
 credential pair is rejected.
 
+Choose the indexing scope by supplying a fonds, an optional subfonds and series,
+or `--all` for the entire catalog. The command includes ISAD(G) records and
+finding aids for every matching archival unit, retaining each series' own
+semantic context. Unpublished records and finding aids templates are skipped.
+
+```shell
+python manage.py index_semantic_catalog_slice --fonds 300
+python manage.py index_semantic_catalog_slice --fonds 300 --subfonds 1
+python manage.py index_semantic_catalog_slice --fonds 300 --subfonds 1 --series 1
+python manage.py index_semantic_catalog_slice --all
+```
+
+`--series` requires `--subfonds`. `--all` cannot be combined with hierarchy
+filters. Add `--dry-run` to preview semantic text without writing to Solr or
+calling the embedding service.
+
 The command also accepts per-run overrides:
 
 ```shell

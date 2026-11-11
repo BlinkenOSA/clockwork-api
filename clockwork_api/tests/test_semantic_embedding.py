@@ -46,7 +46,7 @@ class SemanticEmbeddingTests(SimpleTestCase):
 
     def test_partial_credentials_are_rejected_before_loading_records(self):
         for username, password in (("user", ""), ("", "password")):
-            with self.subTest(username=username), patch.object(Command, "_get_archival_unit") as load:
+            with self.subTest(username=username), patch.object(Command, "_get_archival_units") as load:
                 with self.assertRaisesMessage(
                     CommandError, "Embedding service authentication requires both a username and a password.",
                 ):
@@ -64,14 +64,15 @@ class SemanticEmbeddingTests(SimpleTestCase):
              "https://override.test/tools/embed", HTTPBasicAuth("override", "secret")),
         ):
             with self.subTest(overrides=overrides), patch.object(
-                Command, "_get_archival_unit", return_value=SimpleNamespace(),
-            ), patch.object(Command, "_get_series_context", return_value="context"), patch.object(
+                Command, "_get_archival_units",
+            ) as units, patch.object(Command, "_get_series_context", return_value="context"), patch.object(
                 Command, "_get_finding_aids_entities",
             ) as entities, patch.object(
                 Command, "_build_finding_aids_semantic_text", return_value="record text",
             ), patch(COMMAND_MODULE + ".FindingAidsSemanticIndexer") as indexer, patch(
                 COMMAND_MODULE + ".requests.post", return_value=Mock(status_code=200),
             ) as post:
+                units.return_value.iterator.return_value = iter([SimpleNamespace()])
                 entities.return_value.iterator.return_value = iter([record])
                 indexer.return_value.doc = {"id": "fa-2"}
                 post.return_value.json.return_value = {"embedding": [0.1, 0.2]}
