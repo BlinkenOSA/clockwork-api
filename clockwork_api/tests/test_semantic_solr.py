@@ -116,7 +116,7 @@ class SemanticSolrTests(SimpleTestCase):
         isad = SimpleNamespace(id=1, published=True, reference_code="test-isad")
         finding_aid = SimpleNamespace(id=2, published=True, archival_reference_code="test-fa")
         command_module = "finding_aids.management.commands.index_semantic_catalog_slice"
-        with patch.object(Command, "_get_archival_unit", return_value=SimpleNamespace(isad=isad)), patch.object(
+        with patch.object(Command, "_get_archival_units") as units, patch.object(
             Command, "_get_series_context", return_value="context"
         ), patch.object(Command, "_get_finding_aids_entities") as entities, patch.object(
             Command, "_build_isad_semantic_text", return_value="isad text"
@@ -125,6 +125,7 @@ class SemanticSolrTests(SimpleTestCase):
         ) as isad_indexer, patch(command_module + ".FindingAidsSemanticIndexer") as fa_indexer, patch.object(
             EmbeddingClient, "embed_document", return_value=[0.1, 0.2]
         ), patch(command_module + ".requests.post", return_value=Mock(status_code=200)) as post:
+            units.return_value.iterator.return_value = iter([SimpleNamespace(isad=isad)])
             entities.return_value.iterator.return_value = iter([finding_aid])
             isad_indexer.return_value.doc = {"id": "isad-1"}
             fa_indexer.return_value.doc = {"id": "fa-2"}
@@ -164,7 +165,7 @@ class SemanticSolrTests(SimpleTestCase):
 
     @override_settings(SEMANTIC_SOLR_USERNAME="", SEMANTIC_SOLR_PASSWORD="")
     def test_command_rejects_partial_auth_before_loading_records(self):
-        with patch.object(Command, "_get_archival_unit") as load_record, self.assertRaisesMessage(
+        with patch.object(Command, "_get_archival_units") as load_record, self.assertRaisesMessage(
             CommandError, "Solr authentication requires both a username and a password."
         ):
             call_command(
