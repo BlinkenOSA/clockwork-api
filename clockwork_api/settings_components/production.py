@@ -73,6 +73,10 @@ RESTRICTED_DECISION_MAKER_EMAIL = ['example@example.com']
 
 CATALOG_URL = 'https://catalog.archivum.org/catalog'
 
+# Bulk indexing needs a longer timeout than interactive outbound requests.
+SEMANTIC_SOLR_TIMEOUT = int(os.environ.get("SEMANTIC_SOLR_TIMEOUT", 60))
+SEMANTIC_SOLR_MAX_RETRIES = int(os.environ.get("SEMANTIC_SOLR_MAX_RETRIES", 5))
+
 # The embedder can be behind Apache Basic Auth, independently of Solr auth.
 SEMANTIC_EMBEDDING_BASE_URL = os.environ.get(
     "SEMANTIC_EMBEDDING_BASE_URL", "http://localhost:8000",
