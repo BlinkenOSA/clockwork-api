@@ -1,9 +1,14 @@
 import json
+import logging
 from typing import List, Dict, Any
 
 from clockwork_api.http import Session
+from requests.exceptions import RequestException
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+
+logger = logging.getLogger(__name__)
 
 
 class LCSHMixin(object):
@@ -50,13 +55,26 @@ class LCSHMixin(object):
             session = Session()
             session.trust_env = False
 
-            r = session.get('http://id.loc.gov/search/?q=%s&q=cs:%s&format=json' % (query, rt))
-            if r.status_code == 200:
-                session.close()
+            try:
+                r = session.get(
+                    'https://id.loc.gov/search/',
+                    params={'q': [query, 'cs:%s' % rt], 'format': 'json'},
+                )
+                if r.status_code != 200:
+                    logger.warning(
+                        'LoC search returned HTTP %s for type=%s query=%r',
+                        r.status_code, request_type, query,
+                    )
+                    return []
                 return self.assemble_data_stream(json.loads(r.text))
-            else:
-                session.close()
+            except RequestException as exc:
+                logger.warning(
+                    'LoC search request failed for type=%s query=%r: %s',
+                    request_type, query, exc,
+                )
                 return []
+            finally:
+                session.close()
 
     @staticmethod
     def assemble_data_stream(json_data: Any) -> List[Dict[str, str]]:
