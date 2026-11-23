@@ -101,6 +101,11 @@ class Command(BaseCommand):
         parser.add_argument("--series", type=int, help="Series number (omit to index the entire subfonds)")
         parser.add_argument("--all", action="store_true", help="Index the entire catalog.")
         parser.add_argument(
+            "--from-fonds",
+            type=int,
+            help="With --all, start at this fonds number (inclusive) and index all later fonds.",
+        )
+        parser.add_argument(
             "--embedding-base-url",
             default=getattr(settings, "SEMANTIC_EMBEDDING_BASE_URL", "http://localhost:8000"),
             help="Base URL for the embedding service. The command posts to <base>/embed.",
@@ -204,6 +209,8 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Processed %s document(s)." % indexed_count))
 
     def _validate_scope(self, options):
+        if options["from_fonds"] is not None and not options["all"]:
+            raise CommandError("--from-fonds requires --all.")
         if options["all"]:
             if any(options[key] is not None for key in ("fonds", "subfonds", "series")):
                 raise CommandError("--all cannot be combined with --fonds, --subfonds, or --series.")
@@ -218,9 +225,11 @@ class Command(BaseCommand):
             for key in ("fonds", "subfonds", "series")
             if options[key] is not None
         }
+        if options["from_fonds"] is not None:
+            filters["fonds__gte"] = options["from_fonds"]
         archival_units = ArchivalUnit.objects.filter(**filters).select_related(
             "isad", "parent", "parent__parent"
-        )
+        ).order_by("fonds", "subfonds", "series")
         if not options["all"] and not archival_units.exists():
             raise CommandError("No archival unit found for the requested hierarchy.")
         return archival_units

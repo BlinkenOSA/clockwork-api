@@ -151,6 +151,8 @@ class SemanticCatalogSliceTests(SimpleTestCase):
             (["--fonds", "300", "--subfonds", "0", "--series", "1"],
              {"fonds": 300, "subfonds": 0, "series": 1}),
             (["--all"], {}),
+            (["--all", "--from-fonds", "300"], {"fonds__gte": 300}),
+            (["--all", "--from-fonds", "0"], {"fonds__gte": 0}),
         ):
             with self.subTest(arguments=arguments), patch(COMMAND_MODULE + ".ArchivalUnit.objects.filter") as filter_units:
                 command = Command()
@@ -158,7 +160,9 @@ class SemanticCatalogSliceTests(SimpleTestCase):
                 command._validate_scope(options)
                 selected = command._get_archival_units(options)
                 filter_units.assert_called_once_with(**expected_filters)
-                self.assertIs(selected, filter_units.return_value.select_related.return_value)
+                related = filter_units.return_value.select_related.return_value
+                related.order_by.assert_called_once_with("fonds", "subfonds", "series")
+                self.assertIs(selected, related.order_by.return_value)
 
     def test_invalid_scopes_are_rejected_before_loading_or_sending_records(self):
         for options, message in (
@@ -169,6 +173,9 @@ class SemanticCatalogSliceTests(SimpleTestCase):
             ({"all": True, "fonds": 300}, "--all cannot be combined"),
             ({"all": True, "subfonds": 0}, "--all cannot be combined"),
             ({"all": True, "series": 1}, "--all cannot be combined"),
+            ({"from_fonds": 300}, "--from-fonds requires --all."),
+            ({"fonds": 300, "from_fonds": 300}, "--from-fonds requires --all."),
+            ({"all": True, "from_fonds": 300, "fonds": 300}, "--all cannot be combined"),
         ):
             with self.subTest(options=options), patch.object(Command, "_get_archival_units") as load, patch(
                 COMMAND_MODULE + ".requests.post"
@@ -181,18 +188,21 @@ class SemanticCatalogSliceTests(SimpleTestCase):
         with patch(COMMAND_MODULE + ".ArchivalUnit.objects.filter") as filter_units, patch(
             COMMAND_MODULE + ".requests.post"
         ) as post:
-            filter_units.return_value.select_related.return_value.exists.return_value = False
+            filter_units.return_value.select_related.return_value.order_by.return_value.exists.return_value = False
             with self.assertRaisesMessage(CommandError, "No archival unit found for the requested hierarchy."):
                 call_command("index_semantic_catalog_slice", fonds=300, stdout=StringIO())
             post.assert_not_called()
 
     def test_empty_catalog_with_all_processes_zero_documents(self):
-        with patch(COMMAND_MODULE + ".ArchivalUnit.objects.filter") as filter_units, patch.object(Command, "_commit"):
-            selected = filter_units.return_value.select_related.return_value
-            selected.iterator.return_value = iter([])
-            output = StringIO()
-            call_command("index_semantic_catalog_slice", all=True, stdout=output)
-            self.assertIn("Processed 0 document(s).", output.getvalue())
+        for options in ({}, {"from_fonds": 300}):
+            with self.subTest(options=options), patch(
+                COMMAND_MODULE + ".ArchivalUnit.objects.filter",
+            ) as filter_units, patch.object(Command, "_commit"):
+                selected = filter_units.return_value.select_related.return_value.order_by.return_value
+                selected.iterator.return_value = iter([])
+                output = StringIO()
+                call_command("index_semantic_catalog_slice", all=True, stdout=output, **options)
+                self.assertIn("Processed 0 document(s).", output.getvalue())
 
     def test_multiple_units_use_their_own_series_context_and_commit_once(self):
         for dry_run in (False, True):
