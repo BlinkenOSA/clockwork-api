@@ -68,6 +68,18 @@ python manage.py index_semantic_catalog_slice --fonds 300 --subfonds 1 --series 
 python manage.py index_semantic_catalog_slice --all
 ```
 
+Archival units are processed in ascending `fonds`, `subfonds`, `series` order.
+To restart a full index from a particular fonds after a failure, add
+`--from-fonds` to `--all`:
+
+```shell
+python manage.py index_semantic_catalog_slice --all --from-fonds 300
+```
+
+This reindexes the entire fonds 300 and all fonds with higher numbers, skipping
+lower-numbered fonds. The starting number is inclusive and does not have to
+exist. `--from-fonds` requires `--all`.
+
 `--series` requires `--subfonds`. `--all` cannot be combined with hierarchy
 filters. Add `--dry-run` to preview semantic text without writing to Solr or
 calling the embedding service.
