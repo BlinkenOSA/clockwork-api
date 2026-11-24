@@ -6,6 +6,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from django.conf import settings
 from django.core.management import BaseCommand, CommandError
+from django.db.models import Q
 
 from archival_unit.models import ArchivalUnit
 from clockwork_api.semantic_solr import get_semantic_solr_auth
@@ -138,6 +139,7 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
         self.solr_timeout = getattr(settings, "SEMANTIC_SOLR_TIMEOUT", 60)
         self.solr_max_retries = getattr(settings, "SEMANTIC_SOLR_MAX_RETRIES", 5)
+        self.resume_series = None
 
     def add_arguments(self, parser):
         parser.add_argument("--fonds", type=int, help="Fonds number (required unless --all is used)")
@@ -148,6 +150,18 @@ class Command(BaseCommand):
             "--from-fonds",
             type=int,
             help="With --all, start at this fonds number (inclusive) and index all later fonds.",
+        )
+        parser.add_argument(
+            "--from-series",
+            help='With --all, start at this series reference code (inclusive), e.g. "HU OSA 300-1-2".',
+        )
+        parser.add_argument(
+            "--from-container",
+            type=int,
+            help=(
+                "Start at this container number (inclusive) in the starting series only. "
+                "Requires --from-series or --fonds, --subfonds, and --series."
+            ),
         )
         parser.add_argument(
             "--embedding-base-url",
@@ -252,6 +266,12 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING("No ISAD(G) record found for archival unit."))
 
             finding_aids_entities = self._get_finding_aids_entities(archival_unit)
+            if options["from_container"] is not None and (
+                self.resume_series is None or archival_unit.pk == self.resume_series.pk
+            ):
+                finding_aids_entities = finding_aids_entities.filter(
+                    container__container_no__gte=options["from_container"]
+                )
             for finding_aids_entity in finding_aids_entities.iterator():
                 indexed_count += self._index_finding_aids_entity(
                     finding_aids_entity,
@@ -270,6 +290,17 @@ class Command(BaseCommand):
     def _validate_scope(self, options):
         if options["from_fonds"] is not None and not options["all"]:
             raise CommandError("--from-fonds requires --all.")
+        if options["from_series"] is not None and not options["all"]:
+            raise CommandError("--from-series requires --all.")
+        if options["from_container"] is not None:
+            if options["from_container"] < 0:
+                raise CommandError("--from-container must be zero or greater.")
+            if options["from_series"] is None and not all(
+                options[key] is not None for key in ("fonds", "subfonds", "series")
+            ):
+                raise CommandError(
+                    "--from-container requires --from-series or --fonds, --subfonds, and --series."
+                )
         if options["all"]:
             if any(options[key] is not None for key in ("fonds", "subfonds", "series")):
                 raise CommandError("--all cannot be combined with --fonds, --subfonds, or --series.")
@@ -286,9 +317,27 @@ class Command(BaseCommand):
         }
         if options["from_fonds"] is not None:
             filters["fonds__gte"] = options["from_fonds"]
+        if options["from_container"] is not None and options["from_series"] is None:
+            filters["level"] = "S"
         archival_units = ArchivalUnit.objects.filter(**filters).select_related(
             "isad", "parent", "parent__parent"
         ).order_by("fonds", "subfonds", "series")
+        self.resume_series = None
+        if options["from_series"] is not None:
+            reference_code = options["from_series"].strip()
+            try:
+                self.resume_series = archival_units.get(reference_code=reference_code, level="S")
+            except ArchivalUnit.DoesNotExist as exc:
+                raise CommandError(
+                    "No series found in the requested scope with reference code %r." % reference_code
+                ) from exc
+            start = self.resume_series
+            archival_units = archival_units.filter(
+                Q(fonds__gt=start.fonds)
+                | Q(fonds=start.fonds, subfonds__gt=start.subfonds)
+                | Q(fonds=start.fonds, subfonds=start.subfonds, series__gt=start.series)
+                | Q(pk=start.pk)
+            )
         if not options["all"] and not archival_units.exists():
             raise CommandError("No archival unit found for the requested hierarchy.")
         return archival_units
@@ -331,7 +380,7 @@ class Command(BaseCommand):
             "subject_keyword",
             "findingaidsentitysubject_set",
         )
-        return qs
+        return qs.order_by("container__container_no", "folder_no", "sequence_no", "pk")
 
     def _index_isad(self, isad, embedding_client, solr_url, auth, series_context, dry_run):
         if not isad.published:
@@ -390,6 +439,8 @@ class Command(BaseCommand):
     def _build_isad_semantic_text(self, isad, series_context):
         archival_unit = isad.archival_unit
         return self._build_semantic_text(
+            record_type="ISAD(G) %s description" % isad.get_description_level_display().lower(),
+            archival_reference_code=isad.reference_code,
             title=isad.title,
             description="\n".join(
                 filter(
@@ -410,6 +461,10 @@ class Command(BaseCommand):
     def _build_finding_aids_semantic_text(self, finding_aids_entity, series_context):
         archival_unit = finding_aids_entity.archival_unit
         return self._build_semantic_text(
+            record_type="Finding aid %s (%s)" % (
+                finding_aids_entity.get_level_display().lower(), finding_aids_entity.primary_type,
+            ),
+            archival_reference_code=finding_aids_entity.archival_reference_code,
             title=finding_aids_entity.title,
             description=finding_aids_entity.contents_summary,
             subjects=self._get_finding_aids_subjects(finding_aids_entity),
@@ -428,9 +483,13 @@ class Command(BaseCommand):
         fonds_title,
         subfonds_title,
         hierarchical_context,
+        record_type,
+        archival_reference_code,
     ):
         return "\n\n".join(
             [
+                "TYPE:\n%s" % self._clean_text(record_type),
+                "ARCHIVAL REFERENCE CODE:\n%s" % self._clean_text(archival_reference_code),
                 "TITLE:\n%s" % self._clean_text(title),
                 "DESCRIPTION:\n%s" % self._clean_text(description),
                 "SUBJECTS:\n%s" % self._clean_text(", ".join(subjects)),
