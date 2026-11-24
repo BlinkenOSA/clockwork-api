@@ -171,41 +171,37 @@ class FindingAidsEntityLocationView(APIView):
         # Folder level context
         if fa_entity.description_level == 'L1':
 
-            # Finding Aids Entities
-            fa_qs = FindingAidsEntity.objects.filter(container=container).order_by('folder_no', 'sequence_no')
-            fa_count = fa_qs.count()
+            # Use existing top-level siblings: folder numbers may contain gaps
+            # or start above 1, and L2 items belong beneath their folders.
+            fa_qs = FindingAidsEntity.objects.filter(
+                container=container, description_level='L1'
+            ).order_by('folder_no', 'sequence_no')
             fa_first = fa_qs.first()
             fa_last = fa_qs.last()
+            previous = list(fa_qs.filter(folder_no__lt=fa_entity.folder_no)
+                            .order_by('-folder_no', '-sequence_no')[:2])
+            following = list(fa_qs.filter(folder_no__gt=fa_entity.folder_no)[:2])
 
-            # Add first FA Entity in container
-            tree.append(self.get_fa_entity_data(fa_first, fa_first.archival_reference_code == fa_entity.archival_reference_code))
+            if previous:
+                tree.append(self.get_fa_entity_data(fa_first))
 
-            # Add placeholder
-            if fa_entity.folder_no > 3:
-                tree.append(self.get_placeholder('folder', fa_entity.archival_unit.subfonds != 0))
+                # A second preceding sibling beyond the first means some
+                # records are omitted between the first and previous nodes.
+                if len(previous) > 1 and previous[1].catalog_id != fa_first.catalog_id:
+                    tree.append(self.get_placeholder('folder', series.subfonds != 0))
 
-            # Add previous
-            if fa_entity.folder_no > 2:
-                fa_previous = fa_qs.filter(folder_no=fa_entity.folder_no-1).first()
-                tree.append(self.get_fa_entity_data(fa_previous, False))
+                if previous[0].catalog_id != fa_first.catalog_id:
+                    tree.append(self.get_fa_entity_data(previous[0]))
 
-            # Add active
-            if container.container_no == fa_entity.container.container_no and \
-               fa_first.archival_reference_code != fa_entity.archival_reference_code and \
-               fa_last.archival_reference_code != fa_entity.archival_reference_code:
-                tree.append(self.get_fa_entity_data(fa_entity, True))
+            tree.append(self.get_fa_entity_data(fa_entity, True))
 
-            # Add next
-            if fa_entity.folder_no + 1 < fa_count:
-                fa_next = fa_qs.filter(folder_no=fa_entity.folder_no+1).first()
-                tree.append(self.get_fa_entity_data(fa_next, False))
+            if following:
+                if following[0].catalog_id != fa_last.catalog_id:
+                    tree.append(self.get_fa_entity_data(following[0]))
 
-            # Add placeholder
-            if fa_entity.folder_no + 2 < fa_count:
-                tree.append(self.get_placeholder('folder', fa_entity.archival_unit.subfonds != 0))
+                if len(following) > 1 and following[1].catalog_id != fa_last.catalog_id:
+                    tree.append(self.get_placeholder('folder', series.subfonds != 0))
 
-            # Add last
-            if fa_count > 1:
-                tree.append(self.get_fa_entity_data(fa_last, fa_last.archival_reference_code == fa_entity.archival_reference_code))
+                tree.append(self.get_fa_entity_data(fa_last))
 
         return Response(tree)
