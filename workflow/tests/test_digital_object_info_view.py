@@ -81,6 +81,40 @@ class DigitalObjectInfoViewTests(NoIndexSignalsMixin, TestViewsBaseClass):
         self.assertEqual(response.data['level'], 'Container')
         self.assertEqual(response.data['container']['barcode'], self.container.barcode)
         self.assertEqual(response.data['container']['container_no'], self.container.container_no)
+        self.assertEqual(response.data['catalog_url'], 'N/A')
+
+    def test_digital_object_info_container_without_isad(self):
+        self.series.isad.delete()
+        self.container.barcode = 'HU_OSA_90000406'
+        self.container.save()
+
+        for file_name in ('HU_OSA_90000406.avi', 'HU_OSA_301_1_1_0001.mp4'):
+            with self.subTest(file_name=file_name):
+                response = self.client.get(
+                    reverse('workflow-v1:digital_object_info', kwargs={'file_name': file_name})
+                )
+
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.data['catalog_url'], 'N/A')
+                self.assertEqual(response.data['level'], 'Container')
+                self.assertEqual(response.data['container']['barcode'], self.container.barcode)
+                self.assertEqual(response.data['archival_unit']['series']['title'], self.series.title)
+                self.assertEqual(response.data['digital_versions'], [])
+
+    def test_digital_object_info_container_with_published_isad(self):
+        isad = self.series.isad
+        isad.published = True
+        isad.save()
+
+        response = self.client.get(
+            reverse('workflow-v1:digital_object_info', kwargs={'file_name': 'HU_OSA_301_1_1_0001.mp4'})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data['catalog_url'],
+            f'https://catalog.example/{isad.catalog_id}?tab=content&start={self.container.container_no}',
+        )
 
     def test_digital_object_info_returns_finding_aids_serializer_payload(self):
         response = self.client.get(

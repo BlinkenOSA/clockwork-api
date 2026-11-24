@@ -8,15 +8,17 @@ from catalog.views.finding_aids_views.finding_aids_entity_location_view import F
 
 
 class _FakeFAQuerySet:
-    def __init__(self, items, count_value=None):
+    def __init__(self, items):
         self.items = list(items)
-        self._count_value = count_value if count_value is not None else len(self.items)
 
-    def order_by(self, *args, **kwargs):
-        return self
+    def order_by(self, *fields):
+        items = self.items[:]
+        for field in reversed(fields):
+            items.sort(key=lambda item: getattr(item, field.lstrip('-')), reverse=field.startswith('-'))
+        return _FakeFAQuerySet(items)
 
-    def count(self):
-        return self._count_value
+    def __getitem__(self, key):
+        return self.items[key]
 
     def first(self):
         return self.items[0] if self.items else None
@@ -25,11 +27,15 @@ class _FakeFAQuerySet:
         return self.items[-1] if self.items else None
 
     def filter(self, **kwargs):
-        if "folder_no" in kwargs:
-            folder_no = kwargs["folder_no"]
-            filtered = [item for item in self.items if getattr(item, "folder_no", None) == folder_no]
-            return _FakeFAQuerySet(filtered, count_value=len(filtered))
-        return _FakeFAQuerySet(self.items, count_value=self._count_value)
+        items = self.items
+        for field, value in kwargs.items():
+            if field == "folder_no__lt":
+                items = [item for item in items if item.folder_no < value]
+            elif field == "folder_no__gt":
+                items = [item for item in items if item.folder_no > value]
+            else:
+                items = [item for item in items if getattr(item, field) == value]
+        return _FakeFAQuerySet(items)
 
 
 class FindingAidsEntityLocationViewTests(SimpleTestCase):
@@ -84,6 +90,7 @@ class FindingAidsEntityLocationViewTests(SimpleTestCase):
             container=container,
             description_level=description_level,
             folder_no=folder_no,
+            sequence_no=0,
         )
 
     def test_helper_serializers(self):
@@ -143,7 +150,9 @@ class FindingAidsEntityLocationViewTests(SimpleTestCase):
         fa_active = self._build_fa(series, container, 4, "HU OSA 100:5/4", "FA-4")
         fa_next = self._build_fa(series, container, 5, "HU OSA 100:5/5", "FA-5")
         fa_last = self._build_fa(series, container, 7, "HU OSA 100:5/7", "FA-7")
-        qs = _FakeFAQuerySet([fa_first, fa_previous, fa_active, fa_next, fa_last], count_value=7)
+        fa_second = self._build_fa(series, container, 2, "HU OSA 100:5/2", "FA-2")
+        fa_sixth = self._build_fa(series, container, 6, "HU OSA 100:5/6", "FA-6")
+        qs = _FakeFAQuerySet([fa_first, fa_second, fa_previous, fa_active, fa_next, fa_sixth, fa_last])
 
         request = self.factory.get("/v1/catalog/finding-aids-location/FA-4/")
         with patch(
@@ -164,6 +173,70 @@ class FindingAidsEntityLocationViewTests(SimpleTestCase):
         active_nodes = [node for node in response.data if node.get("active")]
         self.assertEqual(len(active_nodes), 1)
         self.assertEqual(active_nodes[0]["catalog_id"], "FA-4")
+
+    def test_get_l1_context_handles_gaps_and_non_one_start(self):
+        cases = [
+            # Missing previous and next folder numbers used to cause a 500.
+            ([1, 3, 4, 5, 6, 7], 3, [1, 3, 4, "...", 7]),
+            ([1, 2, 3, 5, 6, 7], 3, [1, 2, 3, 5, "...", 7]),
+            ([10, 20, 30, 40, 50, 60, 70], 40, [10, "...", 30, 40, 50, "...", 70]),
+            ([10, 20, 30], 20, [10, 20, 30]),
+            ([10, 20, 30], 10, [10, 20, 30]),
+            ([10, 20, 30], 30, [10, 20, 30]),
+            ([42], 42, [42]),
+            ([10, 20], 10, [10, 20]),
+            ([10, 20], 20, [10, 20]),
+        ]
+        _, _, series, container = self._build_hierarchy()
+        for numbers, active_number, expected in cases:
+            with self.subTest(numbers=numbers, active_number=active_number):
+                entities = [
+                    self._build_fa(series, container, number, f"HU OSA 100:5/{number}", f"FA-{number}")
+                    for number in numbers
+                ]
+                active = next(entity for entity in entities if entity.folder_no == active_number)
+                qs = _FakeFAQuerySet(entities)
+                request = self.factory.get(f"/v1/catalog/finding-aids-location/{active.catalog_id}/")
+                with patch(
+                    "catalog.views.finding_aids_views.finding_aids_entity_location_view.get_object_or_404",
+                    return_value=active,
+                ), patch(
+                    "catalog.views.finding_aids_views.finding_aids_entity_location_view.FindingAidsEntity.objects.filter",
+                    side_effect=qs.filter,
+                ):
+                    response = self.view.get(request, fa_entity_catalog_id=active.catalog_id)
+
+                self.assertEqual(response.status_code, 200)
+                context = response.data[4:]
+                self.assertEqual(
+                    [node.get("catalog_id", "...") for node in context],
+                    [f"FA-{number}" if number != "..." else "..." for number in expected],
+                )
+                self.assertEqual(
+                    [node["catalog_id"] for node in context if node.get("active")],
+                    [active.catalog_id],
+                )
+
+    def test_get_l1_context_excludes_nested_items(self):
+        _, _, series, container = self._build_hierarchy()
+        first = self._build_fa(series, container, 1, "HU OSA 100:5/1", "FA-1")
+        active = self._build_fa(series, container, 3, "HU OSA 100:5/3", "FA-3")
+        child = self._build_fa(
+            series, container, 3, "HU OSA 100:5/3-1", "FA-CHILD", level="I", description_level="L2"
+        )
+        qs = _FakeFAQuerySet([first, active, child])
+        request = self.factory.get("/v1/catalog/finding-aids-location/FA-3/")
+        with patch(
+            "catalog.views.finding_aids_views.finding_aids_entity_location_view.get_object_or_404",
+            return_value=active,
+        ), patch(
+            "catalog.views.finding_aids_views.finding_aids_entity_location_view.FindingAidsEntity.objects.filter",
+            side_effect=qs.filter,
+        ):
+            response = self.view.get(request, fa_entity_catalog_id=active.catalog_id)
+
+        self.assertEqual([node["catalog_id"] for node in response.data[4:]], ["FA-1", "FA-3"])
+        self.assertTrue(response.data[-1]["active"])
 
     def test_get_skips_archival_units_without_isad_attribute(self):
         fonds = SimpleNamespace()

@@ -78,8 +78,9 @@ class ContainerDigitizedSerializer(serializers.ModelSerializer):
 
     def get_catalog_url(self, obj):
         catalog_url = getattr(settings, 'CATALOG_URL')
-        if obj.archival_unit.isad.published:
-            return '{}/{}?tab=content&start={}'.format(catalog_url, obj.archival_unit.isad.catalog_id ,obj.container_no)
+        isad = getattr(obj.archival_unit, 'isad', None)
+        if isad is not None and isad.published:
+            return '{}/{}?tab=content&start={}'.format(catalog_url, isad.catalog_id, obj.container_no)
         else:
             return 'N/A'
 
