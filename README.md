@@ -61,6 +61,15 @@ or `--all` for the entire catalog. The command includes ISAD(G) records and
 finding aids for every matching archival unit, retaining each series' own
 semantic context. Unpublished records and finding aids templates are skipped.
 
+The semantic text includes `TYPE` and `ARCHIVAL REFERENCE CODE` sections before
+the title, description, subjects, and hierarchy. ISAD(G) types identify fonds,
+subfonds, or series descriptions. Finding aids identify their folder/item level
+and primary type, for example `Finding aid folder (Still Image)`. Reference codes
+come from each record's own archival reference, including container and
+folder/item details for finding aids. These sections appear in `--dry-run` output
+and are sent to the embedding service. Existing vectors use the new text only
+after the records are reindexed.
+
 ```shell
 python manage.py index_semantic_catalog_slice --fonds 300
 python manage.py index_semantic_catalog_slice --fonds 300 --subfonds 1
@@ -79,6 +88,33 @@ python manage.py index_semantic_catalog_slice --all --from-fonds 300
 This reindexes the entire fonds 300 and all fonds with higher numbers, skipping
 lower-numbered fonds. The starting number is inclusive and does not have to
 exist. `--from-fonds` requires `--all`.
+
+To resume more precisely, use a series reference code and optionally a container
+number. Quote the reference code because it contains spaces:
+
+```shell
+python manage.py index_semantic_catalog_slice --all \
+  --from-series "HU OSA 300-1-2" --from-container 25
+```
+
+This starts at series `HU OSA 300-1-2`, reindexes its ISAD(G) record, and indexes
+finding aids in container 25 and higher. It then continues through all later
+series and archival units in numeric hierarchy order, indexing **all** their
+containers. Both starting points are inclusive. In the starting series, records
+without a container are skipped when `--from-container` is supplied. Finding
+aids are ordered by container number, folder number, sequence number, and ID.
+
+`--from-series` requires `--all` and an existing series in the selected scope.
+It can be combined with `--from-fonds` if that scope includes the starting
+series. `--from-container` requires a starting series or an exact series scope:
+
+```shell
+python manage.py index_semantic_catalog_slice --fonds 300 --subfonds 1 --series 2 \
+  --from-container 25
+```
+
+The second command stops at the end of that series. Container numbers must be
+nonnegative; the number need not exist, and higher containers are still indexed.
 
 `--series` requires `--subfonds`. `--all` cannot be combined with hierarchy
 filters. Add `--dry-run` to preview semantic text without writing to Solr or
@@ -153,6 +189,27 @@ Prefer the environment-backed settings to keep the password out of process
 arguments and shell history. To override configured authentication for a local
 run, pass both `--embedding-username '' --embedding-password ''`. Existing
 `--embedding-timeout` / `SEMANTIC_EMBEDDING_TIMEOUT` settings still apply.
+
+Embedding requests retry HTTP 408, 429, 500, 502, 503, and 504 responses, timeouts,
+and connection failures up to five times by default, waiting 60 seconds before
+each retry. Indexing waits on the same record and sends it to Solr only after an
+embedding succeeds. Each retry is logged to stderr with the document ID, error,
+retry number, and wait time. Other HTTP errors (including authentication errors)
+fail immediately; invalid responses are not retried. If all attempts fail, the
+command stops with an error identifying the document rather than skipping it.
+
+For a two-minute pause and more retries, use:
+
+```shell
+python manage.py index_semantic_catalog_slice --all --from-fonds 300 \
+  --embedding-max-retries 10 --embedding-retry-delay 120
+```
+
+Defaults can also be set with `SEMANTIC_EMBEDDING_MAX_RETRIES` and
+`SEMANTIC_EMBEDDING_RETRY_DELAY` in the environment or Django settings. Retry
+counts must be nonnegative; delays must be positive seconds. Use
+`--embedding-max-retries 0` to disable embedding retries. Embedding retry settings
+are independent of the Solr retry settings.
 
 ### Direct Solr indexer overrides
 

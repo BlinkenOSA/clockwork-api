@@ -6,7 +6,11 @@ from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase, override_settings
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 
+from archival_unit.models import ArchivalUnit
+from controlled_list.models import PrimaryType
 from finding_aids.management.commands.index_semantic_catalog_slice import Command, EmbeddingClient
+from finding_aids.models import FindingAidsEntity
+from isad.models import Isad
 
 
 COMMAND_MODULE = "finding_aids.management.commands.index_semantic_catalog_slice"
@@ -17,6 +21,68 @@ COMMAND_MODULE = "finding_aids.management.commands.index_semantic_catalog_slice"
     SEMANTIC_SOLR_USERNAME="", SEMANTIC_SOLR_PASSWORD="",
 )
 class SemanticCatalogSliceTests(SimpleTestCase):
+    def _semantic_archival_units(self):
+        fonds = ArchivalUnit(fonds=300, level="F", title="Fonds title")
+        subfonds = ArchivalUnit(fonds=300, subfonds=1, level="SF", parent=fonds, title="Subfonds title")
+        series = ArchivalUnit(fonds=300, subfonds=1, series=2, level="S", parent=subfonds, title="Series title")
+        return fonds, subfonds, series
+
+    def test_isad_semantic_text_identifies_each_description_level_and_its_reference(self):
+        command = Command()
+        for unit, reference, label in zip(
+            self._semantic_archival_units(),
+            ("HU OSA 300", "HU OSA 300-1", "HU OSA 300-1-2"),
+            ("fonds", "subfonds", "series"),
+        ):
+            with self.subTest(level=label):
+                record = Isad(
+                    archival_unit=unit, description_level=unit.level, reference_code=reference,
+                    title="Record title", scope_and_content_abstract="Record description.",
+                )
+                text = command._build_isad_semantic_text(record, "Series context.")
+                self.assertIn("TYPE:\nISAD(G) %s description" % label, text)
+                self.assertIn("ARCHIVAL REFERENCE CODE:\n%s\n\n" % reference, text)
+                self.assertIn("TITLE:\nRecord title", text)
+                self.assertIn("DESCRIPTION:\nRecord description.", text)
+                self.assertIn("HIERARCHICAL CONTEXT:\nSeries context.", text)
+
+    def test_finding_aid_metadata_reaches_embedding_and_dry_run_text(self):
+        series = self._semantic_archival_units()[-1]
+        for level, label, reference in (
+            ("F", "folder", "HU OSA 300-1-2:25/1"),
+            ("I", "item", "HU OSA 300-1-2:25/1-2"),
+        ):
+            record = FindingAidsEntity(
+                id=1, archival_unit=series, level=level, primary_type=PrimaryType(type="Still Image"),
+                archival_reference_code=reference, title="Photographs", contents_summary="Photographs of Budapest.",
+                published=True,
+            )
+            texts = []
+            for dry_run in (False, True):
+                with self.subTest(level=level, dry_run=dry_run), patch(
+                    COMMAND_MODULE + ".FindingAidsSemanticIndexer",
+                ) as indexer, patch.object(Command, "_get_finding_aids_subjects", return_value=["Budapest"]), patch.object(
+                    Command, "_send_to_solr",
+                ) as send:
+                    output = StringIO()
+                    command = Command(stdout=output)
+                    client = Mock()
+                    client.embed_document.return_value = [0.1]
+                    indexer.return_value.doc = {"id": "fa-1"}
+                    command._index_finding_aids_entity(record, client, "https://solr.test", None, "Series context.", dry_run)
+                    if dry_run:
+                        client.embed_document.assert_not_called()
+                        send.assert_not_called()
+                        self.assertIn(texts[0], output.getvalue())
+                    else:
+                        text = client.embed_document.call_args.args[0]
+                        texts.append(text)
+                        self.assertIn("TYPE:\nFinding aid %s (Still Image)" % label, text)
+                        self.assertIn("ARCHIVAL REFERENCE CODE:\n%s\n\n" % reference, text)
+                        self.assertIn("TITLE:\nPhotographs", text)
+                        self.assertIn("SUBJECTS:\nBudapest", text)
+                        send.assert_called_once()
+
     @override_settings(REQUESTS_TIMEOUT=5, SEMANTIC_SOLR_TIMEOUT=60, SEMANTIC_SOLR_MAX_RETRIES=5)
     def test_solr_defaults_are_independent_of_global_request_timeout(self):
         options = Command().create_parser("manage.py", "index_semantic_catalog_slice").parse_args(["--all"])
@@ -129,7 +195,7 @@ class SemanticCatalogSliceTests(SimpleTestCase):
                 "index_semantic_catalog_slice", all=True, solr_timeout=120, solr_max_retries=2,
                 stdout=output, stderr=errors,
             )
-            embed.assert_called_once_with("record text")
+            embed.assert_called_once_with("record text", document_id="fa-2")
             self.assertEqual(post.call_count, 4)
             document, retried_document, commit, retried_commit = post.call_args_list
             self.assertEqual(document, retried_document)
@@ -153,6 +219,8 @@ class SemanticCatalogSliceTests(SimpleTestCase):
             (["--all"], {}),
             (["--all", "--from-fonds", "300"], {"fonds__gte": 300}),
             (["--all", "--from-fonds", "0"], {"fonds__gte": 0}),
+            (["--fonds", "300", "--subfonds", "0", "--series", "1", "--from-container", "0"],
+             {"fonds": 300, "subfonds": 0, "series": 1, "level": "S"}),
         ):
             with self.subTest(arguments=arguments), patch(COMMAND_MODULE + ".ArchivalUnit.objects.filter") as filter_units:
                 command = Command()
@@ -176,6 +244,13 @@ class SemanticCatalogSliceTests(SimpleTestCase):
             ({"from_fonds": 300}, "--from-fonds requires --all."),
             ({"fonds": 300, "from_fonds": 300}, "--from-fonds requires --all."),
             ({"all": True, "from_fonds": 300, "fonds": 300}, "--all cannot be combined"),
+            ({"from_series": "HU OSA 300-1-2"}, "--from-series requires --all."),
+            ({"fonds": 300, "from_series": "HU OSA 300-1-2"}, "--from-series requires --all."),
+            ({"all": True, "from_container": 2}, "--from-container requires --from-series or"),
+            ({"fonds": 300, "from_container": 2}, "--from-container requires --from-series or"),
+            ({"fonds": 300, "subfonds": 1, "from_container": 2}, "--from-container requires --from-series or"),
+            ({"all": True, "from_series": "HU OSA 300-1-2", "from_container": -1},
+             "--from-container must be zero or greater."),
         ):
             with self.subTest(options=options), patch.object(Command, "_get_archival_units") as load, patch(
                 COMMAND_MODULE + ".requests.post"
