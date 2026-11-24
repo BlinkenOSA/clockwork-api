@@ -129,7 +129,7 @@ class SemanticCatalogSliceTests(SimpleTestCase):
                 "index_semantic_catalog_slice", all=True, solr_timeout=120, solr_max_retries=2,
                 stdout=output, stderr=errors,
             )
-            embed.assert_called_once_with("record text")
+            embed.assert_called_once_with("record text", document_id="fa-2")
             self.assertEqual(post.call_count, 4)
             document, retried_document, commit, retried_commit = post.call_args_list
             self.assertEqual(document, retried_document)

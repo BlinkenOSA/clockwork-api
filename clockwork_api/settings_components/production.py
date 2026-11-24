@@ -83,6 +83,8 @@ SEMANTIC_EMBEDDING_BASE_URL = os.environ.get(
 )
 SEMANTIC_EMBEDDING_USERNAME = os.environ.get("SEMANTIC_EMBEDDING_USERNAME", "")
 SEMANTIC_EMBEDDING_PASSWORD = os.environ.get("SEMANTIC_EMBEDDING_PASSWORD", "")
+SEMANTIC_EMBEDDING_MAX_RETRIES = int(os.environ.get("SEMANTIC_EMBEDDING_MAX_RETRIES", 5))
+SEMANTIC_EMBEDDING_RETRY_DELAY = int(os.environ.get("SEMANTIC_EMBEDDING_RETRY_DELAY", 60))
 
 # User-Agent used for Wikidata and Wikipedia requests. Override in the
 # environment for deployments that need a contact address.

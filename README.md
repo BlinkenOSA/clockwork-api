@@ -154,6 +154,27 @@ arguments and shell history. To override configured authentication for a local
 run, pass both `--embedding-username '' --embedding-password ''`. Existing
 `--embedding-timeout` / `SEMANTIC_EMBEDDING_TIMEOUT` settings still apply.
 
+Embedding requests retry HTTP 408, 429, 500, 502, 503, and 504 responses, timeouts,
+and connection failures up to five times by default, waiting 60 seconds before
+each retry. Indexing waits on the same record and sends it to Solr only after an
+embedding succeeds. Each retry is logged to stderr with the document ID, error,
+retry number, and wait time. Other HTTP errors (including authentication errors)
+fail immediately; invalid responses are not retried. If all attempts fail, the
+command stops with an error identifying the document rather than skipping it.
+
+For a two-minute pause and more retries, use:
+
+```shell
+python manage.py index_semantic_catalog_slice --all --from-fonds 300 \
+  --embedding-max-retries 10 --embedding-retry-delay 120
+```
+
+Defaults can also be set with `SEMANTIC_EMBEDDING_MAX_RETRIES` and
+`SEMANTIC_EMBEDDING_RETRY_DELAY` in the environment or Django settings. Retry
+counts must be nonnegative; delays must be positive seconds. Use
+`--embedding-max-retries 0` to disable embedding retries. Embedding retry settings
+are independent of the Solr retry settings.
+
 ### Direct Solr indexer overrides
 
 Direct indexer use supports the same overrides:

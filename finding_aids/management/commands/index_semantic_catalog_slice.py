@@ -1,3 +1,4 @@
+import logging
 import re
 import time
 
@@ -14,9 +15,23 @@ from isad.indexers.isad_semantic_indexer import ISADSemanticIndexer
 
 
 class EmbeddingClient:
-    def __init__(self, base_url, timeout, *, username=None, password=None):
+    def __init__(
+        self, base_url, timeout, *, username=None, password=None,
+        max_retries=None, retry_delay=None, retry_logger=None,
+    ):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self.max_retries = (
+            getattr(settings, "SEMANTIC_EMBEDDING_MAX_RETRIES", 5) if max_retries is None else max_retries
+        )
+        self.retry_delay = (
+            getattr(settings, "SEMANTIC_EMBEDDING_RETRY_DELAY", 60) if retry_delay is None else retry_delay
+        )
+        if self.max_retries < 0:
+            raise ValueError("--embedding-max-retries must be zero or greater.")
+        if self.retry_delay <= 0:
+            raise ValueError("--embedding-retry-delay must be greater than zero.")
+        self.retry_logger = retry_logger if retry_logger is not None else logging.getLogger(__name__).warning
         if username is None:
             username = getattr(settings, "SEMANTIC_EMBEDDING_USERNAME", "")
         if password is None:
@@ -25,17 +40,46 @@ class EmbeddingClient:
             raise ValueError("Embedding service authentication requires both a username and a password.")
         self.auth = HTTPBasicAuth(username, password) if username and password else None
 
-    def embed_document(self, text):
-        response = requests.post(
-            f"{self.base_url}/embed",
-            json={
-                "text": text,
-                "type": "document",
-            },
-            timeout=self.timeout,
-            auth=self.auth,
-        )
-        response.raise_for_status()
+    def _post_document(self, text, document_id):
+        operation = "Embedding request"
+        if document_id is not None:
+            operation += " for document %s" % document_id
+        for attempt in range(self.max_retries + 1):
+            try:
+                response = requests.post(
+                    f"{self.base_url}/embed",
+                    json={"text": text, "type": "document"},
+                    timeout=self.timeout,
+                    auth=self.auth,
+                )
+                response.raise_for_status()
+                return response
+            except requests.exceptions.HTTPError as exc:
+                if exc.response is None:
+                    raise
+                status = exc.response.status_code
+                exc.response.close()
+                if status not in (408, 429, 500, 502, 503, 504):
+                    raise
+                cause = exc
+                reason = "HTTP %s" % status
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as exc:
+                cause = exc
+                reason = type(exc).__name__
+
+            if attempt == self.max_retries:
+                raise CommandError(
+                    "%s failed after %s attempt(s): %s"
+                    % (operation, attempt + 1, reason)
+                ) from cause
+            self.retry_logger(
+                "%s failed (%s); retry %s/%s in %ss."
+                % (operation, reason, attempt + 1, self.max_retries, self.retry_delay)
+            )
+            time.sleep(self.retry_delay)
+
+    def embed_document(self, text, *, document_id=None):
+        response = self._post_document(text, document_id)
         payload = response.json()
 
         if isinstance(payload, list):
@@ -125,6 +169,18 @@ class Command(BaseCommand):
             help="Embedding request timeout in seconds.",
         )
         parser.add_argument(
+            "--embedding-max-retries",
+            default=getattr(settings, "SEMANTIC_EMBEDDING_MAX_RETRIES", 5),
+            type=int,
+            help="Retries per embedding request after a transient failure (default: 5). Use 0 to disable.",
+        )
+        parser.add_argument(
+            "--embedding-retry-delay",
+            default=getattr(settings, "SEMANTIC_EMBEDDING_RETRY_DELAY", 60),
+            type=int,
+            help="Seconds to wait between embedding retries (default: 60).",
+        )
+        parser.add_argument(
             "--solr-url",
             default=getattr(settings, "SEMANTIC_SOLR_URL", "http://localhost:8983/solr/catalog"),
             help="Solr catalog core URL.",
@@ -170,6 +226,9 @@ class Command(BaseCommand):
                 timeout=options["embedding_timeout"],
                 username=options.get("embedding_username"),
                 password=options.get("embedding_password"),
+                max_retries=options["embedding_max_retries"],
+                retry_delay=options["embedding_retry_delay"],
+                retry_logger=self.stderr.write,
             )
         except ValueError as exc:
             raise CommandError(str(exc)) from exc
@@ -290,7 +349,7 @@ class Command(BaseCommand):
         if dry_run:
             self._print_dry_run(indexer.doc["id"], semantic_text)
         else:
-            vector = embedding_client.embed_document(semantic_text)
+            vector = embedding_client.embed_document(semantic_text, document_id=indexer.doc["id"])
             indexer.doc["semantic_vector"] = vector
             self._send_to_solr(solr_url, indexer.doc, auth, indexer.doc["id"])
 
@@ -321,7 +380,7 @@ class Command(BaseCommand):
         if dry_run:
             self._print_dry_run(indexer.doc["id"], semantic_text)
         else:
-            vector = embedding_client.embed_document(semantic_text)
+            vector = embedding_client.embed_document(semantic_text, document_id=indexer.doc["id"])
             indexer.doc["semantic_vector"] = vector
             self._send_to_solr(solr_url, indexer.doc, auth, indexer.doc["id"])
 
