@@ -121,6 +121,38 @@ class ResearcherRegistrationStatisticsViews(APIView):
         })
 
 
+class ResearcherCountryStatisticsViews(APIView):
+    """Return registered researcher totals by country, including unknown countries.
+
+    Optional inclusive ``date_from`` and ``date_to`` filters apply to the
+    researcher's registration date (``date_created``).
+    """
+
+    def get(self, request, *args, **kwargs):
+        queryset, _, _, error_response = get_filtered_queryset_by_date(
+            Researcher.objects.all(),
+            'date_created',
+            request
+        )
+        if error_response:
+            return error_response
+
+        by_country = [
+            {
+                'country': item['country__country'] or 'Unknown',
+                'total': item['total'],
+            }
+            for item in queryset.values('country__country')
+            .annotate(total=Count('id'))
+            .order_by('-total', 'country__country')
+        ]
+
+        return Response({
+            'total': queryset.count(),
+            'by_country': by_country,
+        })
+
+
 class ResearcherVisitStatisticsViews(APIView):
     """
     Returns visit counts and total completed visit hours for an optional date interval.

@@ -14,7 +14,7 @@ from research.views.researcher_degree_views import ResearcherDegreeList, Researc
 from research.views.restricted_requests_views import RestrictedRequestsList, RestrictedRequestAction
 from research.views.statistics_view import ResearcherRegistrationStatisticsViews, ResearcherVisitStatisticsViews, \
     RequestedMaterialsByOriginStatisticsViews, RequestedMaterialsByCarrierTypeStatisticsViews, \
-    MostRequestedArchivalUnitsStatisticsViews
+    MostRequestedArchivalUnitsStatisticsViews, ResearcherCountryStatisticsViews
 
 app_name = 'research'
 
@@ -37,6 +37,8 @@ urlpatterns = [
 
     path('statistics/researcher-registration/', ResearcherRegistrationStatisticsViews.as_view(),
          name='researcher-registration-statistics'),
+    path('statistics/researcher-countries/', ResearcherCountryStatisticsViews.as_view(),
+         name='researcher-country-statistics'),
     path('statistics/researcher-visits/', ResearcherVisitStatisticsViews.as_view(),
          name='researcher-visit-statistics'),
     path('statistics/requested-materials/origin/', RequestedMaterialsByOriginStatisticsViews.as_view(),
