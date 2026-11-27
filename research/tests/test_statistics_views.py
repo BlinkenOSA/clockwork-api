@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from clockwork_api.tests.test_views_base_class import TestViewsBaseClass
+from authority.models import Country
 from controlled_list.models import CarrierType
 from research.models import Researcher, ResearcherVisit, Request, RequestItem
 from archival_unit.models import ArchivalUnit
@@ -129,6 +130,91 @@ class ResearcherRegistrationStatisticsViewsTests(TestViewsBaseClass):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['detail'], 'date_from cannot be later than date_to.')
+
+
+class ResearcherCountryStatisticsViewsTests(TestViewsBaseClass):
+    def setUp(self):
+        super().setUp()
+        hungary = Country.objects.create(country='Hungary', alpha3='HUN')
+        austria = Country.objects.create(country='Austria', alpha3='AUT')
+        Country.objects.create(country='Germany', alpha3='DEU')
+
+        for index, (country, registered_on) in enumerate([
+            (hungary, timezone.datetime(2026, 10, 31, 23, 59)),
+            (hungary, timezone.datetime(2026, 11, 1, 0, 0)),
+            (austria, timezone.datetime(2026, 11, 30, 23, 59)),
+            (None, timezone.datetime(2026, 12, 1, 0, 0)),
+        ]):
+            researcher = Researcher.objects.create(
+                first_name=f'Researcher {index}',
+                last_name='Country',
+                country=country,
+            )
+            Researcher.objects.filter(pk=researcher.pk).update(date_created=registered_on)
+
+    def test_counts_researchers_by_country_including_unknown(self):
+        response = self.client.get(reverse('research-v1:researcher-country-statistics'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['total'], 4)
+        self.assertEqual(response.data['by_country'][0], {'country': 'Hungary', 'total': 2})
+        self.assertCountEqual(response.data['by_country'], [
+            {'country': 'Hungary', 'total': 2},
+            {'country': 'Austria', 'total': 1},
+            {'country': 'Unknown', 'total': 1},
+        ])
+        self.assertEqual(sum(item['total'] for item in response.data['by_country']), 4)
+
+    def test_filters_by_registration_date_with_inclusive_bounds(self):
+        response = self.client.get(
+            reverse('research-v1:researcher-country-statistics'),
+            {'date_from': '2026-11-01', 'date_to': '2026-11-30'}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'total': 2,
+            'by_country': [
+                {'country': 'Austria', 'total': 1},
+                {'country': 'Hungary', 'total': 1},
+            ],
+        })
+
+    def test_supports_one_sided_date_filters(self):
+        for params, expected_total in [
+            ({'date_from': '2026-11-01'}, 3),
+            ({'date_to': '2026-11-30'}, 3),
+        ]:
+            with self.subTest(params=params):
+                response = self.client.get(reverse('research-v1:researcher-country-statistics'), params)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.data['total'], expected_total)
+                self.assertEqual(sum(item['total'] for item in response.data['by_country']), expected_total)
+
+    def test_returns_empty_country_statistics_when_no_registrations_match(self):
+        response = self.client.get(
+            reverse('research-v1:researcher-country-statistics'),
+            {'date_from': '2027-01-01'}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'total': 0, 'by_country': []})
+
+    def test_rejects_invalid_dates_and_reversed_ranges(self):
+        for params in [
+            {'date_from': 'invalid-date'},
+            {'date_to': 'invalid-date'},
+            {'date_from': '2026-12-01', 'date_to': '2026-11-01'},
+        ]:
+            with self.subTest(params=params):
+                response = self.client.get(reverse('research-v1:researcher-country-statistics'), params)
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_requires_authentication(self):
+        self.client.force_authenticate(user=None)
+        response = self.client.get(reverse('research-v1:researcher-country-statistics'))
+
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
 
 class ResearcherVisitStatisticsViewsTests(TestViewsBaseClass):
